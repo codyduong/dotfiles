@@ -39,8 +39,11 @@ git config --global user.signingkey 3AA5C34371567BD2 #<-- Git Bash, tell Git abo
 * [Deno](https://deno.land/) => ```iwr https://deno.land/x/install/install.ps1 -useb | iex```
 
 Utility Software:
+* [QTTabbar](https://github.com/indiff/qttabbar)
+* I always forget about this one, *printer drivers!*
 * [Dual Monitor Tools](http://dualmonitortool.sourceforge.net/)
 * [Artist 12 Drivers](https://www.xp-pen.com/download-68.html)
+* [Taskbar X](https://chrisandriessen.nl/taskbarx)
 
 ## Ubuntu
 * [VS Code](https://code.visualstudio.com/#alt-downloads)
