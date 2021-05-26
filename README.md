@@ -5,20 +5,32 @@ A list of things I need to do on a clean install
 This contains shell/terminal commands for specific stuff
 
 ### Windows 10
+* VS Code https://code.visualstudio.com/#alt-downloads
 * Git https://git-scm.com/downloads
+* GNUPG (GPG Generation) https://www.gnupg.org/download/
+```sh
+# https://docs.github.com/en/github/authenticating-to-github/managing-commit-signature-verification/generating-a-new-gpg-key
+gpg --full-generate-key
+# Enter for RSA and RSA (default)
+# 4096 bits (Github min)
+# No expiration (Expire from Github if needed)
+gpg --list-secret-keys --keyid-format LONG 
+# Copy GPG Key (listed one is an example)
+gpg --armor --export 3AA5C34371567BD2 #<-- Give to Github 
+git config --global user.signingkey 3AA5C34371567BD2 #<-- Git Bash, tell Git about signing key
+```
 * Github Desktop https://desktop.github.com/
 * TDM-GCC: https://jmeubank.github.io/tdm-gcc/ (gcc, g++, make)
-* Python ^3
+* Python ^3 https://www.microsoft.com/en-us/p/python-39/9p7qfqmjrfp7
   * thefuck https://github.com/nvbn/thefuck
     ```sh
     pip install thefuck
     ```
-    Add thefuck to ENV Path. Then create $PROFILE for Alias
+    Add thefuck to ENV Path. Usually at:
+    ```C:\Users\duong\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\LocalCache\local-packages\Python39\Scripts```
+    Then create $PROFILE for Alias
     ```sh
-    if (!(Test-Path -Path $PROFILE)) {
-      New-Item -ItemType File -Path $PROFILE -Force
-    }
-    # Then access $PROFILE
+    if (!(Test-Path -Path $PROFILE)) {New-Item -ItemType File -Path $PROFILE -Force}
     notepad $PROFILE
     ```
     Inside the $PROFILE
@@ -31,7 +43,10 @@ This contains shell/terminal commands for specific stuff
 * Deno https://deno.land/ ```iwr https://deno.land/x/install/install.ps1 -useb | iex```
 
 ### Ubuntu
+* VS Code https://code.visualstudio.com/#alt-downloads
 * Git ```sudo apt install git-all```
+* GNUPG (GPG Generation) https://www.gnupg.org/download/
+```todo OS specific instructions here, look above```
 * Github Desktop Fork https://aur.archlinux.org/packages/github-desktop-bin/ (.deb)
 * gcc, g++, make ```sudo apt install build-essential```
 * Python ^3 ```sudo apt install python3-dev python3-pip python3-setuptools```
