@@ -44,6 +44,7 @@ Utility Software:
 * [Dual Monitor Tools](http://dualmonitortool.sourceforge.net/)
 * [Artist 12 Drivers](https://www.xp-pen.com/download-68.html)
 * [Taskbar X](https://chrisandriessen.nl/taskbarx)
+* [LibreOffice](https://www.libreoffice.org/)
 
 ## Ubuntu
 * [VS Code](https://code.visualstudio.com/#alt-downloads)
