@@ -56,7 +56,11 @@ Utility Software:
 * gcc, g++, make => ```sudo apt install build-essential```
 * Python ^3 => ```sudo apt install python3-dev python3-pip python3-setuptools```
   * [thefuck](https://github.com/nvbn/thefuck) => ```sudo pip3 install thefuck```
-* [Node](https://nodejs.org/en/)
+* [Node](https://nodejs.org/en/), comes preinstalled v10
+  ```sh
+  sudo npm install -g n
+  sudo n stable #or version number, or latest
+  ```
   * [Yarn](https://classic.yarnpkg.com/en/docs/install#debian-stable)
 * [Deno](https://deno.land/#installation) ```curl -fsSL https://deno.land/x/install/install.sh | sh```
 
