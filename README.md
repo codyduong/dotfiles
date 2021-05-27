@@ -51,7 +51,7 @@ Utility Software:
 * [VS Code](https://code.visualstudio.com/#alt-downloads)
 * [Git](https://git-scm.com/downloads) OR ```sudo apt install git-all```
 * [GNUPG (Commit Signing)](https://www.gnupg.org/download/)
-```todo OS specific instructions here, look above```
+```Comes preinstalled, instructions are exact same as above```
 * [GitKraken](https://www.gitkraken.com/git-client)
 * gcc, g++, make => ```sudo apt install build-essential```
 * Python ^3 => ```sudo apt install python3-dev python3-pip python3-setuptools```
