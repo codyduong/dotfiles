@@ -48,6 +48,10 @@ Utility Software:
 * [LibreOffice](https://www.libreoffice.org/)
 
 ## Ubuntu
+* [CheckInstall](https://help.ubuntu.com/community/CheckInstall)
+```sh 
+sudo apt-get update && sudo apt-get install checkinstall
+```
 * [VS Code](https://code.visualstudio.com/#alt-downloads)
 * [Git](https://git-scm.com/downloads) OR ```sudo apt install git-all```
 * [GNUPG (Commit Signing)](https://www.gnupg.org/download/)
