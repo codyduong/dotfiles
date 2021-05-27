@@ -15,7 +15,7 @@ gpg --list-secret-keys --keyid-format LONG
 gpg --armor --export 3AA5C34371567BD2 #<-- Give to Github 
 git config --global user.signingkey 3AA5C34371567BD2 #<-- Git Bash, tell Git about signing key
 ```
-* [Github Desktop](https://desktop.github.com/)
+* [Github Desktop](https://desktop.github.com/) (I should migrate to [GitKraken](https://www.gitkraken.com/git-client), looks better)
 * [TDM-GCC (gcc, g++, make)](https://jmeubank.github.io/tdm-gcc/)
 * [Python ^3 ](https://www.microsoft.com/en-us/p/python-39/9p7qfqmjrfp7)
   * [thefuck](https://github.com/nvbn/thefuck) =>
@@ -52,7 +52,7 @@ Utility Software:
 * [Git](https://git-scm.com/downloads) OR ```sudo apt install git-all```
 * [GNUPG (Commit Signing)](https://www.gnupg.org/download/)
 ```todo OS specific instructions here, look above```
-* [Github Desktop Fork](https://aur.archlinux.org/packages/github-desktop-bin/) (.deb)
+* [GitKraken](https://www.gitkraken.com/git-client)
 * gcc, g++, make => ```sudo apt install build-essential```
 * Python ^3 => ```sudo apt install python3-dev python3-pip python3-setuptools```
   * [thefuck](https://github.com/nvbn/thefuck) => ```sudo pip3 install thefuck```
