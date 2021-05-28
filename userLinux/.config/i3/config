@@ -194,7 +194,7 @@ bindsym $mod+mod1+c exec code
 bindsym $mod+mod1+k exec krita
 bindsym $mod+mod1+d exec discord
 
-bindsym $mod+z focus child
+bindsym $mod+z focus childnt
 
 bindsym $mod+button2 kill
 
@@ -207,6 +207,11 @@ mode "focus" {
 	bindsym c [class="Code"] focus
 	bindsym f [class="Firefox"] focus
 	bindsym k [class="krita"] focus
+	bindsym d [class="discord"] focus
+
+	bindsym Return mode "default"
+	bindsym Escape mode "default"
+	bindsym $mod+shift+f mode "default"
 }
 
 # init
