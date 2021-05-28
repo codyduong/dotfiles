@@ -155,24 +155,24 @@ bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcu
 
 # resize window (you can also use the mouse for that)
 mode "resize" {
-        # These bindings trigger as soon as you enter the resize mode
+	# These bindings trigger as soon as you enter the resize mode
 
-        # codyduong: swapped to VIM setup
-        bindsym h resize shrink width 10 px or 10 ppt
-        bindsym j resize grow height 10 px or 10 ppt
-        bindsym k resize shrink height 10 px or 10 ppt
-        bindsym l resize grow width 10 px or 10 ppt
+	# codyduong: swapped to VIM setup
+	bindsym h resize shrink width 10 px or 10 ppt
+	bindsym j resize grow height 10 px or 10 ppt
+	bindsym k resize shrink height 10 px or 10 ppt
+	bindsym l resize grow width 10 px or 10 ppt
 
-        # same bindings, but for the arrow keys
-        bindsym Left resize shrink width 10 px or 10 ppt
-        bindsym Down resize grow height 10 px or 10 ppt
-        bindsym Up resize shrink height 10 px or 10 ppt
-        bindsym Right resize grow width 10 px or 10 ppt
+	# same bindings, but for the arrow keys
+	bindsym Left resize shrink width 10 px or 10 ppt
+	bindsym Down resize grow height 10 px or 10 ppt
+	bindsym Up resize shrink height 10 px or 10 ppt
+	bindsym Right resize grow width 10 px or 10 ppt
 
-        # back to normal: Enter or Escape or $mod+r
-        bindsym Return mode "default"
-        bindsym Escape mode "default"
-        bindsym $mod+r mode "default"
+	# back to normal: Enter or Escape or $mod+r
+	bindsym Return mode "default"
+	bindsym Escape mode "default"
+	bindsym $mod+r mode "default"
 }
 
 bindsym $mod+r mode "resize"
@@ -180,24 +180,34 @@ bindsym $mod+r mode "resize"
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available)
 bar {
-        status_command i3status
+  status_command i3status
 }
 
 # codyduong: all changes below this line are custom
+# xprop | grep WM_CLASS | awk '{ print $4 }' for getting class names
 
-for_window [class="(?!)firefox"] title_format "<span foreground='blue'>%title</span>
-bindsym $mod+c [class="code"] focus
-bindsym $mod+alt+c exec "code"
+for_window [class="Code"] title_format "<span foreground='cyan'>%title</span>
+for_window [class="Firefox"] title_format "<span foreground='orange'>%title</span>
 
-for_window [class="(?!)firefox"] title_format "<span foreground='red'>%title</span>
-bindsym $mod+alt+f exec "firefox"
-
-bindsym $mod+alt+k exec "krita"
+bindsym $mod+mod1+f exec firefox
+bindsym $mod+mod1+c exec code
+bindsym $mod+mod1+k exec krita
+bindsym $mod+mod1+d exec discord
 
 bindsym $mod+z focus child
 
 bindsym $mod+button2 kill
 
+# this is documented as focus prev|next but doesn't work ?
+# bindsym $mod+comma focus prev
+# bindsym $mod+period focus next
+
+bindsym $mod+shift+f mode "focus"
+mode "focus" {
+	bindsym c [class="Code"] focus
+	bindsym f [class="Firefox"] focus
+	bindsym k [class="krita"] focus
+}
+
 # init
-exec "xrandr --output DP-0 --primary --right-of DVI-D-0"
-exec "xrandr --output HDMI-0 --below DP-0"
+exec ~/.config/i3/init.sh
