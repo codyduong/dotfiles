@@ -184,15 +184,11 @@ bar {
 }
 
 # codyduong: all changes below this line are custom
-# xprop | grep WM_CLASS | awk '{ print $4 }' for getting class names
+# xprop | grep WM_CLASS | awk '{ print $4 }' 
+# for getting class names
 
 for_window [class="Code"] title_format "<span foreground='cyan'>%title</span>
 for_window [class="Firefox"] title_format "<span foreground='orange'>%title</span>
-
-bindsym $mod+mod1+f exec firefox
-bindsym $mod+mod1+c exec code
-bindsym $mod+mod1+k exec krita
-bindsym $mod+mod1+d exec discord
 
 bindsym $mod+z focus child
 
@@ -202,12 +198,19 @@ bindsym $mod+button2 kill
 # bindsym $mod+comma focus prev
 # bindsym $mod+period focus next
 
+bindsym $mod+mod1+f exec firefox
+bindsym $mod+mod1+c exec code
+bindsym $mod+mod1+k exec krita
+bindsym $mod+mod1+d exec discord
+bindsym $mod+mod1+g exec gitkraken
+
 bindsym $mod+shift+f mode "focus"
 mode "focus" {
-	bindsym c [class="Code"] focus
-	bindsym f [class="Firefox"] focus
-	bindsym k [class="krita"] focus
-	bindsym d [class="discord"] focus
+	bindsym c [class="Code"] focus; mode "default"
+	bindsym f [class="Firefox"] focus; mode "default"
+	bindsym k [class="krita"] focus; mode "default"
+	bindsym d [class="discord"] focus; mode "default"
+	bindsym g [class="GitKraken"] focus; mode "default"
 
 	bindsym Return mode "default"
 	bindsym Escape mode "default"
@@ -215,4 +218,8 @@ mode "focus" {
 }
 
 # init
-exec ~/.config/i3/init.sh
+exec_always ~/.config/i3/init.sh
+
+workspace 1 output DP-0
+workspace 2 output DVI-D-0
+workspace 3 output HDMI-0
