@@ -39,6 +39,7 @@ git config --global user.signingkey 3AA5C34371567BD2 #<-- Git Bash, tell Git abo
 * [Deno](https://deno.land/) => ```iwr https://deno.land/x/install/install.ps1 -useb | iex```
 
 Utility Software:
+* The razer things for razer stuff?
 * [QTTabbar](https://github.com/indiff/qttabbar)
 * I always forget about this one, *printer drivers!*
 * [Dual Monitor Tools](http://dualmonitortool.sourceforge.net/)
@@ -69,4 +70,5 @@ sudo apt-get update && sudo apt-get install checkinstall
 * [Deno](https://deno.land/#installation) ```curl -fsSL https://deno.land/x/install/install.sh | sh```
 
 Utility Software:
+* [Polychromatic](https://polychromatic.app/)
 * [Artist 12 Drivers](https://www.xp-pen.com/download-68.html)
