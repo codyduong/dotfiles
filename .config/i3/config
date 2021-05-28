@@ -198,6 +198,8 @@ bindsym $mod+z focus child
 bindsym $mod+button2 kill
 bindsym $mod+button1 focus prev
 bindsym $mod+button3 focus next
+bindsym $mod+button4 focus prev #scrollwheel up
+bindsym $mod+button5 focus next #scrollwheel down
 
 # init
 exec "xrandr --output DP-0 --primary --right-of DVI-D-0"
