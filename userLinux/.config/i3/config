@@ -194,7 +194,7 @@ bindsym $mod+mod1+c exec code
 bindsym $mod+mod1+k exec krita
 bindsym $mod+mod1+d exec discord
 
-bindsym $mod+z focus childnt
+bindsym $mod+z focus child
 
 bindsym $mod+button2 kill
 
