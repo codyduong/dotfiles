@@ -62,6 +62,7 @@ sudo apt-get update && sudo apt-get install checkinstall
 * Python ^3 => ```sudo apt install python3-dev python3-pip python3-setuptools```
   * [thefuck](https://github.com/nvbn/thefuck) => ```sudo pip3 install thefuck```
 * [Node](https://nodejs.org/en/) ```sudo apt install nodejs```
+  * npm ```sudo apt-get install npm``` 
   ```sh
   sudo npm install -g n
   sudo n stable #or version number, or latest
