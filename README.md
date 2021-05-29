@@ -51,7 +51,6 @@ Utility Software:
 ## Ubuntu
 * [Git](https://git-scm.com/downloads) OR ```sudo apt install git```
   * policykit1-gnome ```sudo apt install policykit-1-gnome```
-  * gnome-tweaks ```sudo apt install gnome-tweaks```
   * Copy this repo 
   ```sh 
   git clone https://github.com/codyduong/shopping-list/
