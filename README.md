@@ -58,10 +58,10 @@ sudo apt-get update && sudo apt-get install checkinstall
   * Copy this repo 
   ```sh 
   git clone https://github.com/codyduong/shopping-list/
-  sudo cp ./shopping-list/userLinux/.config ~
+  sudo cp ./shopping-list/userLinux/.config -r ~
   sudo cp ./shopping-list/userLinux/.Xresources ~
   # This is for the triple setup, you may have to manually set this,
-  # copy monitors.xml from ~/.config/monitors.xml
+  # sudo cp ~/.config/monitors.xml /var/lib/gdm3/.config
   sudo cp ./shopping-list/userLinux/monitors.xml /var/lib/gdm3/.config
   ```
 * [GNUPG (Commit Signing)](https://www.gnupg.org/download/)
