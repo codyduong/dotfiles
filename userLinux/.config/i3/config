@@ -244,7 +244,7 @@ bar {
 	}
 }
 
-bindsym $mod+d exec "dmenu_run -nf '#839496' -nb '#073642' -sb '#002B36' -sf '#93A1A1' -fn 'monospace-10' -p 'dmenu prompt &gt;'"
+bindsym $mod+d exec "dmenu_run -nf '#839496' -nb '#073642' -sb '#002B36' -sf '#93A1A1' -fn 'monospace-10' -p 'dmenu prompt:'"
 # init
 exec ~/.config/i3/init.sh
 
