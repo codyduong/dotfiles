@@ -69,7 +69,7 @@ CLI
 * gcc, g++, make => ```sudo apt install build-essential```
 * Python ^3 => ```sudo apt install python3-dev python3-pip python3-setuptools```
   * [thefuck](https://github.com/nvbn/thefuck) => ```sudo pip3 install thefuck```
-  ```sudo apt install pipenv```
+  * ```sudo apt install pipenv```
 * [Node](https://nodejs.org/en/) ```sudo apt install nodejs```
   * npm ```sudo apt-get install npm``` 
   ```sh
