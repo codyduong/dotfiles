@@ -193,6 +193,8 @@ for_window [class="Firefox"] title_format "<span foreground='orange'>%title</spa
 bindsym $mod+z focus child
 
 bindsym $mod+button2 kill
+# Same way browsers use ctrl+w to kill, also kept original binding, so you can fatfinger it :>)
+bindsym $mod+shift+w kill
 
 # this is documented as focus prev|next but doesn't work ?
 # bindsym $mod+comma focus prev
