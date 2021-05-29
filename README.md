@@ -49,8 +49,9 @@ Utility Software:
 * [LibreOffice](https://www.libreoffice.org/)
 
 ## Ubuntu
-* [VS Code](https://code.visualstudio.com/#alt-downloads)
 * [Git](https://git-scm.com/downloads) OR ```sudo apt install git```
+  * policykit1-gnome ```sudo apt install policykit-1-gnome```
+  * gnome-tweaks ```sudo apt install gnome-tweaks```
   * Copy this repo 
   ```sh 
   git clone https://github.com/codyduong/shopping-list/
@@ -60,6 +61,7 @@ Utility Software:
   # sudo cp ~/.config/monitors.xml /var/lib/gdm3/.config
   sudo cp ./shopping-list/userLinux/monitors.xml /var/lib/gdm3/.config
   ```
+* [VS Code](https://code.visualstudio.com/#alt-downloads)
 * [GNUPG (Commit Signing)](https://www.gnupg.org/download/)
 ```Comes preinstalled, instructions are exact same as above```
 * [GitKraken](https://www.gitkraken.com/git-client)
@@ -75,7 +77,6 @@ Utility Software:
   * [Yarn](https://classic.yarnpkg.com/en/docs/install#debian-stable) ```sudo npm install --global yarn```
 * [Deno](https://deno.land/#installation) ```curl -fsSL https://deno.land/x/install/install.sh | sh```
 * [i3](https://i3wm.org/) ```sudo apt install i3```
-  * policykit1-gnome ```sudo apt install policykit-1-gnome```
 
 Utility Software:
 * [Polychromatic](https://polychromatic.app/)
