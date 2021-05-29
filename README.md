@@ -75,6 +75,7 @@ Utility Software:
   * [Yarn](https://classic.yarnpkg.com/en/docs/install#debian-stable) ```sudo npm install --global yarn```
 * [Deno](https://deno.land/#installation) ```curl -fsSL https://deno.land/x/install/install.sh | sh```
 * [i3](https://i3wm.org/) ```sudo apt install i3```
+  * policykit1-gnome ```sudo apt install policykit-1-gnome```
 
 Utility Software:
 * [Polychromatic](https://polychromatic.app/)
