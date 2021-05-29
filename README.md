@@ -70,6 +70,7 @@ sudo apt-get update && sudo apt-get install checkinstall
   * [Yarn](https://classic.yarnpkg.com/en/docs/install#debian-stable) ```sudo npm install --global yarn```
 * [Deno](https://deno.land/#installation) ```curl -fsSL https://deno.land/x/install/install.sh | sh```
 * [i3](https://i3wm.org/) ```sudo apt install i3```
+  * ```chmod +x ~/.config/i3/init.sh``` before running i3
 
 Utility Software:
 * [Polychromatic](https://polychromatic.app/)
