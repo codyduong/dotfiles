@@ -50,11 +50,9 @@ bindsym $mod+Return exec i3-sensible-terminal
 bindsym $mod+Shift+q kill
 
 # start dmenu (a program launcher)
-bindsym $mod+d exec dmenu_run
-# There also is the (new) i3-dmenu-desktop which only displays applications
-# shipping a .desktop file. It is a wrapper around dmenu, so you need that
-# installed.
-# bindsym $mod+d exec --no-startup-id i3-dmenu-desktop
+# rebinded
+# bindsym $mod+d exec dmenu_run
+
 
 # change focus
 # codyduong: swapped to VIM setup
@@ -179,9 +177,9 @@ bindsym $mod+r mode "resize"
 
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available)
-bar {
-  status_command i3status
-}
+# bar {
+#  status_command i3status
+# }
 
 # codyduong: all changes below this line are custom
 # xprop | grep WM_CLASS | awk '{ print $4 }' 
@@ -219,9 +217,39 @@ mode "focus" {
 	bindsym $mod+shift+f mode "default"
 }
 
-# init
-exec_always ~/.config/i3/init.sh
+# https://thomashunter.name/i3-configurator/
+# dark solarized
+# class                 border  bground text    indicator child_border
+client.focused          #002B36 #002B36 #93A1A1 #002B36   #002B36
+client.focused_inactive #073642 #073642 #586E75 #073642   #073642
+client.unfocused        #1C1C1C #1C1C1C #4B5556 #1C1C1C   #1C1C1C
+client.urgent           #DC322F #DC322F #EEE8D5 #DC322F   #DC322F
+client.placeholder      #000000 #0C0C0C #586E75 #000000   #0C0C0C
 
-workspace "1" output DP-1
-workspace "2" output DVI-D-1
-workspace "3" output HDMI-1
+client.background       #002B36
+
+bar {
+	status_command i3status
+
+	colors {
+		background #000000
+		statusline #93A1A1
+		separator  #666666
+
+		focused_workspace  #002B36 #002B36 #93A1A1
+		active_workspace   #073642 #073642 #586E75
+		inactive_workspace #073642 #073642 #888888
+		urgent_workspace   #2F343A #DC322F #EEE8D5
+		binding_mode       #2F343A #brred #839496
+	}
+}
+
+bindsym $mod+d exec "dmenu_run -nf '#839496' -nb '#073642' -sb '#002B36' -sf '#93A1A1' -fn 'monospace-10' -p 'dmenu prompt &gt;'"
+# init
+exec ~/.config/i3/init.sh
+
+workspace "1" output DP-0
+workspace "2" output DVI-D-0
+workspace "3" output HDMI-0
+
+exec --no-startup-id /usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1

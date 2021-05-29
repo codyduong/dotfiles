@@ -7,7 +7,7 @@
       <primary>yes</primary>
       <monitor>
         <monitorspec>
-          <connector>DP-1</connector>
+          <connector>DP-0</connector>
           <vendor>ACI</vendor>
           <product>VG248</product>
           <serial>F8LMQS091800</serial>
@@ -15,7 +15,7 @@
         <mode>
           <width>1920</width>
           <height>1080</height>
-          <rate>144.00076293945312</rate>
+          <rate>60</rate>
         </mode>
       </monitor>
     </logicalmonitor>
@@ -25,7 +25,7 @@
       <scale>1</scale>
       <monitor>
         <monitorspec>
-          <connector>DVI-D-1</connector>
+          <connector>DVI-D-0</connector>
           <vendor>ACR</vendor>
           <product>S241HL</product>
           <serial>LWVAA0018557</serial>
@@ -43,7 +43,7 @@
       <scale>1</scale>
       <monitor>
         <monitorspec>
-          <connector>HDMI-1</connector>
+          <connector>HDMI-0</connector>
           <vendor>UGD</vendor>
           <product>Artist 12    </product>
           <serial>0x00000002</serial>
