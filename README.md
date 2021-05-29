@@ -67,7 +67,7 @@ sudo apt-get update && sudo apt-get install checkinstall
   sudo npm install -g n
   sudo n stable #or version number, or latest
   ```
-  * [Yarn](https://classic.yarnpkg.com/en/docs/install#debian-stable)
+  * [Yarn](https://classic.yarnpkg.com/en/docs/install#debian-stable) ```sudo npm install --global yarn```
 * [Deno](https://deno.land/#installation) ```curl -fsSL https://deno.land/x/install/install.sh | sh```
 * [i3](https://i3wm.org/) ```sudo apt install i3```
 
