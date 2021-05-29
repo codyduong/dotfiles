@@ -54,7 +54,7 @@ Utility Software:
 sudo apt-get update && sudo apt-get install checkinstall
 ```
 * [VS Code](https://code.visualstudio.com/#alt-downloads)
-* [Git](https://git-scm.com/downloads) OR ```sudo apt install git-all```
+* [Git](https://git-scm.com/downloads) OR ```sudo apt install git```
   * Copy this repo 
   ```sh 
   git clone https://github.com/codyduong/shopping-list/
