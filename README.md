@@ -55,6 +55,13 @@ sudo apt-get update && sudo apt-get install checkinstall
 ```
 * [VS Code](https://code.visualstudio.com/#alt-downloads)
 * [Git](https://git-scm.com/downloads) OR ```sudo apt install git-all```
+  * Copy this repo 
+  ```sh 
+  git clone https://github.com/codyduong/shopping-list/
+  sudo cp ./shopping-list/userLinux/.config ~
+  sudo cp ./shopping-list/userLinux/.Xresources ~
+  sudo cp ./shopping-list/userLinux/monitors.xml /var/lib/gdm3/.config
+  ```
 * [GNUPG (Commit Signing)](https://www.gnupg.org/download/)
 ```Comes preinstalled, instructions are exact same as above```
 * [GitKraken](https://www.gitkraken.com/git-client)
@@ -70,8 +77,6 @@ sudo apt-get update && sudo apt-get install checkinstall
   * [Yarn](https://classic.yarnpkg.com/en/docs/install#debian-stable) ```sudo npm install --global yarn```
 * [Deno](https://deno.land/#installation) ```curl -fsSL https://deno.land/x/install/install.sh | sh```
 * [i3](https://i3wm.org/) ```sudo apt install i3```
-  * Double check init.sh monitor names with xrandr 
-  * ```chmod +x ~/.config/i3/init.sh``` before running i3
 
 Utility Software:
 * [Polychromatic](https://polychromatic.app/)
