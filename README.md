@@ -38,7 +38,7 @@ git config --global user.signingkey 3AA5C34371567BD2 #<-- Git Bash, tell Git abo
   * [Yarn](https://classic.yarnpkg.com/en/docs/install/#windows-stable) => ```npm install --global yarn```
 * [Deno](https://deno.land/) => ```iwr https://deno.land/x/install/install.ps1 -useb | iex```
 
-Utility Software:
+Utility Software (less important, but if I want it):
 * The razer things for razer stuff?
 * [QTTabbar](https://github.com/indiff/qttabbar)
 * I always forget about this one, *printer drivers!*
@@ -49,24 +49,27 @@ Utility Software:
 * [LibreOffice](https://www.libreoffice.org/)
 
 ## Ubuntu
+.deb
+* [VS Code](https://code.visualstudio.com/#alt-downloads)
+* [GitKraken](https://www.gitkraken.com/git-client)
+
+CLI
+* [GNUPG (Commit Signing)](https://www.gnupg.org/download/) ```Comes preinstalled, instructions are exact same as above```
 * [Git](https://git-scm.com/downloads) OR ```sudo apt install git```
   * policykit1-gnome ```sudo apt install policykit-1-gnome```
-  * Copy this repo 
   ```sh 
   git clone https://github.com/codyduong/shopping-list/
   sudo cp ./shopping-list/userLinux/.config -r ~
   sudo cp ./shopping-list/userLinux/.Xresources ~
+  sudo cp -a ./shopping-list/userLinux/Solarized-Dark-Cyan-3.36/ /usr/share/themes/
   # This is for the triple setup, you may have to manually set this,
   # sudo cp ~/.config/monitors.xml /var/lib/gdm3/.config
   sudo cp ./shopping-list/userLinux/monitors.xml /var/lib/gdm3/.config
   ```
-* [VS Code](https://code.visualstudio.com/#alt-downloads)
-* [GNUPG (Commit Signing)](https://www.gnupg.org/download/)
-```Comes preinstalled, instructions are exact same as above```
-* [GitKraken](https://www.gitkraken.com/git-client)
 * gcc, g++, make => ```sudo apt install build-essential```
 * Python ^3 => ```sudo apt install python3-dev python3-pip python3-setuptools```
   * [thefuck](https://github.com/nvbn/thefuck) => ```sudo pip3 install thefuck```
+  ```sudo apt install pipenv```
 * [Node](https://nodejs.org/en/) ```sudo apt install nodejs```
   * npm ```sudo apt-get install npm``` 
   ```sh
@@ -77,6 +80,28 @@ Utility Software:
 * [Deno](https://deno.land/#installation) ```curl -fsSL https://deno.land/x/install/install.sh | sh```
 * [i3](https://i3wm.org/) ```sudo apt install i3```
 
-Utility Software:
+All as one
+```sh
+git clone https://github.com/codyduong/shopping-list/
+sudo cp ./shopping-list/userLinux/.config -r ~
+sudo cp ./shopping-list/userLinux/.Xresources ~
+sudo cp -a ./shopping-list/userLinux/Solarized-Dark-Cyan-3.36/ /usr/share/themes/
+sudo cp ./shopping-list/userLinux/monitors.xml /var/lib/gdm3/.config
+sudo apt install build-essential
+sudo apt install python3-dev python3-pip python3-setuptools
+sudo pip3 install thefuck
+fuck
+fuck
+sudo apt install pipenv
+sudo apt install nodejs
+sudo apt-get install npm
+sudo npm install -g n
+sudo n latest
+sudo npm install --global yarn
+curl -fsSL https://deno.land/x/install/install.sh | sh
+sudo apt install i3
+```
+
+Utility Software (less important, but if I want it):
 * [Polychromatic](https://polychromatic.app/)
 * [Artist 12 Drivers](https://www.xp-pen.com/download-68.html)
