@@ -220,6 +220,6 @@ mode "focus" {
 # init
 exec_always ~/.config/i3/init.sh
 
-workspace 1 output DP-0
-workspace 2 output DVI-D-0
-workspace 3 output HDMI-0
+workspace "1" output DP-1
+workspace "2" output DVI-D-1
+workspace "3" output HDMI-1
