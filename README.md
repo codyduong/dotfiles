@@ -1,6 +1,7 @@
 A list of things I need to do on a clean install
 
 ## Windows 10
+https://github.com/mgth/LittleBigMouse
 * [VS Code](https://code.visualstudio.com/#alt-downloads)
 * [Git](https://git-scm.com/downloads)
 * [GNUPG (Commit Signing)](https://www.gnupg.org/download/)
