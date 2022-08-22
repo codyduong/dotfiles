@@ -83,6 +83,7 @@ CLI
 
 All as one
 ```sh
+sudo apt install git
 git clone https://github.com/codyduong/shopping-list/
 sudo cp ./shopping-list/userLinux/.config -r ~
 sudo cp ./shopping-list/userLinux/.Xresources ~
