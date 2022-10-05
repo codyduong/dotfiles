@@ -166,10 +166,10 @@ mode "resize" {
 	# These bindings trigger as soon as you enter the resize mode
 
 	# codyduong: swapped to VIM setup
-	bindsym h resize shrink width 10 px or 10 ppt
-	bindsym j resize shrink height 10 px or 10 ppt
-	bindsym k resize grow height 10 px or 10 ppt
-	bindsym l resize grow width 10 px or 10 ppt
+	bindsym h resize grow left 10 px or 10 ppt
+	bindsym j resize grow down 10 px or 10 ppt
+	bindsym k resize grow up 10 px or 10 ppt
+	bindsym l resize grow right 10 px or 10 ppt
 
 	# same bindings, but for the arrow keys
 	bindsym Left resize shrink width 10 px or 10 ppt
@@ -195,8 +195,8 @@ bindsym $mod+r mode "resize"
 # xprop | grep WM_CLASS | awk '{ print $4 }' 
 # for getting class names
 
-for_window [class="Code"] title_format "<span foreground='cyan'>%title</span>
-for_window [class="Firefox"] title_format "<span foreground='orange'>%title</span>
+for_window [class="Code"] title_format "<span foreground='cyan'>%title</span>"
+for_window [class="Firefox"] title_format "<span foreground='orange'>%title</span>"
 
 bindsym $mod+z focus child
 
