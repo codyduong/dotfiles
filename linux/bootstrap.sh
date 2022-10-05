@@ -10,24 +10,24 @@
 # sudo cp ./shopping-list/userLinux/monitors.xml /var/lib/gdm3/.config
 
 _curl() {
-  which curl >/dev/null &&
-    echo "\033[1;33mcurl installation found, skipping\033[0m" ||
-    (echo "\033[1;33minstalling curl\033[0m"; sudo apt install curl -y)
+  which curl >/dev/null
+    && echo "\033[1;33mcurl installation found, skipping\033[0m"
+    || (echo "\033[1;33minstalling curl\033[0m"; sudo apt install curl -y)
 }
 
 _git() {
-  which git >/dev/null && 
-    echo "\033[1;33mgit installation found, skipping\033[0m" || 
-    (echo "\033[1;33minstalling git\033[0m"; sudo apt install git -y)
+  which git >/dev/null 
+    && echo "\033[1;33mgit installation found, skipping\033[0m"
+    || (echo "\033[1;33minstalling git\033[0m"; sudo apt install git -y)
 }
 
 _i3() {
-  which i3 >/dev/null &&
-    echo "\033[1;33mi3 installation found, skipping\033[0m" ||
-    (echo "\033[1;33minstalling i3\033[0m"; sudo apt install i3 -y)
-  which i3lock-fancy >/dev/null &&
-    echo "\033[1;33mi3lock-fancy installation found, skipping\033[0m" ||
-    (echo "\033[1;33minstalling i3lock-fancy\033[0m"; sudo apt install i3lock-fancy -y) 
+  which i3 >/dev/null
+    && echo "\033[1;33mi3 installation found, skipping\033[0m"
+    || (echo "\033[1;33minstalling i3\033[0m"; sudo apt install i3 -y)
+  which i3lock-fancy >/dev/null
+    && echo "\033[1;33mi3lock-fancy installation found, skipping\033[0m"
+    || (echo "\033[1;33minstalling i3lock-fancy\033[0m"; sudo apt install i3lock-fancy -y) 
 }
 
 _python() {
@@ -82,9 +82,9 @@ _rust() {
 }
 
 _ripgrep() {
-  which rg>/dev/null &&
-    echo "\033[1;33mripgrep installation found, skipping\033[0m" || 
-    (echo "\033[1;33minstalling ripgrep\033[0m"; sudo apt-get install ripgrep)
+  which rg>/dev/null
+    && echo "\033[1;33mripgrep installation found, skipping\033[0m" 
+    || (echo "\033[1;33minstalling ripgrep\033[0m"; sudo apt-get install ripgrep)
 }
 
 _curl

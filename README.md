@@ -1,5 +1,55 @@
-A list of things I need to do on a clean install
+# dotfiles
+My "dotfiles" for linux/windows with bootstrap scripts
 
+## Linux
+For Ubuntu distros... TODO other distros
+
+### Start
+
+**with curl**
+```bash
+sudo apt install curl -y >/dev/null
+which curl >/dev/null &&
+  curl https://raw.githubusercontent.com/codyduong/dotfiles/main/linux/install.sh | bash ||
+  echo "\033[1;31mbootstrap failed\033[0m"
+```
+**with git**
+```bash
+git clone https://github.com/codyduong/dotfiles ~/dotfiles &&
+dotfiles/linux/bootstrap.sh
+```
+
+## Windows
+Based off [Jay Harris's dotfiles for Windows](https://github.com/jayharris/dotfiles-windows)
+
+### Pre-reqs
+* [Powershell 7.2^](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell)
+  ```powershell
+  # in terminal/cmd
+  winget install --id Microsoft.Powershell --source winget
+  winget install --id Microsoft.Powershell.Preview --source winget
+  ```
+
+### Bootstrap
+**without git**
+```powershell
+Set-ExecutionPolicy Unrestricted -Scope CurrentUser
+iex ((new-object net.webclient).DownloadString('https://github.com/codyduong/dotfiles/master/setup/install.ps1'))
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+**with git**
+```powershell
+Set-ExecutionPolicy Unrestricted -Scope CurrentUser
+git clone https://github.com/codyduong/dotfiles.git; cd dotfiles; . .\windows\bootstrap.ps1
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+### Installing dependencies and packages
+```powershell
+.\windows\deps.ps1
+```
+
+<!---
 ## Windows 10
 https://github.com/mgth/LittleBigMouse
 * [VS Code](https://code.visualstudio.com/#alt-downloads)
@@ -138,3 +188,4 @@ sudo apt-get install fonts-powerline
 Utility Software (less important, but if I want it):
 * [Polychromatic](https://polychromatic.app/)
 * [Artist 12 Drivers](https://www.xp-pen.com/download-68.html)
+-->
