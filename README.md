@@ -9,9 +9,9 @@ For Ubuntu distros... TODO other distros
 **with curl**
 ```bash
 sudo apt install curl -y >/dev/null
-which curl >/dev/null &&
-  curl https://raw.githubusercontent.com/codyduong/dotfiles/main/linux/install.sh | bash ||
-  echo "\033[1;31mbootstrap failed\033[0m"
+which curl >/dev/null
+  && curl https://raw.githubusercontent.com/codyduong/dotfiles/main/linux/install.sh | bash
+  || echo "\033[1;31mbootstrap failed\033[0m"
 ```
 **with git**
 ```bash
