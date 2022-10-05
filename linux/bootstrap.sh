@@ -27,7 +27,7 @@ _i3() {
     (echo "\033[1;33minstalling i3\033[0m"; sudo apt install i3 -y)
   which i3lock-fancy >/dev/null &&
     echo "\033[1;33mi3lock-fancy installation found, skipping\033[0m" ||
-    (echo "\033[1;33minstalling i3lock-fancy\033[0m"; sudo apt install i3 -y) 
+    (echo "\033[1;33minstalling i3lock-fancy\033[0m"; sudo apt install i3lock-fancy -y) 
 }
 
 _python() {
@@ -81,6 +81,12 @@ _rust() {
   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 }
 
+_ripgrep() {
+  which rg>/dev/null &&
+    echo "\033[1;33mripgrep installation found, skipping\033[0m" || 
+    (echo "\033[1;33minstalling ripgrep\033[0m"; sudo apt-get install ripgrep)
+}
+
 _curl
 _git
 _i3
@@ -91,3 +97,4 @@ _node
 _code
 _ohmyzsh
 _rust
+_ripgrep

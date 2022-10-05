@@ -114,6 +114,7 @@ export EDITOR="$VISUAL"
 eval $(thefuck --alias)
 alias cls="clear"
 alias lock="i3lock-fancy"
+alias ripgrep="rg"
 
 export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
 export PYENV_ROOT="$HOME/.pyenv"
