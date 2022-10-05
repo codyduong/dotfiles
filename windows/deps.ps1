@@ -25,8 +25,13 @@ Update-Help -Force
 ### Install PowerShell Modules
 Write-Host "Installing PowerShell Modules..." -ForegroundColor "Yellow"
 Install-Module Posh-Git -Scope CurrentUser -Force
+# oh-my-zsh like
+Install-Module oh-my-posh -Scope CurrentUser -Force
 Install-Module PSWindowsUpdate -Scope CurrentUser -Force
-
+# autocomplete
+Install-Module PSReadLine -AllowPrerelease -Scope CurrentUser -Force -SkipPublisherCheck
+# terminal icons
+Install-Module -Name Terminal-Icons -Repository PSGallery -Force
 
 ### Chocolatey
 # installs choclatey, but all new stuff should be with winget
@@ -56,14 +61,30 @@ winget install -e --id OpenJS.NodeJS
 winget install -e --id Python.Python.3.9
 winget install -e --id CoreyButler.NVMforWindows
 winget install -e --id GitHub.GitHubDesktop
+winget install -e --id Git.Git
+winget install -e --id Microsoft.GitCredentialManagerCore
 
-# IDES
+# oh-my-posh
+winget install JanDeDobbeleer.OhMyPosh -s winget
+oh-my-posh font install Meslo
+
+# IDEs / DEs
 winget install -e --id Microsoft.VisualStudioCode
 winget install -e --id vim.vim
 winget install -e --id Neovim.Neovim
 
 # FONTS
 choco install sourcecodepro       --limit-output
+
+# SCOOP
+irm get.scoop.sh | iex
+
+# grep
+winget install -e --id GnuWin32.Grep
+
+# less
+# broken?
+# winget install -e --id JohnTaylor.less
 
 # # system and cli
 # choco install curl                --limit-output
@@ -137,10 +158,11 @@ Remove-Variable nodeLtsVersion
 Write-Host "Installing Node Packages..." -ForegroundColor "Yellow"
 if (which npm) {
    npm update npm
-   npm install -g gulp
-   npm install -g mocha
-   npm install -g node-inspector
-   npm install -g yo
+   # npm install -g gulp
+   # npm install -g mocha
+   # npm install -g node-inspector
+   # npm install -g yo
+   npm install -g yarn
 }
 
 ### Janus for vim
