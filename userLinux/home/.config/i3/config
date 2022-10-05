@@ -170,12 +170,20 @@ mode "resize" {
 	bindsym j resize grow down 10 px or 10 ppt
 	bindsym k resize grow up 10 px or 10 ppt
 	bindsym l resize grow right 10 px or 10 ppt
+	bindsym shift+h resize shrink left 10 px or 10 ppt
+	bindsym shift+j resize shrink down 10 px or 10 ppt
+	bindsym shift+k resize shrink up 10 px or 10 ppt
+	bindsym shift+l resize shrink right 10 px or 10 ppt
 
 	# same bindings, but for the arrow keys
-	bindsym Left resize shrink width 10 px or 10 ppt
-	bindsym Down resize shrink height 10 px or 10 ppt
-	bindsym Up resize grow height 10 px or 10 ppt
-	bindsym Right resize grow width 10 px or 10 ppt
+	bindsym Left resize grow left 10 px or 10 ppt
+	bindsym Down resize grow down 10 px or 10 ppt
+	bindsym Up resize grow up 10 px or 10 ppt
+	bindsym Right resize grow right 10 px or 10 ppt
+	bindsym shift+Left resize grow left 10 px or 10 ppt
+	bindsym shift+Down resize grow down 10 px or 10 ppt
+	bindsym shift+Up resize grow up 10 px or 10 ppt
+	bindsym shift+Right resize grow right 10 px or 10 ppt
 
 	# back to normal: Enter or Escape or $mod+r
 	bindsym Return mode "default"
