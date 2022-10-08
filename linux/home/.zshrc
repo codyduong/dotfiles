@@ -20,8 +20,14 @@ ZSH_THEME="agnoster"
 source /usr/share/zsh-antigen/antigen.zsh
 antigen use oh-my-zsh
 antigen bundle git
-antigen bundle pip
 antigen bundle command-not-found
+antigen bundle zsh-users/zsh-autosuggestions
+antigen bundle zsh-users/zsh-syntax-highlighting
+antigen bundle common-aliases
+antigen bundle djui/alias-tips
+antigen bundle pip
+antigen bundle yarn
+antigen bundle deno
 antigen theme agnoster
 antigen apply
 
@@ -39,7 +45,7 @@ antigen apply
 # DISABLE_UPDATE_PROMPT="true"
 
 # Uncomment the following line to change how often to auto-update (in days).
-# export UPDATE_ZSH_DAYS=13
+export UPDATE_ZSH_DAYS=13
 
 # Uncomment the following line if pasting URLs and other text is messed up.
 # DISABLE_MAGIC_FUNCTIONS="true"
@@ -69,7 +75,7 @@ antigen apply
 # "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
 # or set a custom format using the strftime function format specifications,
 # see 'man strftime' for details.
-# HIST_STAMPS="mm/dd/yyyy"
+HIST_STAMPS="yyyy-mm-dd"
 
 # Would you like to use another custom folder than $ZSH/custom?
 # ZSH_CUSTOM=/path/to/new-custom-folder

@@ -14,27 +14,39 @@ Write-Host "Updating Help..." -ForegroundColor "Yellow"
 Update-Help -Force
 
 
-### Package Providers
-# Write-Host "Installing Package Providers..." -ForegroundColor "Yellow"
+## Package Providers
+Write-Host "Installing chocolatey..." -ForegroundColor "Yellow"
 # Get-PackageProvider NuGet -Force | Out-Null
 # Chocolatey Provider is not ready yet. Use normal Chocolatey
-#Get-PackageProvider Chocolatey -Force
-#Set-PackageSource -Name chocolatey -Trusted
+Get-PackageProvider Chocolatey -Force
+Set-PackageSource -Name chocolatey -Trusted
 
 
 ### Install PowerShell Modules
 Write-Host "Installing PowerShell Modules..." -ForegroundColor "Yellow"
 Install-Module Posh-Git -Scope CurrentUser -Force
-# oh-my-zsh like
-Install-Module oh-my-posh -Scope CurrentUser -Force
 Install-Module PSWindowsUpdate -Scope CurrentUser -Force
+
+
+### Install oh-my-posh and others
+Write-Host "Installing oh-my-posh and extensions..." -ForegroundColor "Yellow"
+winget install JanDeDobbeleer.OhMyPosh -s winget
 # autocomplete
 Install-Module PSReadLine -AllowPrerelease -Scope CurrentUser -Force -SkipPublisherCheck
 # terminal icons
 Install-Module -Name Terminal-Icons -Repository PSGallery -Force
+# oh-my-zsh like git aliases
+# TODO this throws import errors
+# Install-Module git-aliases -Scope CurrentUser -AllowClobber -Force
+# font
+oh-my-posh font install Meslo
 
-### Chocolatey
-# installs choclatey, but all new stuff should be with winget
+
+### Install ExplorePatcher if win11, TODO
+# winget install -e --id valinet.ExplorerPatcher
+
+
+### Desktop Utilities
 Write-Host "Installing Desktop Utilities..." -ForegroundColor "Yellow"
 if ($null -eq (which cinst)) {
    iex (new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1')
@@ -55,60 +67,27 @@ winget install -e --id Mozilla.Firefox.DeveloperEdition
 # PRODUCTIVE
 winget install -e --id Zoom.Zoom
 
-# SYSTEM
+# DEV DEPS
 choco install curl                --limit-output # awaiting winget
 winget install -e --id OpenJS.NodeJS
-winget install -e --id Python.Python.3.9
 winget install -e --id CoreyButler.NVMforWindows
+winget install -e --id Python.Python.3.9
+choco install pyenv-win
 winget install -e --id GitHub.GitHubDesktop
 winget install -e --id Git.Git
 winget install -e --id Microsoft.GitCredentialManagerCore
 
-# oh-my-posh
-winget install JanDeDobbeleer.OhMyPosh -s winget
-oh-my-posh font install Meslo
-
+Write-Host "Installing IDEs..." -ForegroundColor "Yellow"
 # IDEs / DEs
 winget install -e --id Microsoft.VisualStudioCode
 winget install -e --id vim.vim
 winget install -e --id Neovim.Neovim
-
-# FONTS
-choco install sourcecodepro       --limit-output
 
 # SCOOP
 irm get.scoop.sh | iex
 
 # grep
 winget install -e --id GnuWin32.Grep
-
-# less
-# broken?
-# winget install -e --id JohnTaylor.less
-
-# # system and cli
-# choco install curl                --limit-output
-# choco install nuget.commandline   --limit-output
-# choco install webpi               --limit-output
-# choco install git.install         --limit-output -params '"/GitAndUnixToolsOnPath /NoShellIntegration"'
-# choco install nvm.portable        --limit-output
-# choco install python              --limit-output
-# choco install ruby                --limit-output
-
-# #fonts
-# choco install sourcecodepro       --limit-output
-
-# # browsers
-# choco install GoogleChrome        --limit-output; <# pin; evergreen #> choco pin add --name GoogleChrome        --limit-output
-# choco install GoogleChrome.Canary --limit-output; <# pin; evergreen #> choco pin add --name GoogleChrome.Canary --limit-output
-# choco install Firefox             --limit-output; <# pin; evergreen #> choco pin add --name Firefox             --limit-output
-# choco install Opera               --limit-output; <# pin; evergreen #> choco pin add --name Opera               --limit-output
-
-# # dev tools and frameworks
-# choco install atom                --limit-output; <# pin; evergreen #> choco pin add --name Atom                --limit-output
-# choco install Fiddler             --limit-output
-# choco install vim                 --limit-output
-# choco install winmerge            --limit-output
 
 Refresh-Environment
 
@@ -117,8 +96,6 @@ $nodeLtsVersion = choco search nodejs-lts --limit-output | ConvertFrom-String -T
 nvm install $nodeLtsVersion
 nvm use $nodeLtsVersion
 Remove-Variable nodeLtsVersion
-
-# gem pristine --all --env-shebang
 
 ### Windows Features
 # Write-Host "Installing Windows Features..." -ForegroundColor "Yellow"
@@ -165,8 +142,5 @@ if (which npm) {
    npm install -g yarn
 }
 
-### Janus for vim
-# Write-Host "Installing Janus..." -ForegroundColor "Yellow"
-# if ((which curl) -and (which vim) -and (which rake) -and (which bash)) {
-#    curl.exe -L https://bit.ly/janus-bootstrap | bash
-# }
+# wsl
+wsl --install
