@@ -1,6 +1,5 @@
 # derived from https://github.com/gluons/powershell-git-aliases
-# rather than installing powershell module just copy the aliases and allow customization here... hacky but w/e
-. $PSScriptRoot\oh-my-zsh-git-util.ps1
+. $PSScriptRoot\gitAliasUtils.ps1
 
 # Prevent conflict with built-in aliases
 Remove-Alias gc -Force -ErrorAction SilentlyContinue
@@ -12,6 +11,7 @@ Remove-Alias gm -Force -ErrorAction SilentlyContinue
 Remove-Alias gp -Force -ErrorAction SilentlyContinue
 Remove-Alias gpv -Force -ErrorAction SilentlyContinue
 
+Set-Alias g git
 function g {
 	git $args
 }

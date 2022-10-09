@@ -1,3 +1,8 @@
+############################################################################
+# https://github.com/gluons/powershell-git-aliases/blob/master/src/utils.ps1
+############################################################################
+
+
 <#
 .SYNOPSIS
 	Get current git branch.

@@ -8,10 +8,9 @@ ${function:.....} = { Set-Location ..\..\..\.. }
 ${function:......} = { Set-Location ..\..\..\..\.. }
 
 # Navigation Shortcuts
-${function:drop} = { Set-Location ~\Documents\Dropbox }
-${function:dt} = { Set-Location ~\Desktop }
-${function:docs} = { Set-Location ~\Documents }
-${function:dl} = { Set-Location ~\Downloads }
+# ${function:dt} = { Set-Location ~\Desktop }
+# ${function:docs} = { Set-Location ~\Documents }
+# ${function:dl} = { Set-Location ~\Downloads }
 
 # Missing Bash aliases
 Set-Alias time Measure-Command
@@ -71,6 +70,7 @@ Set-Alias update System-Update
 Set-Alias vim nvim
 Set-Alias less 'C:\Program Files (x86)\Less\less.exe'
 Set-Alias grep findstr
+
 function which ($command) {
 Get-Command -Name $command -ErrorAction SilentlyContinue |
     Select-Object -ExpandProperty Path -ErrorAction SilentlyContinue
