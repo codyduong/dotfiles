@@ -7,11 +7,33 @@ $script:vstsCommandsWithShortParams = $shortVstsParams.Keys -join '|'
 $script:vstsCommandsWithLongParams = $longVstsParams.Keys -join '|'
 
 $script:gitAliases = $poshGitAliasList.Keys -join '|'
-$script:gitAliasesWithLongParams = ($poshGitAliasMap.Keys | Where-Object {$longGitParams.Keys.Contains($_)}) -join '|'
-$script:gitAliasesWithShortParams = ($poshGitAliasMap.Keys | Where-Object {$shortGitParams.Keys.Contains($_)}) -join '|'
+$script:gitAliasesWithLongParams = ($poshGitAliasMap.Keys | Where-Object { $longGitParams.Keys.Contains($_) }) -join '|'
+$script:gitAliasesWithShortParams = ($poshGitAliasMap.Keys | Where-Object { $shortGitParams.Keys.Contains($_) }) -join '|'
 
-Write-Host $gitAliasesWithLongParams -ForegroundColor "Yellow"
-Write-Host $gitAliasesWithShortParams -ForegroundColor "Yellow"
+$script:gitLongParams = $longGitParams
+$script:gitShortParams = $shortGitParams
+
+foreach ($key in $poshGitAliasList.Keys) {
+    foreach ($arg in ($longGitParams[$poshGitAliasMap[$key]].Trim() -split ' ')) {
+        $key_args = $poshGitAliasList[$key] -replace "--","" -split ' '
+        if ($key_args -notcontains $arg) {
+            $gitLongParams[$key] += " $($arg)"
+        }
+    }
+}
+
+foreach ($key in $poshGitAliasList.Keys) {
+    foreach ($arg in ($shortGitParams[$poshGitAliasMap[$key]].Trim() -split ' ')) {
+        $key_args = $poshGitAliasList[$key] -replace "-","" -split ' '
+        if ($key_args -notcontains $arg) {
+            $gitShortParams[$key] += " $($arg)"
+        }
+    }
+}
+
+foreach ($key in $gitLongParams.Keys) {
+    Write-Host "$($key) $($gitLongParams[$key]) $($gitShortParams[$key])`n" -ForegroundColor "Yellow"
+}
 
 filter quoteStringWithSpecialChars {
     if ($_ -and ($_ -match '\s+|#|@|\$|;|,|''|\{|\}|\(|\)')) {
@@ -307,14 +329,6 @@ function GitTabExpansionInternalB($lastBlock, $GitStatus = $null) {
         # "^(?:push|pull)${ignoreGitParams}\s+(?<remote>[^\s-]\S*).*\s+(?<force>\+?)(?<ref>[^\s\:]*)$" {
         #     gitBranches $matches['ref'] -prefix $matches['force']
         #     gitTags $matches['ref'] -prefix $matches['force']
-        # }
-
-        # # Handles git pull <remote>
-        # # Handles git push <remote>
-        # # Handles git fetch <remote>
-        # "^(?:push|pull|fetch)${ignoreGitParams}\s+(?<remote>\S*)$" {
-        #     gitRemotes $matches['remote']
-        # }
 
         # # Handles git reset HEAD <path>
         # # Handles git reset HEAD -- <path>
@@ -417,10 +431,33 @@ function GitTabExpansionInternalB($lastBlock, $GitStatus = $null) {
         #     expandShortParams $shortVstsParams $matches['cmd'] $matches['shortparam']
         # }
 
-        # git add <files>
-        "^ga.* (?<files>\S*)$" {
+        # ga: git add <files>
+        # gapa: git add --patch <files>
+        # gau: git add --update <files>
+        # gav: git add --verbose <files>
+        "^ga(pa|u|v)?.* (?<files>\S*)$" {
             gitAddFiles $GitStatus $matches['files']
         }
+
+        # git add --all <long flags>
+        # recommends long flags since it's easier to read
+        "^gaa.* (?<files>[-]{2}[^-\s]*|)$" {
+            expandLongParams $gitLongParams "gaa" $matches['param']
+        }
+
+        # git branch
+        "^gb.* (?<branch>\S*)$" {
+            gitBranches $matches['branch']
+        }
+
+        # git branch all <pattern?>
+        # "^gba.* (?<pattern>\S*)$" {
+        #     gitBranches $matches['pattern']
+        # }
+        "^gba.* (?<files>[-]{2}[^-\s]*|)$" {
+            expandLongParams $gitLongParams "gaa" $matches['param']
+        }
+
         # git checkout <ref>
         "^gco.* (?<ref>\S*)$" {
             & {
@@ -431,14 +468,21 @@ function GitTabExpansionInternalB($lastBlock, $GitStatus = $null) {
             } | Select-Object -Unique
         }
 
+        # git pull <remote>
+        # git push <remote>
+        # git fetch <remote>
+        "^(?:gl|gp|gf)${ignoreGitParams}\s+(?<remote>\S*)$" {
+            gitRemotes $matches['remote']
+        }
+
         # Handles git <cmd> --<param>
         "^(?<cmd>$gitAliasesWithLongParams).* --(?<param>\S*)$" {
-            expandLongParams $longGitParams $poshGitAliasMap[$matches['cmd']] $matches['param']
+            expandLongParams $gitLongParams $matches['cmd'] $matches['param']
         }
 
         # Handles git <cmd> -<shortparam>
         "^(?<cmd>$gitAliasesWithShortParams).* -(?<shortparam>\S*)$" {
-            expandShortParams $shortGitParams $poshGitAliasMap[$matches['cmd']] $matches['shortparam']
+            expandShortParams $gitShortParams $matches['cmd'] $matches['shortparam']
         }
     }
 }

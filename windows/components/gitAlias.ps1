@@ -11,27 +11,33 @@ Remove-Alias gm -Force -ErrorAction SilentlyContinue
 Remove-Alias gp -Force -ErrorAction SilentlyContinue
 Remove-Alias gpv -Force -ErrorAction SilentlyContinue
 
+$script:alias_indicator = $true
+$script:alias_indicator_color = "Yellow"
+
 Set-Alias g git
 function g {
-	git $args
+	aliasRun "git $($args)" $alias_indicator $alias_indicator_color
 }
 function ga {
-	git add $args
+	aliasRun "git add $($args)" $alias_indicator $alias_indicator_color
 }
 function gaa {
-	git add --all $args
+	aliasRun "git add --all $($args)" $alias_indicator $alias_indicator_color
 }
 function gapa {
-	git add --patch $args
+	aliasRun "git add --patch $($args)" $alias_indicator $alias_indicator_color
 }
 function gau {
-	git add --update $args
+	aliasRun "git add --update $($args)" $alias_indicator $alias_indicator_color
+}
+function gav {
+	aliasRun "git add --verbose $($args)" $alias_indicator $alias_indicator_color
 }
 function gb {
-	git branch $args
+	aliasRun "git branch $($args)" $alias_indicator $alias_indicator_color
 }
 function gba {
-	git branch -a $args
+	aliasRun "git branch -a $($args)" $alias_indicator $alias_indicator_color
 }
 function gbda {
 	$MainBranch = Get-Git-MainBranch
@@ -115,7 +121,7 @@ function gcmsg {
 	git commit -m $args
 }
 function gco {
-	git checkout $args
+	aliasRun "git checkout $($args)" $alias_indicator $alias_indicator_color
 }
 function gcount {
 	git shortlog -sn $args
@@ -145,13 +151,13 @@ function gdw {
 	git diff --word-diff $args
 }
 function gf {
-	git fetch $args
+	aliasRun "git fetch $($args)" $alias_indicator $alias_indicator_color
 }
 function gfa {
 	git fetch --all --prune $args
 }
 function gfo {
-	git fetch origin $args
+	aliasRun "git fetch origin $($args)" $alias_indicator $alias_indicator_color
 }
 function gg {
 	git gui citool $args
@@ -189,7 +195,7 @@ function gignored {
 	git ls-files -v | Select-String "^[a-z]" -CaseSensitive
 }
 function gl {
-	git pull $args
+	aliasRun "git pull $($args)" $alias_indicator $alias_indicator_color
 }
 function glg {
 	git log --stat --color $args

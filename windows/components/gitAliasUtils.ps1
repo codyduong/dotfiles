@@ -138,3 +138,26 @@ function Get-Git-Aliases ([string] $Alias) {
 
 	return Format-Table -InputObject $aliases -AutoSize -Wrap -Property $cols
 }
+
+# https://stackoverflow.com/a/25682508
+function script:IIf($If, $Then, $Else) {
+	If ($If -IsNot "Boolean") {$_ = $If}
+	If ($If) {If ($Then -is "ScriptBlock") {&$Then} Else {$Then}}
+	Else {If ($Else -is "ScriptBlock") {&$Else} Else {$Else}}
+}
+
+function Invoke-Utf8ConsoleCommand ([ScriptBlock]$cmd) {
+	$currentEncoding = [Console]::OutputEncoding
+	try {
+			[Console]::OutputEncoding = [Text.Encoding]::UTF8
+			& $cmd
+	}
+	finally {
+			[Console]::OutputEncoding = $currentEncoding
+	}
+}
+
+function aliasRun($cmd, $show, $color) {
+	IIf $alias_indicator (Write-Host $cmd -ForegroundColor $alias_indicator_color)
+	Invoke-Utf8ConsoleCommand {  }
+}
