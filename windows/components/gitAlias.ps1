@@ -74,7 +74,7 @@ function gbss {
 	git bisect start $args
 }
 function gc {
-	git commit -v $args
+	aliasRun "git commit -v $($args)" $alias_indicator $alias_indicator_color
 }
 function gc! {
 	git commit -v --amend $args
@@ -247,7 +247,7 @@ function gmum {
 	git merge upstream/$MainBranch $args
 }
 function gp {
-	git push $args
+	aliasRun "git push $($args)" $alias_indicator $alias_indicator_color
 }
 function gpd {
 	git push --dry-run $args
@@ -356,7 +356,7 @@ function gss {
 	git status -s $args
 }
 function gst {
-	git status $args
+	aliasRun "git status $($args)" $alias_indicator $alias_indicator_color
 }
 function gsta {
 	git stash save $args

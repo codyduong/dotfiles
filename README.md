@@ -30,7 +30,12 @@ Based off [Jay Harris's dotfiles for Windows](https://github.com/jayharris/dotfi
   winget install --id Microsoft.Powershell.Preview --source winget
   ```
 
-### Bootstrap
+### Installing dependencies and packages
+```powershell
+.\windows\deps.ps1
+```
+
+### Bootstrap Profile
 **without git**
 ```powershell
 Set-ExecutionPolicy Unrestricted -Scope CurrentUser
@@ -42,11 +47,6 @@ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 Set-ExecutionPolicy Unrestricted -Scope CurrentUser
 git clone https://github.com/codyduong/dotfiles.git; cd dotfiles; . .\windows\bootstrap.ps1
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
-```
-
-### Installing dependencies and packages
-```powershell
-.\windows\deps.ps1
 ```
 
 <!---

@@ -31,9 +31,9 @@ foreach ($key in $poshGitAliasList.Keys) {
     }
 }
 
-foreach ($key in $gitLongParams.Keys) {
-    Write-Host "$($key) $($gitLongParams[$key]) $($gitShortParams[$key])`n" -ForegroundColor "Yellow"
-}
+# foreach ($key in $gitLongParams.Keys) {
+#     Write-Host "$($key) $($gitLongParams[$key]) $($gitShortParams[$key])`n" -ForegroundColor "Yellow"
+# }
 
 filter quoteStringWithSpecialChars {
     if ($_ -and ($_ -match '\s+|#|@|\$|;|,|''|\{|\}|\(|\)')) {
@@ -466,6 +466,30 @@ function GitTabExpansionInternalB($lastBlock, $GitStatus = $null) {
                 gitTags $matches['ref']
                 # Return only unique branches (to eliminate duplicates where the branch exists locally and on the remote)
             } | Select-Object -Unique
+        }
+
+        # git checkout -- <files>
+        "^gco.* -- (?<files>\S*)$" {
+            gitCheckoutFiles $GitStatus $matches['files']
+        }
+
+        # Handles git help <cmd> (commands only)
+        "^ghh (?<cmd>\S*)$" {
+            gitCommands $matches['cmd'] $FALSE
+        }
+
+        # git push remote <ref>:<branch>
+        # git push remote +<ref>:<branch>
+        "^gp${ignoreGitParams}\s+(?<remote>[^\s-]\S*).*\s+(?<force>\+?)(?<ref>[^\s\:]*\:)(?<branch>\S*)$" {
+            gitRemoteBranches $matches['remote'] $matches['ref'] $matches['branch'] -prefix $matches['force']
+        }
+
+        # git pull <ref>
+        # git push <ref>
+        # git push +<ref>
+        "^(?:gl|gp)${ignoreGitParams}\s+(?<remote>[^\s-]\S*).*\s+(?<force>\+?)(?<ref>[^\s\:]*)$" {
+            gitBranches $matches['ref'] -prefix $matches['force']
+            gitTags $matches['ref'] -prefix $matches['force']
         }
 
         # git pull <remote>

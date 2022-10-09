@@ -76,7 +76,7 @@ $poshGitAliasList = @{
     # ggsup ="git branch --set-upstream-to=origin/$(git_current_branch)"
     # ggu ="git pull --rebase origin $(current_branch)"
     # gpsup ="git push --set-upstream origin $(git_current_branch)"
-    # ghh ="git help"
+    ghh ="git help"
     # gignore ="git update-index --assume-unchanged"
     # gignored ="git ls-files -v | grep "^[[:lower:]]""
     # git-="svn-dcommit-push git svn dcommit && git push github $(git_main_branch):svntrunk"
