@@ -33,6 +33,8 @@ Write-Host "Installing oh-my-posh and extensions..." -ForegroundColor "Yellow"
 winget install JanDeDobbeleer.OhMyPosh -s winget
 # autocomplete
 Install-Module PSReadLine -AllowPrerelease -Scope CurrentUser -Force -SkipPublisherCheck
+# predictor for autocomplete
+Install-Module -Name CompletionPredictor -Scope CurrentUser -Force -SkipPublisherCheck
 # terminal icons
 Install-Module -Name Terminal-Icons -Repository PSGallery -Force
 # oh-my-zsh like git aliases
@@ -41,6 +43,8 @@ Install-Module -Name Terminal-Icons -Repository PSGallery -Force
 # font
 oh-my-posh font install Meslo
 
+# profiling
+Install-Module PSProfiler -Scope CurrentUser -Force -SkipPublisherCheck -AllowPrerelease
 
 ### Install ExplorePatcher if win11, TODO
 # winget install -e --id valinet.ExplorerPatcher

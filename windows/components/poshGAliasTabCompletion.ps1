@@ -1,8 +1,9 @@
+# Tab Completion
+# TODO: git-alias-suggestions
+
 . $PSScriptRoot\poshGAliasList.ps1
 
-$script:gitCommandsWithLongParams = "$($longGitParams.Keys -join '|')|$($gitAliasesWithLongParams)"
-$script:gitCommandsWithShortParams = "$($shortGitParams.Keys -join '|')|$($gitAliasesWithShortParams)"
-$script:gitCommandsWithParamValues = $gitParamValues.Keys -join '|'
+$script:gitCommandsWithParamValues = ($poshGitAliasMap.Keys | Where-Object { $gitParamValues.Keys.Contains($_) }) -join '|'
 $script:vstsCommandsWithShortParams = $shortVstsParams.Keys -join '|'
 $script:vstsCommandsWithLongParams = $longVstsParams.Keys -join '|'
 
@@ -10,25 +11,50 @@ $script:gitAliases = $poshGitAliasList.Keys -join '|'
 $script:gitAliasesWithLongParams = ($poshGitAliasMap.Keys | Where-Object { $longGitParams.Keys.Contains($_) }) -join '|'
 $script:gitAliasesWithShortParams = ($poshGitAliasMap.Keys | Where-Object { $shortGitParams.Keys.Contains($_) }) -join '|'
 
+$script:lgitParamValues = $gitParamValues
 $script:gitLongParams = $longGitParams
 $script:gitShortParams = $shortGitParams
 
+$script:someCommands = @('add','am','annotate','archive','bisect','blame','branch','bundle','checkout','cherry',
+                         'cherry-pick','citool','clean','clone','commit','config','describe','diff','difftool','fetch',
+                         'format-patch','gc','grep','gui','help','init','instaweb','log','merge','mergetool','mv',
+                         'notes','prune','pull','push','rebase','reflog','remote','rerere','reset','restore','revert','rm',
+                         'shortlog','show','stash','status','submodule','svn','switch','tag','whatchanged', 'worktree')
+
+if ((($PSVersionTable.PSVersion.Major -eq 5) -or $IsWindows) -and ($script:GitVersion -ge [System.Version]'2.16.2')) {
+    $script:someCommands += 'update-git-for-windows'
+}
+
 foreach ($key in $poshGitAliasList.Keys) {
-    foreach ($arg in ($longGitParams[$poshGitAliasMap[$key]].Trim() -split ' ')) {
-        $key_args = $poshGitAliasList[$key] -replace "--","" -split ' '
-        if ($key_args -notcontains $arg) {
-            $gitLongParams[$key] += " $($arg)"
+    if ($gitParamValues[$poshGitAliasMap[$key]] -ne $null) {
+        $old_arg_map = $gitParamValues[$poshGitAliasMap[$key]]
+        $new_arg_map = @{}
+        foreach ($arg in $old_arg_map.Keys) {
+            $key_args = $poshGitAliasList[$key] -replace "(--|=)","" -split ' '
+            if ($key_args -notcontains $arg) {
+                $new_arg_map[$arg] = $old_arg_map[$arg]
+            }
         }
+        $lgitParamValues[$key] = $new_arg_map
     }
 }
 
 foreach ($key in $poshGitAliasList.Keys) {
-    foreach ($arg in ($shortGitParams[$poshGitAliasMap[$key]].Trim() -split ' ')) {
-        $key_args = $poshGitAliasList[$key] -replace "-","" -split ' '
-        if ($key_args -notcontains $arg) {
-            $gitShortParams[$key] += " $($arg)"
-        }
-    }
+    $old_args = $longGitParams[$poshGitAliasMap[$key]]
+    $args_to_remove = ($poshGitAliasList[$key] -split ' ' | 
+        Where { $_ -match "(?<=--)\S*$" }) -join '|'
+
+    $new_args= $old_args -replace "($($args_to_remove))",""
+    $gitLongParams[$key] = $new_args
+}
+
+foreach ($key in $poshGitAliasList.Keys) {
+    $old_args = $gitShortParams[$poshGitAliasMap[$key]]
+    $args_to_remove = ($poshGitAliasList[$key] -split ' ' | 
+        Where { $_ -match "(?<=-)\S*$" }) -join '|'
+
+    $new_args= $old_args -replace "($($args_to_remove))",""
+    $gitShortParams[$key] = $new_args
 }
 
 # foreach ($key in $gitLongParams.Keys) {
@@ -229,7 +255,7 @@ function script:expandShortParams($hash, $cmd, $filter) {
 }
 
 function script:expandParamValues($cmd, $param, $filter) {
-    $paramValues = $gitParamValues[$cmd][$param]
+    $paramValues = $lgitParamValues[$cmd][$param]
 
     $completions = if ($paramValues -is [scriptblock]) {
         & $paramValues $filter
@@ -301,12 +327,6 @@ function GitTabExpansionInternalB($lastBlock, $GitStatus = $null) {
         #     gitTfsShelvesets $matches['shelveset']
         # }
 
-        # # Handles git branch -d|-D|-m|-M <branch name>
-        # # Handles git branch <branch name> <start-point>
-        # "^branch.* (?<branch>\S*)$" {
-        #     gitBranches $matches['branch']
-        # }
-
         # # Handles git <cmd> (commands & aliases)
         # "^(?<cmd>\S*)$" {
         #     gitCommands $matches['cmd'] $TRUE
@@ -344,11 +364,6 @@ function GitTabExpansionInternalB($lastBlock, $GitStatus = $null) {
         # # Handles git add <path>
         # "^add.* (?<files>\S*)$" {
         #     gitAddFiles $GitStatus $matches['files']
-        # }
-
-        # # Handles git checkout -- <path>
-        # "^checkout.* -- (?<files>\S*)$" {
-        #     gitCheckoutFiles $GitStatus $matches['files']
         # }
 
         # # Handles git restore -s <ref> / --source=<ref> - must come before the next regex case
@@ -404,16 +419,6 @@ function GitTabExpansionInternalB($lastBlock, $GitStatus = $null) {
         #     expandParamValues $matches['cmd'] $matches['param'] $matches['value']
         # }
 
-        # # Handles git <cmd> --<param>
-        # "^(?<cmd>$gitCommandsWithLongParams).* --(?<param>\S*)$" {
-        #     expandLongParams $longGitParams $matches['cmd'] $matches['param']
-        # }
-
-        # # Handles git <cmd> -<shortparam>
-        # "^(?<cmd>$gitCommandsWithShortParams).* -(?<shortparam>\S*)$" {
-        #     expandShortParams $shortGitParams $matches['cmd'] $matches['shortparam']
-        # }
-
         # # Handles git pr alias
         # "vsts\.pr\s+(?<op>\S*)$" {
         #     gitCmdOperations $subcommands 'vsts.pr' $matches['op']
@@ -445,21 +450,21 @@ function GitTabExpansionInternalB($lastBlock, $GitStatus = $null) {
             expandLongParams $gitLongParams "gaa" $matches['param']
         }
 
+        # git branch all <pattern?>
+        "^gba.* (?<pattern>\S*)$" {
+            gitBranches $matches['pattern']
+        }
+
         # git branch
-        "^gb.* (?<branch>\S*)$" {
+        # git branch -d
+        # git branch -D
+        "^gb(d|D)?.* (?<branch>\S*)$" {
             gitBranches $matches['branch']
         }
 
-        # git branch all <pattern?>
-        # "^gba.* (?<pattern>\S*)$" {
-        #     gitBranches $matches['pattern']
-        # }
-        "^gba.* (?<files>[-]{2}[^-\s]*|)$" {
-            expandLongParams $gitLongParams "gaa" $matches['param']
-        }
-
         # git checkout <ref>
-        "^gco.* (?<ref>\S*)$" {
+        # git switch <ref>
+        "^(gco|gsw).* (?<ref>\S*)$" {
             & {
                 gitBranches $matches['ref'] $true
                 gitRemoteUniqueBranches $matches['ref']
@@ -499,6 +504,11 @@ function GitTabExpansionInternalB($lastBlock, $GitStatus = $null) {
             gitRemotes $matches['remote']
         }
 
+        # # Handles git <cmd> --<param>=<value>
+        "^(?<cmd>$gitCommandsWithParamValues).* --(?<param>[^=]+)=(?<value>\S*)$" {
+            expandParamValues $matches['cmd'] $matches['param'] $matches['value']
+        }
+
         # Handles git <cmd> --<param>
         "^(?<cmd>$gitAliasesWithLongParams).* --(?<param>\S*)$" {
             expandLongParams $gitLongParams $matches['cmd'] $matches['param']
@@ -511,14 +521,72 @@ function GitTabExpansionInternalB($lastBlock, $GitStatus = $null) {
     }
 }
 
+# if (!$UseLegacyTabExpansion -and ($PSVersionTable.PSVersion.Major -ge 6)) {
+#     $cmdNames = $poshGitAliasList.Keys
+
+#     # Create regex pattern from $cmdNames: ^(git|git\.exe|tgit|tgit\.exe|gitk|gitk\.exe)$
+#     # $cmdNamesPattern = "^($($cmdNames -join '|'))(\.exe)?$"
+#     # $cmdNames += Get-Alias | Where-Object { $_.Definition -match $cmdNamesPattern } | Foreach-Object Name
+
+#     # if ($EnableProxyFunctionExpansion) {
+#     #     $funcNames += Get-ChildItem -Path Function:\ | Where-Object { $_.Definition -match $script:GitProxyFunctionRegex } | Foreach-Object Name
+#     #     $cmdNames += $funcNames
+
+#     #     # Create regex pattern from $funcNames e.g.: ^(Git-Checkout|Git-Switch)$
+#     #     $funcNamesPattern = "^($($funcNames -join '|'))$"
+#     #     $cmdNames += Get-Alias | Where-Object { $_.Definition -match $funcNamesPattern } | Foreach-Object Name
+#     # }
+
+#     # $global:GitTabSettings.RegisteredCommands = $cmdNames -join ", "
+
+#     Microsoft.PowerShell.Core\Register-ArgumentCompleter -CommandName $cmdNames -Native -ScriptBlock {
+#         param($wordToComplete, $commandAst, $cursorPosition)
+
+#         # The PowerShell completion has a habit of stripping the trailing space when completing:
+#         # git checkout <tab>
+#         # The Expand-GitCommand expects this trailing space, so pad with a space if necessary.
+#         $padLength = $cursorPosition # - $commandAst.Extent.StartOffset
+#         $textToComplete = $commandAst.ToString().PadRight($padLength, ' ').Substring(0, $padLength)
+#         # if ($EnableProxyFunctionExpansion) {
+#         #     $textToComplete = Expand-GitProxyFunction($textToComplete)
+#         # }
+
+#         WriteTabExpLog "Expand: command: '$($commandAst.Extent.Text)', padded: '$textToComplete', padlen: $padLength"
+#         Expand-GitCommand2 $textToComplete
+#     }
+# }
+
+# regardless of argument hint completition register the new expansions
 function TabExpansion($line, $lastWord) {
+    $PowerTab_RegisterTabExpansion = if (Get-Module -Name powertab) { Get-Command Register-TabExpansion -Module powertab -ErrorAction SilentlyContinue }
+    if ($PowerTab_RegisterTabExpansion) {
+        foreach ($cmd in $poshGitAliasList.Keys) {
+            & $PowerTab_RegisterTabExpansion $cmd -Type Command {
+                param($Context, [ref]$TabExpansionHasOutput, [ref]$QuoteSpaces)
+    
+                $line = $Context.Line
+                $lastBlock = [regex]::Split($line, '[|;]')[-1].TrimStart()
+                # if ($EnableProxyFunctionExpansion) {
+                #     $lastBlock = Expand-GitProxyFunction($lastBlock)
+                # }
+                $TabExpansionHasOutput.Value = $true
+                WriteTabExpLog "PowerTab expand: '$lastBlock'"
+                Expand-GitCommand2 $lastBlock
+            }
+    
+            return
+        }
+    }
+
     $lastBlock = [regex]::Split($line, '[|;]')[-1].TrimStart()
+    $msg = "Legacy expand: '$lastBlock'"
 
     switch -regex ($lastBlock) {
         # Execute git tab completion for all git-related commands
-        "^$($gitAliases) (.*)" { GitTabExpansionInternalB $lastBlock $Global:GitStatus }
+        "^$($gitAliases) (.*)" { WriteTabExpLog $msg; Expand-GitCommand2 $lastBlock $Global:GitStatus }
         # "^$(Get-AliasPattern git) (.*)" { WriteTabExpLog $msg; Expand-GitCommand $lastBlock }
         # "^$(Get-AliasPattern tgit) (.*)" { WriteTabExpLog $msg; Expand-GitCommand $lastBlock }
         # "^$(Get-AliasPattern gitk) (.*)" { WriteTabExpLog $msg; Expand-GitCommand $lastBlock }
     }
 }
+

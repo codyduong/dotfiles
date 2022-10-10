@@ -8,8 +8,8 @@ Set-Environment "GIT_EDITOR" $Env:EDITOR
 # oh-my-posh
 oh-my-posh init pwsh --config "$env:POSH_THEMES_PATH\M365Princess.omp.json" | Invoke-Expression
 Import-Module PSReadLine
-Set-PSReadLineOption -PredictionSource History
-Set-PSReadLineOption -PredictionViewStyle ListView
+Import-Module CompletionPredictor
 Import-Module Terminal-Icons
-# TODO import throws error
-# Import-Module git-aliases
+
+# profiling
+Import-Module PSProfiler

@@ -146,18 +146,7 @@ function script:IIf($If, $Then, $Else) {
 	Else {If ($Else -is "ScriptBlock") {&$Else} Else {$Else}}
 }
 
-function Invoke-Utf8ConsoleCommand ([ScriptBlock]$cmd) {
-	$currentEncoding = [Console]::OutputEncoding
-	try {
-			[Console]::OutputEncoding = [Text.Encoding]::UTF8
-			& $cmd
-	}
-	finally {
-			[Console]::OutputEncoding = $currentEncoding
-	}
-}
-
 function aliasRun($cmd, $show, $color) {
 	IIf $alias_indicator (Write-Host $cmd -ForegroundColor $alias_indicator_color)
-	Invoke-Utf8ConsoleCommand {  }
+	Invoke-Expression $cmd
 }

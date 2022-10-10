@@ -14,7 +14,6 @@ Remove-Alias gpv -Force -ErrorAction SilentlyContinue
 $script:alias_indicator = $true
 $script:alias_indicator_color = "Yellow"
 
-Set-Alias g git
 function g {
 	aliasRun "git $($args)" $alias_indicator $alias_indicator_color
 }
@@ -39,6 +38,9 @@ function gb {
 function gba {
 	aliasRun "git branch -a $($args)" $alias_indicator $alias_indicator_color
 }
+function gbd {
+	aliasRun "git branch -d $($args)" $alias_indicator $alias_indicator_color
+}
 function gbda {
 	$MainBranch = Get-Git-MainBranch
 	$MergedBranchs = $(git branch --merged | Select-String "^(\*|\s*($MainBranch|develop|dev)\s*$)" -NotMatch).Line
@@ -50,7 +52,7 @@ function gbda {
 	}
 }
 function gbl {
-	git blame -b -w $args
+	aliasRun "git blame -b -w $($args)" $alias_indicator $alias_indicator_color
 }
 function gbnm {
 	git branch --no-merged $args
@@ -74,7 +76,8 @@ function gbss {
 	git bisect start $args
 }
 function gc {
-	aliasRun "git commit -v $($args)" $alias_indicator $alias_indicator_color
+	git commit -v $args
+	# aliasRun "" $alias_indicator $alias_indicator_color
 }
 function gc! {
 	git commit -v --amend $args
@@ -176,7 +179,7 @@ function ggfl {
 	git push --force-with-lease origin $CurrentBranch
 }
 function ghh {
-	git help $args
+	aliasRun "git help $($args)" $alias_indicator $alias_indicator_color
 }
 function ggsup {
 	$CurrentBranch = Get-Git-CurrentBranch

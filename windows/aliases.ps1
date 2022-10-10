@@ -12,14 +12,11 @@ ${function:......} = { Set-Location ..\..\..\..\.. }
 # ${function:docs} = { Set-Location ~\Documents }
 # ${function:dl} = { Set-Location ~\Downloads }
 
-# Missing Bash aliases
-Set-Alias time Measure-Command
-
 # Correct PowerShell Aliases if tools are available (aliases win if set)
 # WGet: Use `wget.exe` if available
-if (Get-Command wget.exe -ErrorAction SilentlyContinue | Test-Path) {
-  rm alias:wget -ErrorAction SilentlyContinue
-}
+# if (Get-Command wget.exe -ErrorAction SilentlyContinue | Test-Path) {
+#   rm alias:wget -ErrorAction SilentlyContinue
+# }
 
 # Directory Listing: Use `ls.exe` if available
 if (Get-Command ls.exe -ErrorAction SilentlyContinue | Test-Path) {
@@ -52,8 +49,8 @@ if (Get-Command curl.exe -ErrorAction SilentlyContinue | Test-Path) {
 }
 
 # Create a new directory and enter it
-Set-Alias mkd CreateAndSet-Directory
-Set-Alias mkdir CreateAndSet-Directory
+Set-Alias mkdir CreateDirectory
+Set-Alias mkdircd CreateAndSet-Directory
 # Determine size of a file or total size of a directory
 Set-Alias fs Get-DiskUsage
 # Empty the Recycle Bin on all drives
@@ -61,7 +58,7 @@ Set-Alias emptytrash Empty-RecycleBin
 # Cleanup old files all drives
 Set-Alias cleandisks Clean-Disks
 # Reload the shell
-Set-Alias reload Reload-Powershell
+# Set-Alias reload Reload-Powershell
 # http://xkcd.com/530/
 Set-Alias mute Set-SoundMute
 Set-Alias unmute Set-SoundUnmute
@@ -70,8 +67,16 @@ Set-Alias update System-Update
 Set-Alias vim nvim
 Set-Alias less 'C:\Program Files (x86)\Less\less.exe'
 Set-Alias grep findstr
+# which is a function already loaded in functions.ps1
+# Set-Alias which which
 
-function which ($command) {
-Get-Command -Name $command -ErrorAction SilentlyContinue |
-    Select-Object -ExpandProperty Path -ErrorAction SilentlyContinue
+# PS-Readline
+$PSReadLineOptions = @{
+    PredictionSource = "HistoryAndPlugin"
+    PredictionViewStyle = "ListView"
+}
+Set-PSReadLineOption @PSReadLineOptions
+
+function source() {
+    Invoke-Command { & "pwsh.exe" } -NoNewScope
 }
