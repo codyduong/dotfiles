@@ -15,31 +15,31 @@ $script:alias_indicator = $true
 $script:alias_indicator_color = "Yellow"
 
 function g {
-	aliasRun "git $($args)" $alias_indicator $alias_indicator_color
+	aliasRun {git $args} $args $alias_indicator $alias_indicator_color
 }
 function ga {
-	aliasRun "git add $($args)" $alias_indicator $alias_indicator_color
+	aliasRun {git add $args} $args $alias_indicator $alias_indicator_color
 }
 function gaa {
-	aliasRun "git add --all $($args)" $alias_indicator $alias_indicator_color
+	aliasRun {git add --all $args} $args $alias_indicator $alias_indicator_color
 }
 function gapa {
-	aliasRun "git add --patch $($args)" $alias_indicator $alias_indicator_color
+	aliasRun {git add --patch $args} $args $alias_indicator $alias_indicator_color
 }
 function gau {
-	aliasRun "git add --update $($args)" $alias_indicator $alias_indicator_color
+	aliasRun {git add --update $args} $args $alias_indicator $alias_indicator_color
 }
 function gav {
-	aliasRun "git add --verbose $($args)" $alias_indicator $alias_indicator_color
+	aliasRun {git add --verbose $args} $args $alias_indicator $alias_indicator_color
 }
 function gb {
-	aliasRun "git branch $($args)" $alias_indicator $alias_indicator_color
+	aliasRun {git branch $args} $args $alias_indicator $alias_indicator_color
 }
 function gba {
-	aliasRun "git branch -a $($args)" $alias_indicator $alias_indicator_color
+	aliasRun {git branch -a $args} $args $alias_indicator $alias_indicator_color
 }
 function gbd {
-	aliasRun "git branch -d $($args)" $alias_indicator $alias_indicator_color
+	aliasRun {git branch -d $args} $args $alias_indicator $alias_indicator_color
 }
 function gbda {
 	$MainBranch = Get-Git-MainBranch
@@ -52,7 +52,7 @@ function gbda {
 	}
 }
 function gbl {
-	aliasRun "git blame -b -w $($args)" $alias_indicator $alias_indicator_color
+	aliasRun { git blame -b -w $args} $args $alias_indicator $alias_indicator_color
 }
 function gbnm {
 	git branch --no-merged $args
@@ -76,8 +76,7 @@ function gbss {
 	git bisect start $args
 }
 function gc {
-	git commit -v $args
-	# aliasRun "" $alias_indicator $alias_indicator_color
+	aliasRun {git commit -v $args} $args $alias_indicator $alias_indicator_color
 }
 function gc! {
 	git commit -v --amend $args
@@ -124,7 +123,7 @@ function gcmsg {
 	git commit -m $args
 }
 function gco {
-	aliasRun "git checkout $($args)" $alias_indicator $alias_indicator_color
+	aliasRun {git checkout $args} $args $alias_indicator $alias_indicator_color
 }
 function gcount {
 	git shortlog -sn $args
@@ -154,13 +153,13 @@ function gdw {
 	git diff --word-diff $args
 }
 function gf {
-	aliasRun "git fetch $($args)" $alias_indicator $alias_indicator_color
+	aliasRun {git fetch $args} $args $alias_indicator $alias_indicator_color
 }
 function gfa {
 	git fetch --all --prune $args
 }
 function gfo {
-	aliasRun "git fetch origin $($args)" $alias_indicator $alias_indicator_color
+	aliasRun {git fetch origin $args} $args $alias_indicator $alias_indicator_color
 }
 function gg {
 	git gui citool $args
@@ -179,7 +178,7 @@ function ggfl {
 	git push --force-with-lease origin $CurrentBranch
 }
 function ghh {
-	aliasRun "git help $($args)" $alias_indicator $alias_indicator_color
+	aliasRun {git help $args} $args $alias_indicator $alias_indicator_color
 }
 function ggsup {
 	$CurrentBranch = Get-Git-CurrentBranch
@@ -198,7 +197,7 @@ function gignored {
 	git ls-files -v | Select-String "^[a-z]" -CaseSensitive
 }
 function gl {
-	aliasRun "git pull $($args)" $alias_indicator $alias_indicator_color
+	aliasRun {git pull $args} $args $alias_indicator $alias_indicator_color
 }
 function glg {
 	git log --stat --color $args
@@ -250,7 +249,7 @@ function gmum {
 	git merge upstream/$MainBranch $args
 }
 function gp {
-	aliasRun "git push $($args)" $alias_indicator $alias_indicator_color
+	aliasRun {git push $args} $args $alias_indicator $alias_indicator_color
 }
 function gpd {
 	git push --dry-run $args
@@ -359,7 +358,7 @@ function gss {
 	git status -s $args
 }
 function gst {
-	aliasRun "git status $($args)" $alias_indicator $alias_indicator_color
+	aliasRun {git status $args} $args $alias_indicator $alias_indicator_color
 }
 function gsta {
 	git stash save $args
