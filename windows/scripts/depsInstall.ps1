@@ -8,10 +8,12 @@ if (!(Verify-Elevated)) {
   exit
 }
 
+. $PSScriptRoot\utils.ps1
+InstallerPromptUpdateOutdated
 
 ### Update Help for Modules
-Write-Host "Updating Help..." -ForegroundColor "Yellow"
-Update-Help -Force
+# Write-Host "Updating Help..." -ForegroundColor "Yellow"
+# Update-Help -Force
 
 
 ## Package Providers
@@ -47,7 +49,7 @@ oh-my-posh font install Meslo
 Install-Module PSProfiler -Scope CurrentUser -Force -SkipPublisherCheck -AllowPrerelease
 
 ### Install ExplorePatcher if win11, TODO
-# winget install -e --id valinet.ExplorerPatcher
+# WingetInstall("valinet.ExplorerPatcher")
 
 
 ### Desktop Utilities
@@ -59,39 +61,39 @@ if ($null -eq (which cinst)) {
 }
 
 # PERSONAL
-winget install -e --id Discord.Discord
-winget install -e --id Valve.Steam
+WingetInstall("Discord.Discord")
+WingetInstall("Valve.Steam")
 
 # BROWSERS
-winget install -e --id Google.Chrome
-winget install -e --id Google.Chrome.Canary
-winget install -e --id Mozilla.Firefox.ESR # Extended Support Release
-winget install -e --id Mozilla.Firefox.DeveloperEdition 
+WingetInstall("Google.Chrome")
+WingetInstall("Google.Chrome.Canary")
+WingetInstall("Mozilla.Firefox.ESR") # Extended Support Release
+WingetInstall("Mozilla.Firefox.DeveloperEdition ")
 
 # PRODUCTIVE
-winget install -e --id Zoom.Zoom
+WingetInstall("Zoom.Zoom")
 
 # DEV DEPS
 choco install curl                --limit-output # awaiting winget
-winget install -e --id OpenJS.NodeJS
-winget install -e --id CoreyButler.NVMforWindows
-winget install -e --id Python.Python.3.9
+WingetInstall("OpenJS.NodeJS")
+WingetInstall("CoreyButler.NVMforWindows")
+WingetInstall("Python.Python.3.9")
 choco install pyenv-win
-winget install -e --id GitHub.GitHubDesktop
-winget install -e --id Git.Git
-winget install -e --id Microsoft.GitCredentialManagerCore
+WingetInstall("GitHub.GitHubDesktop")
+WingetInstall("Git.Git")
+WingetInstall("Microsoft.GitCredentialManagerCore")
 
 Write-Host "Installing IDEs..." -ForegroundColor "Yellow"
 # IDEs / DEs
-winget install -e --id Microsoft.VisualStudioCode
-winget install -e --id vim.vim
-winget install -e --id Neovim.Neovim
+WingetInstall("Microsoft.VisualStudioCode")
+WingetInstall("vim.vim")
+WingetInstall("Neovim.Neovim")
 
 # SCOOP
 irm get.scoop.sh | iex
 
 # grep
-winget install -e --id GnuWin32.Grep
+WingetInstall("GnuWin32.Grep")
 
 Refresh-Environment
 

@@ -5,5 +5,5 @@ _git() {
     || (echo "\033[1;33minstalling git...\033[0m"; sudo apt install git -y)
   which git >/dev/null 
     && git clone https://github.com/codyduong/dotfiles ~/dotfiles 
-    && dotfiles/linux/bootstrap.sh
+    && ~/dotfiles/linux/bootstrap.sh
 }
