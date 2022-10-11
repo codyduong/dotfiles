@@ -4,6 +4,10 @@ enum PackageIs {
     outdated
 }
 
+$script:InstallationIndicatorColorInstalling = "DarkCyan"
+$script:InstallationIndicatorColorUpdating = "DarkGreen"
+$script:InstallationIndicatorColorFound = "DarkGray"
+
 function script:WingetIsPackageInstalled {
     param (
         [parameter(mandatory)][string]$packageStr
@@ -35,15 +39,15 @@ function WingetInstall {
     $a = $installed[1]
     $updateOutdated = $Env:UPDATE_OUTDATED_DEPS
     if ($i -eq [PackageIs]::notinstalled) {
-        Write-Host "Installing $($packageStr)..." -ForegroundColor "Cyan"
+        Write-Host "Installing $($packageStr)..." -ForegroundColor $InstallationIndicatorColorInstalling
         winget install -e --id $packageStr
     }
     elseif ($i -eq [PackageIs]::outdated -and $updateOutdated -eq $true) {
-        Write-Host "Updating $($packageStr) from $($a[0]) to $($a[1])..." -ForegroundColor "Cyan"
+        Write-Host "Updating $($packageStr) from $($a[0]) to $($a[1])..." -ForegroundColor $InstallationIndicatorColorUpdating
         winget install -e --id $packageStr
     }
     else {
-        Write-Host "$($packageStr) $($a[0]) found, skipping..." -ForegroundColor "Cyan"
+        Write-Host "$($packageStr) $($a[0]) found, skipping..." -ForegroundColor $InstallationIndicatorColorFound
     }
 }
 
@@ -136,14 +140,14 @@ function PowershellInstall($packageStr) {
     $a = $installed[1]
     $updateOutdated = $Env:UPDATE_OUTDATED_DEPS
     if ($i -eq [PackageIs]::notinstalled) {
-        Write-Host "Installing $($packageStr)..." -ForegroundColor "Cyan"
+        Write-Host "Installing $($packageStr)..." -ForegroundColor $InstallationIndicatorColorInstalling
         Install-Module $packageStr @args
     }
     elseif ($i -eq [PackageIs]::outdated -and $updateOutdated -eq $true) {
-        Write-Host "Updating $($packageStr) from $($a[0]) to $($a[1])..." -ForegroundColor "Cyan"
+        Write-Host "Updating $($packageStr) from $($a[0]) to $($a[1])..." -ForegroundColor $InstallationIndicatorColorUpdating
         Install-Module $packageStr @args
     }
     else {
-        Write-Host "$($packageStr) $($a[0]) found, skipping..." -ForegroundColor "Cyan"
+        Write-Host "$($packageStr) $($a[0]) found, skipping..." -ForegroundColor $InstallationIndicatorColorFound
     }
 }

@@ -1,6 +1,6 @@
 $script:account = "codyduong"
 $script:repo    = "dotfiles"
-$script:branch  = "master"
+$script:branch  = "main"
 
 $script:dotfilesTempDir = Join-Path $env:TEMP "dotfiles"
 if (![System.IO.Directory]::Exists($dotfilesTempDir)) {[System.IO.Directory]::CreateDirectory($dotfilesTempDir)}
@@ -60,4 +60,4 @@ Pop-Location
 $newProcess = new-object System.Diagnostics.ProcessStartInfo "PowerShell";
 $newProcess.Arguments = "-nologo";
 [System.Diagnostics.Process]::Start($newProcess);
-exit
+# exit

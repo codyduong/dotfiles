@@ -34,7 +34,7 @@ Based off [Jay Harris's dotfiles for Windows](https://github.com/jayharris/dotfi
 **without git**
 ```powershell
 Set-ExecutionPolicy Unrestricted -Scope CurrentUser
-iex ((new-object net.webclient).DownloadString('https://github.com/codyduong/dotfiles/master/windows/setup/remote.ps1'))
+iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/codyduong/dotfiles/main/windows/setup/remote.ps1'))
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 **with git**

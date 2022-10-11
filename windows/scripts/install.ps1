@@ -19,21 +19,21 @@ InstallerPromptUpdateOutdated
 
 
 ### Package Providers
-Write-Host "Installing chocolatey..." -ForegroundColor "Yellow"
-Get-PackageProvider NuGet -Force | Out-Null
-# Chocolatey Provider is not ready yet. Use normal Chocolatey
-Get-PackageProvider Chocolatey -Force
-Set-PackageSource -Name chocolatey -Trusted
+# Write-Host "`nInstalling Package Providers" -ForegroundColor "Yellow"
+# Get-PackageProvider NuGet -Force | Out-Null
+# # Chocolatey Provider is not ready yet. Use normal Chocolatey
+# Get-PackageProvider Chocolatey -Force
+# Set-PackageSource -Name chocolatey -Trusted
 
 
 ### Install PowerShell Modules
-Write-Host "Installing PowerShell Modules..." -ForegroundColor "Yellow"
+Write-Host "`nInstalling PowerShell Modules..." -ForegroundColor "Yellow"
 PowershellInstall Posh-Git -Scope CurrentUser -Force -Verbose
 PowershellInstall PSWindowsUpdate -Scope CurrentUser -Force -Verbose
-
+PowershellInstall PSProfiler -Scope CurrentUser -Force -SkipPublisherCheck -AllowPrerelease -Verbose
 
 ### Install oh-my-posh and others
-Write-Host "Installing oh-my-posh and extensions..." -ForegroundColor "Yellow"
+Write-Host "`nInstalling OhMyPosh and Extensions" -ForegroundColor "Yellow"
 WingetInstall JanDeDobbeleer.OhMyPosh
 # autocomplete
 PowershellInstall PSReadLine -AllowPrerelease -Scope CurrentUser -Force -SkipPublisherCheck -Verbose
@@ -43,21 +43,46 @@ PowershellInstall -Name CompletionPredictor -Scope CurrentUser -Force -SkipPubli
 PowershellInstall -Name Terminal-Icons -Repository PSGallery -Force -Verbose
 oh-my-posh font install Meslo
 
-# profiling
-PowershellInstall PSProfiler -Scope CurrentUser -Force -SkipPublisherCheck -AllowPrerelease -Verbose
+################
+#Developer Tools
+################
+Write-Host "`nInstalling IDEs/Editors..." -ForegroundColor "Yellow"
+WingetInstall Microsoft.VisualStudioCode
+WingetInstall vim.vim
+WingetInstall Neovim.Neovim
 
-### Install ExplorePatcher if win11, TODO
-# WingetInstall valinet.ExplorerPatcher
-
-
-### Desktop Utilities
-Write-Host "Installing Desktop Utilities..." -ForegroundColor "Yellow"
+Write-Host "`nInstalling Languages & Tools..." -ForegroundColor "Yellow"
 # if ($null -eq (which cinst)) {
 #    iex (new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1')
 #    Refresh-Environment
 #    choco feature enable -n=allowGlobalConfirmation
 # }
+# curl is included by default
+WingetInstall OpenJS.NodeJS
+WingetInstall CoreyButler.NVMforWindows
+WingetInstall Python.Python.3.9
+# https://github.com/microsoft/winget-pkgs/issues/17988
+choco install pyenv-win
+WingetInstall GitHub.GitHubDesktop
+WingetInstall Git.Git
+WingetInstall Microsoft.GitCredentialManagerCore
+WingetInstall GnuWin32.Grep
 
+# Node Setup
+Write-Host "`nInstalling Node Packages..." -ForegroundColor "Yellow"
+if (which npm) {
+  npm update npm
+  npm install -g yarn
+}
+# $nodeLtsVersion = choco search nodejs-lts --limit-output | ConvertFrom-String -TemplateContent "{Name:package-name}\|{Version:1.11.1}" | Select -ExpandProperty "Version"
+# nvm install $nodeLtsVersion
+# nvm use $nodeLtsVersion
+Remove-Variable nodeLtsVersion
+
+###################
+# Desktop Utilities
+###################
+Write-Host "`nInstalling Desktop..." -ForegroundColor "Yellow"
 # PERSONAL
 WingetInstall Discord.Discord
 WingetInstall Valve.Steam
@@ -68,46 +93,38 @@ WingetInstall Google.Chrome.Canary
 WingetInstall Mozilla.Firefox.ESR # Extended Support Release
 WingetInstall Mozilla.Firefox.DeveloperEdition 
 
-# PRODUCTIVE
+# WORK/PRODUCTIVE
 WingetInstall Zoom.Zoom
+WingetInstall Microsoft.Teams
+WingetInstall SlackTechnologies.Slack
 
-# DEV DEPS
-# curl is included by default
-WingetInstall OpenJS.NodeJS
-WingetInstall CoreyButler.NVMforWindows
-WingetInstall Python.Python.3.9
-# https://github.com/microsoft/winget-pkgs/issues/17988
-choco install pyenv-win
-WingetInstall GitHub.GitHubDesktop
-WingetInstall Git.Git
-WingetInstall Microsoft.GitCredentialManagerCore
+# PATCH W11
+# https://learn.microsoft.com/en-us/windows/release-health/windows11-release-information
+if (([Environment]::OSVersion.Version).Build -ge 22621) {
+  WingetInstall valinet.ExplorerPatcher
+}
 
-Write-Host "Installing IDEs..." -ForegroundColor "Yellow"
-# IDEs / DEs
-WingetInstall Microsoft.VisualStudioCode
-WingetInstall vim.vim
-WingetInstall Neovim.Neovim
-
-# grep
-WingetInstall GnuWin32.Grep
+#######
+# OTHER
+#######
 
 # SCOOP
 # irm get.scoop.sh | iex
 
-Refresh-Environment
-
-nvm on
-# $nodeLtsVersion = choco search nodejs-lts --limit-output | ConvertFrom-String -TemplateContent "{Name:package-name}\|{Version:1.11.1}" | Select -ExpandProperty "Version"
-# nvm install $nodeLtsVersion
-# nvm use $nodeLtsVersion
-Remove-Variable nodeLtsVersion
-
-### Node Packages
-Write-Host "Installing Node Packages..." -ForegroundColor "Yellow"
-if (which npm) {
-   npm update npm
-   npm install -g yarn
+#####
+# WSL
+#####
+if (-not (which wsl)) {
+  wsl --install
 }
 
-# wsl
-wsl --install
+Write-Host @"
+
+======== Installation Complete ========
+If WSL was installed this run, you must 
+reboot Windows for WSL to work properly
+
+"@ -ForegroundColor White
+Write-Host "  * Reloading shell automatically..." -ForegroundColor Cyan
+Write-Host "=======================================`n" -ForegroundColor White
+Invoke-Command { & "pwsh.exe" } -NoNewScope
