@@ -16,7 +16,6 @@ function script:Get-File {
   Write-Host "Downloading $url to $file"
   [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
   Invoke-WebRequest -Uri $url -OutFile $file
-
 }
 
 function script:Read-File {
@@ -54,7 +53,7 @@ if ([System.IO.Directory]::Exists($dotfilesInstallDir)) {[System.IO.Directory]::
 Read-File $sourceFile $dotfilesTempDir
 
 Push-Location $dotfilesInstallDir
-& .\windows\scripts\bootstrap.ps1
+& .\windows\scripts\bootstrap.ps1 $true $sourceFile
 Pop-Location
 
 $newProcess = new-object System.Diagnostics.ProcessStartInfo "PowerShell";
