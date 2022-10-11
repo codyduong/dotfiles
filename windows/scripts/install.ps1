@@ -71,13 +71,13 @@ WingetInstall GnuWin32.Grep
 # Node Setup
 Write-Host "`nInstalling Node Packages..." -ForegroundColor "Yellow"
 if (which npm) {
-  npm update npm
+  npm install -g npm@latest
   npm install -g yarn
 }
 # $nodeLtsVersion = choco search nodejs-lts --limit-output | ConvertFrom-String -TemplateContent "{Name:package-name}\|{Version:1.11.1}" | Select -ExpandProperty "Version"
 # nvm install $nodeLtsVersion
 # nvm use $nodeLtsVersion
-Remove-Variable nodeLtsVersion
+# Remove-Variable nodeLtsVersion
 
 ###################
 # Desktop Utilities
