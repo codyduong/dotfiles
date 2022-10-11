@@ -54,7 +54,7 @@ if ([System.IO.Directory]::Exists($dotfilesInstallDir)) {[System.IO.Directory]::
 Read-File $sourceFile $dotfilesTempDir
 
 Push-Location $dotfilesInstallDir
-& .\windows\bootstrap.ps1
+& .\windows\scripts\bootstrap.ps1
 Pop-Location
 
 $newProcess = new-object System.Diagnostics.ProcessStartInfo "PowerShell";

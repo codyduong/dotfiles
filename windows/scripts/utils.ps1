@@ -54,12 +54,17 @@ function InstallerPromptUpdateOutdated() {
 
 function PromptBooleanQuestion {
     param (
-        [parameter(mandatory)][string]$promptStr
+        [parameter(mandatory)][string]$promptStr,
+        [boolean]$default
     )
     
     $answer = $null
+    $defaultStr = ("y/n")
+    if ($null -ne $default) {
+        $defaultStr = $default ? "Y/n" : "y/N"
+    }
     while ($null -eq $answer) {
-        $prompt = Read-Host "$($promptStr) (y/n)?"
+        $prompt = Read-Host "$($promptStr) ($($defaultStr))?"
         try {
             $answer = $prompt -match "[yYnN]" ? $prompt -match "[yY]" : $null
         }
@@ -67,6 +72,10 @@ function PromptBooleanQuestion {
             
         }
         if ($null -eq $answer) {
+            if ($null -ne $default) {
+                $answer = $default
+                break
+            }
             Write-Host "Invalid input, received: " -ForegroundColor "Red" -NoNewline
             Write-Host "$($prompt)"
             Write-Host "`texpected one of: " -ForegroundColor "Red" -NoNewline
@@ -76,13 +85,23 @@ function PromptBooleanQuestion {
     return $answer
 }
 
+filter quoteStringWithSpecialChars {
+    if ($_ -and ($_ -match '\s+|#|@|\$|;|,|''|\{|\}|\(|\)')) {
+        $str = $_ -replace "'", "''"
+        "'$str'"
+    }
+    else {
+        $_
+    }
+}
+
 function script:PrepModuleToStr {
     param (
         [Parameter(ValueFromPipeline)]
         [string]$moduleStr
     )
 
-    return $moduleStr -replace '^@{|}$', '' -replace '\\', '\\' -replace '; ', "`n"
+    return $moduleStr -replace '^@{|}$', '' -replace '\\', '\\' -replace "`n","\n" -replace '; ', "`n"
 }
 
 function script:PowershellModuleIsInstalled {
@@ -108,6 +127,10 @@ function script:PowershellModuleIsInstalled {
 }
 
 function PowershellInstall($packageStr) {
+    if ($null -eq $packageStr -or $packageStr -match "^-") {
+        $args -join " " -match "((?<=-[nN]ame\s)\S*)" | Out-Null
+        $packageStr = $Matches[0]
+    }
     $installed = PowershellModuleIsInstalled($packageStr)
     $i = $installed[0]
     $a = $installed[1]

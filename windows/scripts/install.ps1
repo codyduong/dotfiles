@@ -1,14 +1,16 @@
-# Check to see if we are currently running "as Administrator"
-if (!(Verify-Elevated)) {
-  $newProcess = new-object System.Diagnostics.ProcessStartInfo "PowerShell";
-  $newProcess.Arguments = $myInvocation.MyCommand.Definition;
-  $newProcess.Verb = "runas";
-  [System.Diagnostics.Process]::Start($newProcess);
-
-  exit
-}
-
 . $PSScriptRoot\utils.ps1
+. $PSScriptRoot/../components/console.ps1
+
+# Check to see if we are currently running "as Administrator"
+# if (!(Verify-Elevated)) {
+#   $newProcess = new-object System.Diagnostics.ProcessStartInfo "PowerShell";
+#   $newProcess.Arguments = $myInvocation.MyCommand.Definition;
+#   $newProcess.Verb = "runas";
+#   [System.Diagnostics.Process]::Start($newProcess);
+
+#   exit
+# }
+
 InstallerPromptUpdateOutdated
 
 ### Update Help for Modules
@@ -16,9 +18,9 @@ InstallerPromptUpdateOutdated
 # Update-Help -Force
 
 
-## Package Providers
+### Package Providers
 Write-Host "Installing chocolatey..." -ForegroundColor "Yellow"
-# Get-PackageProvider NuGet -Force | Out-Null
+Get-PackageProvider NuGet -Force | Out-Null
 # Chocolatey Provider is not ready yet. Use normal Chocolatey
 Get-PackageProvider Chocolatey -Force
 Set-PackageSource -Name chocolatey -Trusted
@@ -26,7 +28,7 @@ Set-PackageSource -Name chocolatey -Trusted
 
 ### Install PowerShell Modules
 Write-Host "Installing PowerShell Modules..." -ForegroundColor "Yellow"
-PowershellInstall Posh-Git -Scope=CurrentUser -Force -Verbose
+PowershellInstall Posh-Git -Scope CurrentUser -Force -Verbose
 PowershellInstall PSWindowsUpdate -Scope CurrentUser -Force -Verbose
 
 
