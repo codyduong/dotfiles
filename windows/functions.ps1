@@ -47,11 +47,11 @@ function curlex($url) {
     return new-object io.fileinfo $path
 }
 
-# Empty the Recycle Bin on all drives
-function Empty-RecycleBin {
-    $RecBin = (New-Object -ComObject Shell.Application).Namespace(0xA)
-    $RecBin.Items() | %{Remove-Item $_.Path -Recurse -Confirm:$false}
-}
+# # Empty the Recycle Bin on all drives
+# function Empty-RecycleBin {
+#     $RecBin = (New-Object -ComObject Shell.Application).Namespace(0xA)
+#     $RecBin.Items() | %{Remove-Item $_.Path -Recurse -Confirm:$false}
+# }
 
 
 ### File System functions

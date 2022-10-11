@@ -1,14 +1,14 @@
-$account = "codyduong"
-$repo    = "dotfiles"
-$branch  = "master"
+$script:account = "codyduong"
+$script:repo    = "dotfiles"
+$script:branch  = "master"
 
-$dotfilesTempDir = Join-Path $env:TEMP "dotfiles"
+$script:dotfilesTempDir = Join-Path $env:TEMP "dotfiles"
 if (![System.IO.Directory]::Exists($dotfilesTempDir)) {[System.IO.Directory]::CreateDirectory($dotfilesTempDir)}
-$sourceFile = Join-Path $dotfilesTempDir "dotfiles.zip"
-$dotfilesInstallDir = Join-Path $dotfilesTempDir "$repo-$branch"
+$script:sourceFile = Join-Path $dotfilesTempDir "dotfiles.zip"
+$script:dotfilesInstallDir = Join-Path $dotfilesTempDir "$repo-$branch"
 
 
-function Get-File {
+function script:Get-File {
   param (
     [string]$url,
     [string]$file
@@ -19,7 +19,7 @@ function Get-File {
 
 }
 
-function Read-File {
+function script:Read-File {
     param (
         [string]$File,
         [string]$Destination = (Get-Location).Path

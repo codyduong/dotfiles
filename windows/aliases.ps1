@@ -57,8 +57,6 @@ Set-Alias fs Get-DiskUsage
 Set-Alias emptytrash Empty-RecycleBin
 # Cleanup old files all drives
 Set-Alias cleandisks Clean-Disks
-# Reload the shell
-# Set-Alias reload Reload-Powershell
 # http://xkcd.com/530/
 Set-Alias mute Set-SoundMute
 Set-Alias unmute Set-SoundUnmute
@@ -77,6 +75,6 @@ $PSReadLineOptions = @{
 }
 Set-PSReadLineOption @PSReadLineOptions
 
-function source() {
+function reload() {
     Invoke-Command { & "pwsh.exe" } -NoNewScope
 }
