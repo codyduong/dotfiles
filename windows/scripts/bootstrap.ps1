@@ -1,6 +1,6 @@
 param (
-    [Parameter(ParameterSetName="remote")][boolean]$isBootstrappingFromRemote,
-    [Parameter(ParameterSetName="remote", mandatory)][string]$sourceFile
+    [Parameter(Position=0, ParameterSetName="remote")][boolean]$isBootstrappingFromRemote,
+    [Parameter(Position=1, ParameterSetName="remote", mandatory)][string]$sourceFile
 )
 
 . $PSScriptRoot\utils.ps1

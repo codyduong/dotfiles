@@ -18,7 +18,7 @@ function script:Get-File {
   Invoke-WebRequest -Uri $url -OutFile $file
 }
 
-function script:Read-File {
+function Read-File {
     param (
         [string]$File,
         [string]$Destination = (Get-Location).Path

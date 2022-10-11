@@ -52,7 +52,7 @@ function WingetInstall {
 }
 
 function InstallerPromptUpdateOutdated() {
-    $updateOutdated = PromptBooleanQuestion("Would you like to update existing dependencies")
+    $updateOutdated = PromptBooleanQuestion("Would you like to update existing dependencies") $true
     $Env:UPDATE_OUTDATED_DEPS = $updateOutdated
 }
 
