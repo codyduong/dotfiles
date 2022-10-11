@@ -1,3 +1,4 @@
+[CmdletBinding(DefaultParametersetName='none')] 
 param (
     [Parameter(Position=0, ParameterSetName="remote")][boolean]$isBootstrappingFromRemote,
     [Parameter(Position=1, ParameterSetName="remote", mandatory)][string]$sourceFile
@@ -16,7 +17,7 @@ track updates and boostrap new profiles from
   if ($installLocalCopy) {
     Write-Host "`n`tExtracting $($sourceFile) to 'This Pc\\Documents'" -ForegroundColor DarkGray
     
-    Read-File $sourceFile [Environment]::GetFolderPath("MyDocuments")
+    Read-File $sourceFile ([Environment]::GetFolderPath("MyDocuments"))
   }
 }
 

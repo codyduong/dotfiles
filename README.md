@@ -33,15 +33,11 @@ Based off [Jay Harris's dotfiles for Windows](https://github.com/jayharris/dotfi
 ### Bootstrap Profile
 **without git**
 ```powershell
-Set-ExecutionPolicy Unrestricted -Scope CurrentUser
 iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/codyduong/dotfiles/main/windows/setup/remote.ps1'))
-Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 **with git**
 ```powershell
-Set-ExecutionPolicy Unrestricted -Scope CurrentUser
-git clone https://github.com/codyduong/dotfiles.git; cd dotfiles; . .\windows\scripts\bootstrap.ps1
-Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/codyduong/dotfiles/main/windows/setup/git.ps1'))
 ```
 
 <!---
