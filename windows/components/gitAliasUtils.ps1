@@ -147,11 +147,12 @@ function script:IIf($If, $Then, $Else) {
 }
 
 function aliasRun([ScriptBlock]$cmd, $a, $show, $color) {
-	IIf $alias_indicator (Write-Host $cmd.ToString().Replace('$args', $a) -ForegroundColor $alias_indicator_color)
+	$formattedCommand = $cmd.ToString().Replace('$args', $a)
+	IIf $alias_indicator (Write-Host $formattedCommand -ForegroundColor $alias_indicator_color)
 	$currentEncoding = [Console]::OutputEncoding
 	try {
 			[Console]::OutputEncoding = [Text.Encoding]::UTF8
-			& $cmd $a
+			Invoke-Expression "& $formattedCommand"
 	}
 	finally {
 			[Console]::OutputEncoding = $currentEncoding
