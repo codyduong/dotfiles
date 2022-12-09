@@ -78,3 +78,8 @@ Set-PSReadLineOption @PSReadLineOptions
 function reload() {
     Invoke-Command { & "pwsh.exe" } -NoNewScope
 }
+
+# poetry
+function poetry {
+    & "$env:APPDATA\Python\Scripts\poetry.exe" $args
+}

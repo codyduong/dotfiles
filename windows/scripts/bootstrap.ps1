@@ -21,7 +21,7 @@ track updates and boostrap new profiles from
   }
 }
 
-$installDeps = PromptBooleanQuestion "`nWould you like to install the required dependencies" $true
+$installDeps = PromptBooleanQuestion "Would you like to install the required dependencies" $true
 if ($installDeps) {
   . $PSScriptRoot\install.ps1
 }
