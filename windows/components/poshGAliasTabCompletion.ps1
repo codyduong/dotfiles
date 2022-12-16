@@ -521,43 +521,40 @@ function GitTabExpansionInternalB($lastBlock, $GitStatus = $null) {
     }
 }
 
-# if (!$UseLegacyTabExpansion -and ($PSVersionTable.PSVersion.Major -ge 6)) {
-#     $cmdNames = $poshGitAliasList.Keys
+if (!$UseLegacyTabExpansion -and $PSVersionTable.PSVersion.Major -ge 6) {
+    $cmdNames = $poshGitAliasList.Keys
 
-#     # Create regex pattern from $cmdNames: ^(git|git\.exe|tgit|tgit\.exe|gitk|gitk\.exe)$
-#     # $cmdNamesPattern = "^($($cmdNames -join '|'))(\.exe)?$"
-#     # $cmdNames += Get-Alias | Where-Object { $_.Definition -match $cmdNamesPattern } | Foreach-Object Name
+    # Create regex pattern from $cmdNames: ^(git|git\.exe|tgit|tgit\.exe|gitk|gitk\.exe)$
+    $cmdNamesPattern = "^($($cmdNames -join '|'))(\.exe)?$"
+    $cmdNames += Get-Alias | Where-Object { $_.Definition -match $cmdNamesPattern } | Foreach-Object Name
 
-#     # if ($EnableProxyFunctionExpansion) {
-#     #     $funcNames += Get-ChildItem -Path Function:\ | Where-Object { $_.Definition -match $script:GitProxyFunctionRegex } | Foreach-Object Name
-#     #     $cmdNames += $funcNames
+    if ($EnableProxyFunctionExpansion) {
+        $funcNames += Get-ChildItem -Path Function:\ | Where-Object { $_.Definition -match $script:GitProxyFunctionRegex } | Foreach-Object Name
+        $cmdNames += $funcNames
 
-#     #     # Create regex pattern from $funcNames e.g.: ^(Git-Checkout|Git-Switch)$
-#     #     $funcNamesPattern = "^($($funcNames -join '|'))$"
-#     #     $cmdNames += Get-Alias | Where-Object { $_.Definition -match $funcNamesPattern } | Foreach-Object Name
-#     # }
+        # Create regex pattern from $funcNames e.g.: ^(Git-Checkout|Git-Switch)$
+        $funcNamesPattern = "^($($funcNames -join '|'))$"
+        $cmdNames += Get-Alias | Where-Object { $_.Definition -match $funcNamesPattern } | Foreach-Object Name
+    }
 
-#     # $global:GitTabSettings.RegisteredCommands = $cmdNames -join ", "
+    $global:GitTabSettings.RegisteredCommands = $cmdNames -join ", "
 
-#     Microsoft.PowerShell.Core\Register-ArgumentCompleter -CommandName $cmdNames -Native -ScriptBlock {
-#         param($wordToComplete, $commandAst, $cursorPosition)
+    Microsoft.PowerShell.Core\Register-ArgumentCompleter -CommandName $cmdNames -Native -ScriptBlock {
+        param($wordToComplete, $commandAst, $cursorPosition)
+        
+        # The PowerShell completion has a habit of stripping the trailing space when completing:
+        # git checkout <tab>
+        # The Expand-GitCommand expects this trailing space, so pad with a space if necessary.
+        $padLength = $cursorPosition - $commandAst.Extent.StartOffset
+        $textToComplete = $commandAst.ToString().PadRight($padLength, ' ').Substring(0, $padLength)
+        if ($EnableProxyFunctionExpansion) {
+            $textToComplete = Expand-GitProxyFunction($textToComplete)
+        }
 
-#         # The PowerShell completion has a habit of stripping the trailing space when completing:
-#         # git checkout <tab>
-#         # The Expand-GitCommand expects this trailing space, so pad with a space if necessary.
-#         $padLength = $cursorPosition # - $commandAst.Extent.StartOffset
-#         $textToComplete = $commandAst.ToString().PadRight($padLength, ' ').Substring(0, $padLength)
-#         # if ($EnableProxyFunctionExpansion) {
-#         #     $textToComplete = Expand-GitProxyFunction($textToComplete)
-#         # }
-
-#         WriteTabExpLog "Expand: command: '$($commandAst.Extent.Text)', padded: '$textToComplete', padlen: $padLength"
-#         Expand-GitCommand2 $textToComplete
-#     }
-# }
-
-# regardless of argument hint completition register the new expansions
-function TabExpansion($line, $lastWord) {
+        # WriteTabExpLog "Expand: command: '$($commandAst.Extent.Text)', padded: '$textToComplete', padlen: $padLength"
+        Expand-GitCommand2 $textToComplete
+    }
+} else {
     $PowerTab_RegisterTabExpansion = if (Get-Module -Name powertab) { Get-Command Register-TabExpansion -Module powertab -ErrorAction SilentlyContinue }
     if ($PowerTab_RegisterTabExpansion) {
         foreach ($cmd in $poshGitAliasList.Keys) {
@@ -578,15 +575,14 @@ function TabExpansion($line, $lastWord) {
         }
     }
 
-    $lastBlock = [regex]::Split($line, '[|;]')[-1].TrimStart()
-    $msg = "Legacy expand: '$lastBlock'"
-
-    switch -regex ($lastBlock) {
-        # Execute git tab completion for all git-related commands
-        "^$($gitAliases) (.*)" { WriteTabExpLog $msg; Expand-GitCommand2 $lastBlock $Global:GitStatus }
-        # "^$(Get-AliasPattern git) (.*)" { WriteTabExpLog $msg; Expand-GitCommand $lastBlock }
-        # "^$(Get-AliasPattern tgit) (.*)" { WriteTabExpLog $msg; Expand-GitCommand $lastBlock }
-        # "^$(Get-AliasPattern gitk) (.*)" { WriteTabExpLog $msg; Expand-GitCommand $lastBlock }
-    }
+    function TabExpansion($line, $lastWord) {
+        $lastBlock = [regex]::Split($line, '[|;]')[-1].TrimStart()
+        $msg = "Legacy expand: '$lastBlock'"
+        Write-Host ("`n`n'$lastBlock'")
+    
+        switch -regex ($lastBlock) {
+            # Execute git tab completion for all git-related commands
+            "^$($gitAliases) (.*)" { WriteTabExpLog $msg; Expand-GitCommand2 $lastBlock $Global:GitStatus }
+        }
+    }   
 }
-

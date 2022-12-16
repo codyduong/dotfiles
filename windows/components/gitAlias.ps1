@@ -52,120 +52,120 @@ function gbda {
 	}
 }
 function gbl {
-	aliasRun { git blame -b -w $args} $args $alias_indicator $alias_indicator_color
+	aliasRun {git blame -b -w $args} $args $alias_indicator $alias_indicator_color
 }
 function gbnm {
-	git branch --no-merged $args
+	aliasRun {git branch --no-merged $args} $args $alias_indicator $alias_indicator_color
 }
 function gbr {
-	git branch --remote $args
+	aliasRun {git branch --remote $args} $args $alias_indicator $alias_indicator_color
 }
 function gbs {
-	git bisect $args
+	aliasRun {git bisect $args} $args $alias_indicator $alias_indicator_color
 }
 function gbsb {
-	git bisect bad $args
+	aliasRun {git bisect bad $args} $args $alias_indicator $alias_indicator_color
 }
 function gbsg {
-	git bisect good $args
+	aliasRun {git bisect good $args} $args $alias_indicator $alias_indicator_color
 }
 function gbsr {
-	git bisect reset $args
+	aliasRun {git bisect reset $args} $args $alias_indicator $alias_indicator_color
 }
 function gbss {
-	git bisect start $args
+	aliasRun {git bisect start $args} $args $alias_indicator $alias_indicator_color
 }
 function gc {
 	aliasRun {git commit -v $args} $args $alias_indicator $alias_indicator_color
 }
 function gc! {
-	git commit -v --amend $args
+	aliasRun {git commit -v --amend $args} $args $alias_indicator $alias_indicator_color
 }
 function gcn! {
-	git commit -v --no-edit --amend $args
+	aliasRun {git commit -v --no-edit --amend $args} $args $alias_indicator $alias_indicator_color
 }
 function gca {
-	git commit -v -a $args
+	aliasRun {git commit -v -a $args} $args $alias_indicator $alias_indicator_color
 }
 function gcam {
-	git commit -a -m $args
+	aliasRun {git commit -a -m $args} $args $alias_indicator $alias_indicator_color
 }
 function gca! {
-	git commit -v -a --amend $args
+	aliasRun {git commit -v -a --amend $args} $args $alias_indicator $alias_indicator_color
 }
 function gcan! {
-	git commit -v -a --no-edit --amend $args
+	aliasRun {git commit -v -a --no-edit --amend $args} $args $alias_indicator $alias_indicator_color
 }
 function gcans! {
-	git commit -v -a -s --no-edit --amend $args
+	aliasRun {git commit -v -a -s --no-edit --amend $args} $args $alias_indicator $alias_indicator_color
 }
 function gcb {
-	git checkout -b $args
+	aliasRun {git checkout -b $args} $args $alias_indicator $alias_indicator_color
 }
 function gcf {
-	git config --list $args
+	aliasRun {git config --list $args} $args $alias_indicator $alias_indicator_color
 }
 function gcl {
-	git clone --recursive $args
+	aliasRun {git clone --recursive $args} $args $alias_indicator $alias_indicator_color
 }
 function gclean {
-	git clean -df $args
+	aliasRun {git clean -df $args} $args $alias_indicator $alias_indicator_color
 }
 function gcm {
 	$MainBranch = Get-Git-MainBranch
 
-	git checkout $MainBranch $args
+	aliasRun {git checkout $MainBranch $args} $args $alias_indicator $alias_indicator_color
 }
 function gcd {
-	git checkout develop $args
+	aliasRun {git checkout develop $args} $args $alias_indicator $alias_indicator_color
 }
 function gcmsg {
-	git commit -m $args
+	aliasRun {git commit -m $args} $args $alias_indicator $alias_indicator_color
 }
 function gco {
 	aliasRun {git checkout $args} $args $alias_indicator $alias_indicator_color
 }
 function gcount {
-	git shortlog -sn $args
+	aliasRun {git shortlog -sn $args} $args $alias_indicator $alias_indicator_color
 }
 function gcp {
-	git cherry-pick $args
+	aliasRun {git cherry-pick $args} $args $alias_indicator $alias_indicator_color
 }
 function gcpa {
-	git cherry-pick --abort $args
+	aliasRun {git cherry-pick --abort $args} $args $alias_indicator $alias_indicator_color
 }
 function gcpc {
-	git cherry-pick --continue $args
+	aliasRun {git cherry-pick --continue $args} $args $alias_indicator $alias_indicator_color
 }
 function gcs {
-	git commit -S $args
+	aliasRun {git commit -S $args} $args $alias_indicator $alias_indicator_color
 }
 function gd {
-	git diff $args
+	aliasRun {git diff $args} $args $alias_indicator $alias_indicator_color
 }
 function gdca {
-	git diff --cached $args
+	aliasRun {git diff --cached $args} $args $alias_indicator $alias_indicator_color
 }
 function gdt {
-	git diff-tree --no-commit-id --name-only -r $args
+	aliasRun {git diff-tree --no-commit-id --name-only -r $args} $args $alias_indicator $alias_indicator_color
 }
 function gdw {
-	git diff --word-diff $args
+	aliasRun {git diff --word-diff $args} $args $alias_indicator $alias_indicator_color
 }
 function gf {
 	aliasRun {git fetch $args} $args $alias_indicator $alias_indicator_color
 }
 function gfa {
-	git fetch --all --prune $args
+	aliasRun {git fetch --all --prune $args} $args $alias_indicator $alias_indicator_color
 }
 function gfo {
 	aliasRun {git fetch origin $args} $args $alias_indicator $alias_indicator_color
 }
 function gg {
-	git gui citool $args
+	aliasRun {git gui citool $args} $args $alias_indicator $alias_indicator_color
 }
 function gga {
-	git gui citool --amend $args
+	aliasRun {git gui citool --amend $args} $args $alias_indicator $alias_indicator_color
 }
 function ggf {
 	$CurrentBranch = Get-Git-CurrentBranch
@@ -191,7 +191,7 @@ function gpsup {
 	git push --set-upstream origin $CurrentBranch
 }
 function gignore {
-	git update-index --assume-unchanged $args
+	aliasRun {git update-index --assume-unchanged $args} $args $alias_indicator $alias_indicator_color
 }
 function gignored {
 	git ls-files -v | Select-String "^[a-z]" -CaseSensitive
@@ -200,65 +200,65 @@ function gl {
 	aliasRun {git pull $args} $args $alias_indicator $alias_indicator_color
 }
 function glg {
-	git log --stat --color $args
+	aliasRun {git log --stat --color $args} $args $alias_indicator $alias_indicator_color
 }
 function glgg {
-	git log --graph --color $args
+	aliasRun {git log --graph --color $args} $args $alias_indicator $alias_indicator_color
 }
 function glgga {
-	git log --graph --decorate --all $args
+	aliasRun {git log --graph --decorate --all $args} $args $alias_indicator $alias_indicator_color
 }
 function glgm {
-	git log --graph --max-count=10 $args
+	aliasRun {git log --graph --max-count=10 $args} $args $alias_indicator $alias_indicator_color
 }
 function glgp {
-	git log --stat --color -p $args
+	aliasRun {git log --stat --color -p $args} $args $alias_indicator $alias_indicator_color
 }
 function glo {
-	git log --oneline --decorate --color $args
+	aliasRun {git log --oneline --decorate --color $args} $args $alias_indicator $alias_indicator_color
 }
 function glog {
-	git log --oneline --decorate --color --graph $args
+	aliasRun {git log --oneline --decorate --color --graph $args} $args $alias_indicator $alias_indicator_color
 }
 function gloga {
-	git log --oneline --decorate --color --graph --all $args
+	aliasRun {git log --oneline --decorate --color --graph --all $args} $args $alias_indicator $alias_indicator_color
 }
 function glol {
-	git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit $args
+	aliasRun {git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit $args} $args $alias_indicator $alias_indicator_color
 }
 function glola {
-	git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --all $args
+	aliasRun {git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --all $args} $args $alias_indicator $alias_indicator_color
 }
 function gm {
-	git merge $args
+	aliasRun {git merge $args} $args $alias_indicator $alias_indicator_color
 }
 function gmom {
 	$MainBranch = Get-Git-MainBranch
 
-	git merge origin/$MainBranch $args
+	aliasRun {git merge origin/$MainBranch $args} $args $alias_indicator $alias_indicator_color
 }
 function gmt {
-	git mergetool --no-prompt $args
+	aliasRun {git mergetool --no-prompt $args} $args $alias_indicator $alias_indicator_color
 }
 function gmtvim {
-	git mergetool --no-prompt --tool=vimdiff $args
+	aliasRun {git mergetool --no-prompt --tool=vimdiff $args} $args $alias_indicator $alias_indicator_color
 }
 function gmum {
 	$MainBranch = Get-Git-MainBranch
 
-	git merge upstream/$MainBranch $args
+	aliasRun {git merge upstream/$MainBranch $args} $args $alias_indicator $alias_indicator_color
 }
 function gp {
 	aliasRun {git push $args} $args $alias_indicator $alias_indicator_color
 }
 function gpd {
-	git push --dry-run $args
+	aliasRun {git push --dry-run $args} $args $alias_indicator $alias_indicator_color
 }
 function gpf {
-	git push --force-with-lease $args
+	aliasRun {git push --force-with-lease $args} $args $alias_indicator $alias_indicator_color
 }
 function gpf! {
-	git push --force $args
+	aliasRun {git push --force $args} $args $alias_indicator $alias_indicator_color
 }
 function gpoat {
 	git push origin --all
@@ -269,54 +269,54 @@ function gpristine {
 	git clean -dfx
 }
 function gpu {
-	git push upstream $args
+	aliasRun {git push upstream $args} $args $alias_indicator $alias_indicator_color
 }
 function gpv {
-	git push -v $args
+	aliasRun {git push -v $args} $args $alias_indicator $alias_indicator_color
 }
 function gr {
-	git remote $args
+	aliasRun {git remote $args} $args $alias_indicator $alias_indicator_color
 }
 function gra {
-	git remote add $args
+	aliasRun {git remote add $args} $args $alias_indicator $alias_indicator_color
 }
 function grb {
-	git rebase $args
+	aliasRun {git rebase $args} $args $alias_indicator $alias_indicator_color
 }
 function grba {
-	git rebase --abort $args
+	aliasRun {git rebase --abort $args} $args $alias_indicator $alias_indicator_color
 }
 function grbc {
-	git rebase --continue $args
+	aliasRun {git rebase --continue $args} $args $alias_indicator $alias_indicator_color
 }
 function grbi {
-	git rebase -i $args
+	aliasRun {git rebase -i $args} $args $alias_indicator $alias_indicator_color
 }
 function grbm {
 	$MainBranch = Get-Git-MainBranch
 
-	git rebase $MainBranch $args
+	aliasRun {git rebase $MainBranch $args} $args $alias_indicator $alias_indicator_color
 }
 function grbs {
-	git rebase --skip $args
+	aliasRun {git rebase --skip $args} $args $alias_indicator $alias_indicator_color
 }
 function grh {
-	git reset $args
+	aliasRun {git reset $args} $args $alias_indicator $alias_indicator_color
 }
 function grhh {
-	git reset --hard $args
+	aliasRun {git reset --hard $args} $args $alias_indicator $alias_indicator_color
 }
 function grmv {
-	git remote rename $args
+	aliasRun {git remote rename $args} $args $alias_indicator $alias_indicator_color
 }
 function grrm {
-	git remote remove $args
+	aliasRun {git remote remove $args} $args $alias_indicator $alias_indicator_color
 }
 function grs {
-	git restore $args
+	aliasRun {git restore $args} $args $alias_indicator $alias_indicator_color
 }
 function grset {
-	git remote set-url $args
+	aliasRun {git remote set-url $args} $args $alias_indicator $alias_indicator_color
 }
 function grt {
 	try {
@@ -328,91 +328,91 @@ function grt {
 	Set-Location $RootPath
 }
 function gru {
-	git reset -- $args
+	aliasRun {git reset -- $args} $args $alias_indicator $alias_indicator_color
 }
 function grup {
-	git remote update $args
+	aliasRun {git remote update $args} $args $alias_indicator $alias_indicator_color
 }
 function grv {
-	git remote -v $args
+	aliasRun {git remote -v $args} $args $alias_indicator $alias_indicator_color
 }
 function gsb {
-	git status -sb $args
+	aliasRun {git status -sb $args} $args $alias_indicator $alias_indicator_color
 }
 function gsd {
-	git svn dcommit $args
+	aliasRun {git svn dcommit $args} $args $alias_indicator $alias_indicator_color
 }
 function gsh {
-	git show $args
+	aliasRun {git show $args} $args $alias_indicator $alias_indicator_color
 }
 function gsi {
-	git submodule init $args
+	aliasRun {git submodule init $args} $args $alias_indicator $alias_indicator_color
 }
 function gsps {
-	git show --pretty=short --show-signature $args
+	aliasRun {git show --pretty=short --show-signature $args} $args $alias_indicator $alias_indicator_color
 }
 function gsr {
-	git svn rebase $args
+	aliasRun {git svn rebase $args} $args $alias_indicator $alias_indicator_color
 }
 function gss {
-	git status -s $args
+	aliasRun {git status -s $args} $args $alias_indicator $alias_indicator_color
 }
 function gst {
 	aliasRun {git status $args} $args $alias_indicator $alias_indicator_color
 }
 function gsta {
-	git stash save $args
+	aliasRun {git stash save $args} $args $alias_indicator $alias_indicator_color
 }
 function gstaa {
-	git stash apply $args
+	aliasRun {git stash apply $args} $args $alias_indicator $alias_indicator_color
 }
 function gstd {
-	git stash drop $args
+	aliasRun {git stash drop $args} $args $alias_indicator $alias_indicator_color
 }
 function gstl {
-	git stash list $args
+	aliasRun {git stash list $args} $args $alias_indicator $alias_indicator_color
 }
 function gstp {
-	git stash pop $args
+	aliasRun {git stash pop $args} $args $alias_indicator $alias_indicator_color
 }
 function gstc {
-	git stash clear $args
+	aliasRun {git stash clear $args} $args $alias_indicator $alias_indicator_color
 }
 function gsts {
-	git stash show --text $args
+	aliasRun {git stash show --text $args} $args $alias_indicator $alias_indicator_color
 }
 function gsu {
-	git submodule update $args
+	aliasRun {git submodule update $args} $args $alias_indicator $alias_indicator_color
 }
 function gsw {
-	git switch $args
+	aliasRun {git switch $args} $args $alias_indicator $alias_indicator_color
 }
 function gts {
-	git tag -s $args
+	aliasRun {git tag -s $args} $args $alias_indicator $alias_indicator_color
 }
 function gunignore {
-	git update-index --no-assume-unchanged $args
+	aliasRun {git update-index --no-assume-unchanged $args} $args $alias_indicator $alias_indicator_color
 }
 function gunwip {
 	Write-Output $(git log -n 1 | Select-String "--wip--" -Quiet).Count
 	git reset HEAD~1
 }
 function gup {
-	git pull --rebase $args
+	aliasRun {git pull --rebase $args} $args $alias_indicator $alias_indicator_color
 }
 function gupv {
-	git pull --rebase -v $args
+	aliasRun {git pull --rebase -v $args} $args $alias_indicator $alias_indicator_color
 }
 function glum {
 	$MainBranch = Get-Git-MainBranch
 
-	git pull upstream $MainBranch $args
+	aliasRun {git pull upstream $MainBranch $args} $args $alias_indicator $alias_indicator_color
 }
 function gvt {
-	git verify-tag $args
+	aliasRun {git verify-tag $args} $args $alias_indicator $alias_indicator_color
 }
 function gwch {
-	git whatchanged -p --abbrev-commit --pretty=medium $args
+	aliasRun {git whatchanged -p --abbrev-commit --pretty=medium $args} $args $alias_indicator $alias_indicator_color
 }
 function gwip {
 	git add -A
