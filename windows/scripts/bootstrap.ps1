@@ -1,7 +1,8 @@
 [CmdletBinding(DefaultParametersetName='none')] 
 param (
     [Parameter(Position=0, ParameterSetName="remote")][boolean]$isBootstrappingFromRemote,
-    [Parameter(Position=1, ParameterSetName="remote", mandatory)][string]$sourceFile
+    [Parameter(Position=1, ParameterSetName="remote", mandatory)][string]$sourceFile,
+    [Parameter(Position=2, ParameterSetName="install", mandatory)][boolean]$install
 )
 
 . $PSScriptRoot\utils.ps1
@@ -15,13 +16,13 @@ would you like to create a local git repository to
 track updates and boostrap new profiles from
 "@ $true
   if ($installLocalCopy) {
-    Write-Host "`n`tExtracting $($sourceFile) to 'This Pc\\Documents'" -ForegroundColor DarkGray
+    Write-Host "`n`tExtracting $($sourceFile) to '$HOME'" -ForegroundColor DarkGray
     
-    Read-File $sourceFile ([Environment]::GetFolderPath("MyDocuments"))
+    Read-File $sourceFile $HOME
   }
 }
 
-$installDeps = PromptBooleanQuestion "Would you like to install the required dependencies" $true
+$installDeps = $install ?? (PromptBooleanQuestion "Would you like to install the required dependencies" $true)
 if ($installDeps) {
   . $PSScriptRoot\install.ps1
 }
