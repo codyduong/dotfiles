@@ -26,7 +26,7 @@ if ((($PSVersionTable.PSVersion.Major -eq 5) -or $IsWindows) -and ($script:GitVe
 }
 
 foreach ($key in $poshGitAliasList.Keys) {
-    if ($gitParamValues[$poshGitAliasMap[$key]] -ne $null) {
+    if ($null -ne $gitParamValues[$poshGitAliasMap[$key]]) {
         $old_arg_map = $gitParamValues[$poshGitAliasMap[$key]]
         $new_arg_map = @{}
         foreach ($arg in $old_arg_map.Keys) {
@@ -42,7 +42,7 @@ foreach ($key in $poshGitAliasList.Keys) {
 foreach ($key in $poshGitAliasList.Keys) {
     $old_args = $longGitParams[$poshGitAliasMap[$key]]
     $args_to_remove = ($poshGitAliasList[$key] -split ' ' | 
-        Where { $_ -match "(?<=--)\S*$" }) -join '|'
+        Where-Object { $_ -match "(?<=--)\S*$" }) -join '|'
 
     $new_args = $old_args -replace "($($args_to_remove))", ""
     $gitLongParams[$key] = $new_args
@@ -51,7 +51,7 @@ foreach ($key in $poshGitAliasList.Keys) {
 foreach ($key in $poshGitAliasList.Keys) {
     $old_args = $gitShortParams[$poshGitAliasMap[$key]]
     $args_to_remove = ($poshGitAliasList[$key] -split ' ' | 
-        Where { $_ -match "(?<=-)\S*$" }) -join '|'
+        Where-Object { $_ -match "(?<=-)\S*$" }) -join '|'
 
     $new_args = $old_args -replace "($($args_to_remove))", ""
     $gitShortParams[$key] = $new_args

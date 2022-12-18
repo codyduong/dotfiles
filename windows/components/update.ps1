@@ -105,13 +105,13 @@ function updateProfile() {
       }
     }
     finally {
-      Set-Location $old_location
+      Invoke-Command { & "pwsh.exe" -NoLogo -command "& Set-Location $old_location" } -NoNewScope
     }
   }
   else {
     . $PSScriptRoot/../setup/remote.ps1 $true
+    Invoke-Command { & "pwsh.exe" -NoLogo } -NoNewScope
   }
-  Invoke-Command { & "pwsh.exe" -NoLogo } -NoNewScope
 }
 
 $null = promptProfileUpdate
