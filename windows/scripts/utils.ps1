@@ -2,11 +2,12 @@ enum PackageIs {
     notinstalled
     installed
     outdated
+    unknown
 }
 
-$script:InstallationIndicatorColorInstalling = "DarkCyan"
-$script:InstallationIndicatorColorUpdating = "DarkGreen"
-$script:InstallationIndicatorColorFound = "DarkGray"
+$script:InstallationIndicatorColorInstalling    = "DarkCyan"
+$script:InstallationIndicatorColorUpdating      = "DarkGreen"
+$script:InstallationIndicatorColorFound         = "DarkGray"
 
 function script:WingetIsPackageInstalled {
     param (
@@ -17,9 +18,29 @@ function script:WingetIsPackageInstalled {
     Where-Object { $_ -match "^\S+.*$" }
     $table_header = $output_lines[0]
     $application_str = $output_lines[2]
-    $version = ($application_str -replace "[^\d\W]|\.(?=[^\d\W])", "").Trim() -split " "
+    $application_str = ($application_str -replace "\s(?=\s{1,})", "")
+    $regex = if ($table_header -match "Available") {
+        "((unknown )|([\w\.]* ))[\w\.]*(?= winget$)"
+    } else {
+        "((unknown )|([\w\.]*))(?= winget$)"
+    }
+
+    $version = try {
+        ($application_str | select-string -allmatches $regex).
+        Matches[0] -split " "
+    } catch [InvalidOperationException] {
+        $false
+    }
+
+    if ($version -is [String]) {
+        $version = $version, $null
+    }
+
     if ($application_str -notmatch $packageStr) {
         return [PackageIs]::notinstalled, $null
+    }
+    elseif ($version[0] -eq "unknown") {
+        return [PackageIs]::unknown, $version
     }
     elseif ($table_header -match "Available" -and ($version[1] -gt $version[0])) {
         return [PackageIs]::outdated, $version

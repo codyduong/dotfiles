@@ -2,13 +2,13 @@
 param (
     [Parameter(Position=0, ParameterSetName="remote")][boolean]$isBootstrappingFromRemote,
     [Parameter(Position=1, ParameterSetName="remote", mandatory)][string]$sourceFile,
-    [Parameter(Position=2, ParameterSetName="install", mandatory)][boolean]$install
+    [Parameter(Position=2, ParameterSetName="install")][boolean]$update
 )
 
 . $PSScriptRoot\utils.ps1
 
 $installDeps = $false
-if ($isBootstrappingFromRemote) {
+if ($isBootstrappingFromRemote -and -not $update) {
   $installLocalCopy = PromptBooleanQuestion @"
 
 It seems like you are installing directly from remote,
@@ -22,9 +22,13 @@ track updates and boostrap new profiles from
   }
 }
 
-$installDeps = $install ?? (PromptBooleanQuestion "Would you like to install the required dependencies" $true)
-if ($installDeps) {
-  . $PSScriptRoot\install.ps1
+if ($update) {
+  . $PSScriptRoot\install.ps1 $true
+} else {
+  $installDeps = PromptBooleanQuestion "Would you like to install the required dependencies" $true
+  if ($installDeps) {
+    . $PSScriptRoot\install.ps1
+  }
 }
 
 $profileDir = Split-Path -parent $profile

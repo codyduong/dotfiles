@@ -1,3 +1,8 @@
+[CmdletBinding(DefaultParametersetName='none')] 
+param (
+    [Parameter(Position=2, ParameterSetName="update")]$update
+)
+
 $script:account = "codyduong"
 $script:repo    = "dotfiles"
 $script:branch  = "main"
@@ -52,11 +57,14 @@ Get-File "https://github.com/$account/$repo/archive/$branch.zip" $sourceFile
 if ([System.IO.Directory]::Exists($dotfilesInstallDir)) {[System.IO.Directory]::Delete($dotfilesInstallDir, $true)}
 Read-File $sourceFile $dotfilesTempDir
 
+# $null = Start-ThreadJob -Name "Bootstrap profile install" -StreamingHost $Host -ArgumentList $dotfilesInstallDir, $sourceFile, $update -ScriptBlock {
+#     param($dotfilesInstallDir, $sourceFile, $update)
+#     Push-Location $dotfilesInstallDir
+#     & .\windows\scripts\bootstrap.ps1 $true $sourceFile $update
+# }
+
 Push-Location $dotfilesInstallDir
-& .\windows\scripts\bootstrap.ps1 $true $sourceFile
+& .\windows\scripts\bootstrap.ps1 $true $sourceFile $update
 Pop-Location
 
-$newProcess = new-object System.Diagnostics.ProcessStartInfo "PowerShell";
-$newProcess.Arguments = "-nologo";
-[System.Diagnostics.Process]::Start($newProcess);
-# exit
+Invoke-Command { & "pwsh.exe" -NoLogo } -NoNewScope

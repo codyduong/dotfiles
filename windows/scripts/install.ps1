@@ -1,3 +1,8 @@
+[CmdletBinding(DefaultParametersetName='none')] 
+param (
+    [Parameter(Position=2, ParameterSetName="update")]$update
+)
+
 . $PSScriptRoot\utils.ps1
 . $PSScriptRoot/../components/console.ps1
 
@@ -11,7 +16,11 @@
 #   exit
 # }
 
-InstallerPromptUpdateOutdated
+if ($null -ne $update) {
+  $Env:UPDATE_OUTDATED_DEPS = $update
+} else {
+  InstallerPromptUpdateOutdated
+}
 
 ### Update Help for Modules
 # Write-Host "Updating Help..." -ForegroundColor "Yellow"
@@ -27,13 +36,13 @@ InstallerPromptUpdateOutdated
 
 
 ### Install PowerShell Modules
-Write-Host "`nInstalling PowerShell Modules..." -ForegroundColor "Yellow"
-PowershellInstall Posh-Git -Scope CurrentUser -Force -Verbose
+Write-Host "`nInstalling PowerShell Extensions..." -ForegroundColor "Yellow"
 PowershellInstall PSWindowsUpdate -Scope CurrentUser -Force -Verbose
 PowershellInstall PSProfiler -Scope CurrentUser -Force -SkipPublisherCheck -AllowPrerelease -Verbose
+PowershellInstall Posh-Git -Scope CurrentUser -Force -Verbose
 
 ### Install oh-my-posh and others
-Write-Host "`nInstalling OhMyPosh and Extensions" -ForegroundColor "Yellow"
+# Write-Host "`nInstalling OhMyPosh and Extensions" -ForegroundColor "Yellow"
 WingetInstall JanDeDobbeleer.OhMyPosh
 # autocomplete
 PowershellInstall PSReadLine -AllowPrerelease -Scope CurrentUser -Force -SkipPublisherCheck -Verbose
@@ -52,6 +61,7 @@ WingetInstall vim.vim
 WingetInstall Neovim.Neovim
 
 Write-Host "`nInstalling Languages & Tools..." -ForegroundColor "Yellow"
+WingetInstall Microsoft.PowerToys
 # if ($null -eq (which cinst)) {
 #    iex (new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1')
 #    Refresh-Environment
@@ -61,9 +71,10 @@ Write-Host "`nInstalling Languages & Tools..." -ForegroundColor "Yellow"
 WingetInstall OpenJS.NodeJS
 WingetInstall CoreyButler.NVMforWindows
 WingetInstall Python.Python.3.9
+WingetInstall Rustlang.Rustup
 # https://github.com/microsoft/winget-pkgs/issues/17988
-choco install pyenv-win
-WingetInstall GitHub.GitHubDesktop
+# choco install pyenv-win
+# WingetInstall GitHub.GitHubDesktop
 WingetInstall Git.Git
 WingetInstall Microsoft.GitCredentialManagerCore
 WingetInstall GnuWin32.Grep
@@ -82,7 +93,7 @@ if (which npm) {
 ###################
 # Desktop Utilities
 ###################
-Write-Host "`nInstalling Desktop..." -ForegroundColor "Yellow"
+Write-Host "`nInstalling Desktop Apps..." -ForegroundColor "Yellow"
 # PERSONAL
 WingetInstall Discord.Discord
 WingetInstall Valve.Steam

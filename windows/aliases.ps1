@@ -76,7 +76,7 @@ $PSReadLineOptions = @{
 Set-PSReadLineOption @PSReadLineOptions
 
 function reload() {
-    Invoke-Command { & "pwsh.exe" } -NoNewScope
+    Invoke-Command { & "pwsh.exe" -NoLogo } -NoNewScope
 }
 
 # poetry
