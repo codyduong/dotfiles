@@ -79,9 +79,8 @@ function isProfileOutdated {
 
 function updateProfile() {
   if (Test-Path "$dotfiles\.git") {
-    $null = Start-ThreadJob -Name "Update profile using git" -StreamingHost $Host -ArgumentList $dotfiles -ScriptBlock {
-      param ($dotfiles)
-      Set-Location $dotfiles
+    Set-Location $dotfiles
+    try {
       [boolean]$stashed = $false
       [string]$stashName = New-Guid
       try {
@@ -89,14 +88,17 @@ function updateProfile() {
       } catch {}
       git fetch
       git pull
-      . .\windows\scripts\bootstrap.ps1 -install $true;
+      . .\windows\scripts\bootstrap.ps1 -update $true;
       try {
         git stash pop $stashName
       } catch {}
+    } finally {
+      Pop-Location
     }
   } else {
     . $PSScriptRoot/../setup/remote.ps1 $true
   }
+  Invoke-Command { & "pwsh.exe" -NoLogo } -NoNewScope
 }
 
 $null = promptProfileUpdate

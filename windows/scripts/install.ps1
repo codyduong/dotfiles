@@ -1,6 +1,6 @@
 [CmdletBinding(DefaultParametersetName='none')] 
 param (
-    [Parameter(Position=2, ParameterSetName="update")]$update
+    [Parameter(Position=0, ParameterSetName="update")]$update
 )
 
 . $PSScriptRoot\utils.ps1
@@ -81,10 +81,10 @@ WingetInstall GnuWin32.Grep
 
 # Node Setup
 Write-Host "`nInstalling Node Packages..." -ForegroundColor "Yellow"
-if (which npm) {
+try {
   npm install -g npm@latest
   npm install -g yarn
-}
+} catch {}
 # $nodeLtsVersion = choco search nodejs-lts --limit-output | ConvertFrom-String -TemplateContent "{Name:package-name}\|{Version:1.11.1}" | Select -ExpandProperty "Version"
 # nvm install $nodeLtsVersion
 # nvm use $nodeLtsVersion
@@ -125,7 +125,9 @@ if (([Environment]::OSVersion.Version).Build -ge 22621) {
 #####
 # WSL
 #####
-if (-not (which wsl)) {
+try {
+  wsl -v
+} catch {
   wsl --install
 }
 
@@ -138,4 +140,6 @@ reboot Windows for WSL to work properly
 "@ -ForegroundColor White
 Write-Host "  * Reloading shell automatically..." -ForegroundColor Cyan
 Write-Host "=======================================`n" -ForegroundColor White
-Invoke-Command { & "pwsh.exe" } -NoNewScope
+if (-not $update) {
+  Invoke-Command { & "pwsh.exe" -NoLogo } -NoNewScope
+}
