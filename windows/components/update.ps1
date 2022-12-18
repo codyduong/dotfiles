@@ -8,30 +8,22 @@ $script:latestVersionFile = [System.IO.Path]::Combine("$HOME",'.latest_profile_v
 $script:versionRegEx      = "# [vV]ersion (?<version>\d+\.\d+\.\d+)"
 $script:dotfiles          = [System.IO.Path]::Combine("$HOME","$repo")
 
+function getProfileVersions {
+  "Current: $currentVersion    Available: $latestVersion"
+}
+
 function promptProfileUpdate {
   if (isProfileOutdated) {
-    $choice = PromptBooleanQuestion "Found newer profile, install" $true
+    $choice = PromptBooleanQuestion "Profile update available $currentVersion -> $latestVersion, install" $true
     if ($choice) {
       updateProfile
     }
+  } else {
+    # Write-Host "Powershell Profile $currentVersion ($(Join-Path (Split-Path -parent $profile) "profile.ps1"))" 
   }
 }
 
-function isProfileOutdated {
-  [boolean]$isOutdated = $false
-  if ([System.IO.File]::Exists($latestVersionFile)) {
-    $latestVersion = [System.IO.File]::ReadAllText($latestVersionFile)
-    $currentProfile = [System.IO.File]::ReadAllText((Join-Path (Split-Path -parent $profile) "profile.ps1"))
-    [version]$currentVersion = "0.0.0"
-    if ($currentProfile -match $versionRegEx) {
-      $currentVersion = $matches.Version
-    }
-    if ([version]$latestVersion -gt $currentVersion) {
-      Write-Host "Current version: $currentVersion`nLatest version: $latestVersion"
-      $isOutdated = $true
-    }
-  }
-
+function forceProfileCheck {
   $null = Start-ThreadJob -Name "Get remote version" -StreamingHost $Host -ArgumentList $remoteVersionUrl, $latestVersionFile, $versionRegEx -ScriptBlock {
     param ($remoteVersionUrl, $latestVersionFile, $versionRegEx)
 
@@ -52,7 +44,6 @@ function isProfileOutdated {
       try {
         git stash pop $stashName
       } catch {}
-      write-host 'git-check'
     } else {
       # Check via remote if we can
       $profileFile = Invoke-WebRequest -Uri $remoteVersionUrl -UseBasicParsing
@@ -65,6 +56,23 @@ function isProfileOutdated {
       }
     }
   }
+}
+
+function isProfileOutdated {
+  [boolean]$isOutdated = $false
+  if ([System.IO.File]::Exists($latestVersionFile)) {
+    $global:latestVersion = [version][System.IO.File]::ReadAllText($latestVersionFile)
+    $global:currentProfile = [System.IO.File]::ReadAllText((Join-Path (Split-Path -parent $profile) "profile.ps1"))
+    [version]$global:currentVersion = "0.0.0"
+    if ($currentProfile -match $versionRegEx) {
+      $global:currentVersion = $matches.Version
+    }
+    if ([version]$latestVersion -gt $currentVersion) {
+      $isOutdated = $true
+    }
+  }
+
+  forceProfileCheck
   
   $isOutdated
 }
