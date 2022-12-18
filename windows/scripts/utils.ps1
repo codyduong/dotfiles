@@ -22,7 +22,7 @@ function script:WingetListAll {
         $id_index = $table_header.IndexOf("Id")
         $version_index = $table_header.IndexOf("Version")
         ForEach ($line in $valid_lines) {
-            $name = $line.substring($id_index, $version_index-$id_index-1).Trim()
+            $name = $line.substring($id_index, $version_index - $id_index - 1).Trim()
             $line = $line.substring($version_index).Trim()
             $line = $line -replace "\s(?=\s{1,})", ""
             # Write-Output $name $line
@@ -53,7 +53,8 @@ function script:WingetIsPackageInstalled {
     if ($winget_table[$packageStr]) {
         $installed = $true
         $version = $winget_table[$packageStr]
-    } else {
+    }
+    else {
         $output_lines = $(winget list -e --id $packageStr) | 
         Where-Object { $_ -match "^\S+.*$" }
         $table_header = $output_lines[0]
@@ -61,7 +62,8 @@ function script:WingetIsPackageInstalled {
         $application_str = ($application_str -replace "\s(?=\s{1,})", "")
         $regex = if ($table_header -match "Available") {
             "((unknown )|([\w\.]* ))[\w\.]*(?= winget$)"
-        } else {
+        }
+        else {
             "((unknown )|([\w\.]*))(?= winget$)"
         }
         if ($application_str -match $packageStr) {
@@ -71,7 +73,8 @@ function script:WingetIsPackageInstalled {
         $version = try {
             ($application_str | select-string -allmatches $regex).
             Matches[0] -split " "
-        } catch [InvalidOperationException] {
+        }
+        catch [InvalidOperationException] {
             $false
         }
     }
@@ -138,7 +141,7 @@ function script:PrepModuleToStr {
         [string]$moduleStr
     )
 
-    return $moduleStr -replace '^@{|}$', '' -replace '\\', '\\' -replace "`n","\n" -replace '; ', "`n"
+    return $moduleStr -replace '^@{|}$', '' -replace '\\', '\\' -replace "`n", "\n" -replace '; ', "`n"
 }
 
 function script:PowershellModuleIsInstalled {

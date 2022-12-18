@@ -29,7 +29,8 @@ if (Get-Command ls.exe -ErrorAction SilentlyContinue | Test-Path) {
     ${function:la} = { ls -laF @args }
     # List only directories
     ${function:lsd} = { Get-ChildItem -Directory -Force @args }
-} else {
+}
+else {
     # List all files, including hidden files
     ${function:la} = { ls -Force @args }
     # List only directories
@@ -43,7 +44,8 @@ if (Get-Command curl.exe -ErrorAction SilentlyContinue | Test-Path) {
     ${function:curl} = { curl.exe @args }
     # Gzip-enabled `curl`
     ${function:gurl} = { curl --compressed @args }
-} else {
+}
+else {
     # Gzip-enabled `curl`
     ${function:gurl} = { curl -TransferEncoding GZip }
 }
@@ -70,7 +72,7 @@ Set-Alias grep findstr
 
 # PS-Readline
 $PSReadLineOptions = @{
-    PredictionSource = "HistoryAndPlugin"
+    PredictionSource    = "HistoryAndPlugin"
     PredictionViewStyle = "ListView"
 }
 Set-PSReadLineOption @PSReadLineOptions

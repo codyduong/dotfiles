@@ -12,7 +12,8 @@ function Get-Git-CurrentBranch {
 
 	if ($LASTEXITCODE -eq 0) {
 		return git rev-parse --abbrev-ref HEAD
-	} else {
+	}
+ else {
 		return
 	}
 }
@@ -141,17 +142,18 @@ function Get-Git-Aliases ([string] $Alias) {
 
 # https://stackoverflow.com/a/25682508
 function script:IIf($If, $Then, $Else) {
-	If ($If -IsNot "Boolean") {$_ = $If}
-	If ($If) {If ($Then -is "ScriptBlock") {&$Then} Else {$Then}}
-	Else {If ($Else -is "ScriptBlock") {&$Else} Else {$Else}}
+	If ($If -IsNot "Boolean") { $_ = $If }
+	If ($If) { If ($Then -is "ScriptBlock") { &$Then } Else { $Then } }
+	Else { If ($Else -is "ScriptBlock") { &$Else } Else { $Else } }
 }
 
 function aliasRun([ScriptBlock]$cmd, $a, $show, $color) {
 	$formattedArgs = ""
-	foreach($b in $a) {
+	foreach ($b in $a) {
 		if ($b -like '-*') {
 			$formattedArgs += "$b"
-		} else {
+		}
+		else {
 			$formattedArgs += " `"$b`""
 		}
 	}
@@ -159,10 +161,10 @@ function aliasRun([ScriptBlock]$cmd, $a, $show, $color) {
 	IIf $alias_indicator (Write-Host $formattedCommand -ForegroundColor $alias_indicator_color)
 	$currentEncoding = [Console]::OutputEncoding
 	try {
-			[Console]::OutputEncoding = [Text.Encoding]::UTF8
-			Invoke-Expression "& $formattedCommand"
+		[Console]::OutputEncoding = [Text.Encoding]::UTF8
+		Invoke-Expression "& $formattedCommand"
 	}
 	finally {
-			[Console]::OutputEncoding = $currentEncoding
+		[Console]::OutputEncoding = $currentEncoding
 	}
 }

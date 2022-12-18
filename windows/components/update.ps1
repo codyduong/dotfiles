@@ -18,7 +18,8 @@ function promptProfileUpdate {
     if ($choice) {
       updateProfile
     }
-  } else {
+  }
+  else {
     # Write-Host "Powershell Profile $currentVersion ($(Join-Path (Split-Path -parent $profile) "profile.ps1"))" 
   }
 }
@@ -37,7 +38,8 @@ function forceProfileCheck {
       [string]$stashName = New-Guid
       try {
         $stashed = (git stash push -u -m $stashName)
-      } catch {}
+      }
+      catch {}
       $old_branch = (git rev-parse --abbrev-ref HEAD)
       git checkout $branch
       git fetch
@@ -47,7 +49,8 @@ function forceProfileCheck {
       if ($stashed) {
         git stash pop
       }
-    } else {
+    }
+    else {
       # Check via remote if we can
       $profileFile = Invoke-WebRequest -Uri $remoteVersionUrl -UseBasicParsing
     }
@@ -89,7 +92,8 @@ function updateProfile() {
       [string]$stashName = New-Guid
       try {
         $stashed = (git stash push -u -m $stashName)
-      } catch {}
+      }
+      catch {}
       $old_branch = (git rev-parse --abbrev-ref HEAD)
       git checkout $branch
       git fetch
@@ -99,10 +103,12 @@ function updateProfile() {
       if ($stashed) {
         git stash pop
       }
-    } finally {
+    }
+    finally {
       Set-Location $old_location
     }
-  } else {
+  }
+  else {
     . $PSScriptRoot/../setup/remote.ps1 $true
   }
   Invoke-Command { & "pwsh.exe" -NoLogo } -NoNewScope

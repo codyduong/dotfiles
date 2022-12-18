@@ -40,7 +40,7 @@ function curlex($url) {
     $uri = new-object system.uri $url
     $filename = $name = $uri.segments | Select-Object -Last 1
     $path = join-path $env:Temp $filename
-    if( test-path $path ) { rm -force $path }
+    if ( test-path $path ) { rm -force $path }
 
     (new-object net.webclient).DownloadFile($url, $path)
 
@@ -58,15 +58,15 @@ function curlex($url) {
 ### ----------------------------
 # Create a new directory and enter it
 function CreateDirectory([String] $path) { New-Item $path -ItemType Directory -ErrorAction SilentlyContinue }
-function CreateAndSet-Directory([String] $path) { New-Item $path -ItemType Directory -ErrorAction SilentlyContinue; Set-Location $path}
+function CreateAndSet-Directory([String] $path) { New-Item $path -ItemType Directory -ErrorAction SilentlyContinue; Set-Location $path }
 
 # Determine size of a file or total size of a directory
-function Get-DiskUsage([string] $path=(Get-Location).Path) {
+function Get-DiskUsage([string] $path = (Get-Location).Path) {
     Convert-ToDiskSize `
-        ( `
+    ( `
             Get-ChildItem .\ -recurse -ErrorAction SilentlyContinue `
-            | Measure-Object -property length -sum -ErrorAction SilentlyContinue
-        ).Sum `
+        | Measure-Object -property length -sum -ErrorAction SilentlyContinue
+    ).Sum `
         1
 }
 
@@ -81,18 +81,18 @@ function Get-DiskUsage([string] $path=(Get-Location).Path) {
 # Reload the $env object from the registry
 function Refresh-Environment {
     $locations = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Environment',
-                 'HKCU:\Environment'
+    'HKCU:\Environment'
 
     $locations | ForEach-Object {
         $k = Get-Item $_
         $k.GetValueNames() | ForEach-Object {
-            $name  = $_
+            $name = $_
             $value = $k.GetValue($_)
             Set-Item -Path Env:\$name -Value $value
         }
     }
 
-    $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+    $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
 }
 
 # Set a permanent Environment variable, and reload it into $env
@@ -115,9 +115,9 @@ function Append-EnvPathIfExists([String]$path) { if (Test-Path $path) { Append-E
 
 # Convert a number to a disk size (12.4K or 5M)
 function Convert-ToDiskSize {
-    param ( $bytes, $precision='0' )
-    foreach ($size in ("B","K","M","G","T")) {
-        if (($bytes -lt 1000) -or ($size -eq "T")){
+    param ( $bytes, $precision = '0' )
+    foreach ($size in ("B", "K", "M", "G", "T")) {
+        if (($bytes -lt 1000) -or ($size -eq "T")) {
             $bytes = ($bytes).tostring("F0" + "$precision")
             return "${bytes}${size}"
         }
@@ -171,7 +171,7 @@ function Unzip-File {
     #>
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory=$true, ValueFromPipeline=$true)]
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [string]$File,
 
         [ValidateNotNullOrEmpty()]
@@ -188,14 +188,17 @@ function Unzip-File {
         try {
             [System.Reflection.Assembly]::LoadWithPartialName("System.IO.Compression.FileSystem") | Out-Null
             [System.IO.Compression.ZipFile]::ExtractToDirectory("$filePath", "$destinationPath")
-        } catch {
+        }
+        catch {
             Write-Warning -Message "Unexpected Error. Error details: $_.Exception.Message"
         }
-    } else {
+    }
+    else {
         try {
             $shell = New-Object -ComObject Shell.Application
             $shell.Namespace($destinationPath).copyhere(($shell.NameSpace($filePath)).items())
-        } catch {
+        }
+        catch {
             Write-Warning -Message "Unexpected Error. Error details: $_.Exception.Message"
         }
     }

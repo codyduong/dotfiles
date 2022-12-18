@@ -15,11 +15,11 @@ $script:lgitParamValues = $gitParamValues
 $script:gitLongParams = $longGitParams
 $script:gitShortParams = $shortGitParams
 
-$script:someCommands = @('add','am','annotate','archive','bisect','blame','branch','bundle','checkout','cherry',
-                         'cherry-pick','citool','clean','clone','commit','config','describe','diff','difftool','fetch',
-                         'format-patch','gc','grep','gui','help','init','instaweb','log','merge','mergetool','mv',
-                         'notes','prune','pull','push','rebase','reflog','remote','rerere','reset','restore','revert','rm',
-                         'shortlog','show','stash','status','submodule','svn','switch','tag','whatchanged', 'worktree')
+$script:someCommands = @('add', 'am', 'annotate', 'archive', 'bisect', 'blame', 'branch', 'bundle', 'checkout', 'cherry',
+    'cherry-pick', 'citool', 'clean', 'clone', 'commit', 'config', 'describe', 'diff', 'difftool', 'fetch',
+    'format-patch', 'gc', 'grep', 'gui', 'help', 'init', 'instaweb', 'log', 'merge', 'mergetool', 'mv',
+    'notes', 'prune', 'pull', 'push', 'rebase', 'reflog', 'remote', 'rerere', 'reset', 'restore', 'revert', 'rm',
+    'shortlog', 'show', 'stash', 'status', 'submodule', 'svn', 'switch', 'tag', 'whatchanged', 'worktree')
 
 if ((($PSVersionTable.PSVersion.Major -eq 5) -or $IsWindows) -and ($script:GitVersion -ge [System.Version]'2.16.2')) {
     $script:someCommands += 'update-git-for-windows'
@@ -30,7 +30,7 @@ foreach ($key in $poshGitAliasList.Keys) {
         $old_arg_map = $gitParamValues[$poshGitAliasMap[$key]]
         $new_arg_map = @{}
         foreach ($arg in $old_arg_map.Keys) {
-            $key_args = $poshGitAliasList[$key] -replace "(--|=)","" -split ' '
+            $key_args = $poshGitAliasList[$key] -replace "(--|=)", "" -split ' '
             if ($key_args -notcontains $arg) {
                 $new_arg_map[$arg] = $old_arg_map[$arg]
             }
@@ -44,7 +44,7 @@ foreach ($key in $poshGitAliasList.Keys) {
     $args_to_remove = ($poshGitAliasList[$key] -split ' ' | 
         Where { $_ -match "(?<=--)\S*$" }) -join '|'
 
-    $new_args= $old_args -replace "($($args_to_remove))",""
+    $new_args = $old_args -replace "($($args_to_remove))", ""
     $gitLongParams[$key] = $new_args
 }
 
@@ -53,7 +53,7 @@ foreach ($key in $poshGitAliasList.Keys) {
     $args_to_remove = ($poshGitAliasList[$key] -split ' ' | 
         Where { $_ -match "(?<=-)\S*$" }) -join '|'
 
-    $new_args= $old_args -replace "($($args_to_remove))",""
+    $new_args = $old_args -replace "($($args_to_remove))", ""
     $gitShortParams[$key] = $new_args
 }
 
@@ -554,7 +554,8 @@ if (!$UseLegacyTabExpansion -and $PSVersionTable.PSVersion.Major -ge 6) {
         # WriteTabExpLog "Expand: command: '$($commandAst.Extent.Text)', padded: '$textToComplete', padlen: $padLength"
         Expand-GitCommand2 $textToComplete
     }
-} else {
+}
+else {
     $PowerTab_RegisterTabExpansion = if (Get-Module -Name powertab) { Get-Command Register-TabExpansion -Module powertab -ErrorAction SilentlyContinue }
     if ($PowerTab_RegisterTabExpansion) {
         foreach ($cmd in $poshGitAliasList.Keys) {

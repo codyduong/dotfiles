@@ -1,6 +1,6 @@
-[CmdletBinding(DefaultParametersetName='none')] 
+[CmdletBinding(DefaultParametersetName = 'none')] 
 param (
-    [Parameter(Position=0, ParameterSetName="update")]$update
+  [Parameter(Position = 0, ParameterSetName = "update")]$update
 )
 
 . $PSScriptRoot\utils.ps1
@@ -18,7 +18,8 @@ param (
 
 if ($null -ne $update) {
   $Env:UPDATE_OUTDATED_DEPS = $update
-} else {
+}
+else {
   InstallerPromptUpdateOutdated
 }
 
@@ -84,7 +85,8 @@ Write-Host "`nInstalling Node Packages..." -ForegroundColor "Yellow"
 try {
   npm install -g npm@latest
   npm install -g yarn
-} catch {}
+}
+catch {}
 # $nodeLtsVersion = choco search nodejs-lts --limit-output | ConvertFrom-String -TemplateContent "{Name:package-name}\|{Version:1.11.1}" | Select -ExpandProperty "Version"
 # nvm install $nodeLtsVersion
 # nvm use $nodeLtsVersion
@@ -127,7 +129,8 @@ if (([Environment]::OSVersion.Version).Build -ge 22621) {
 #####
 try {
   wsl -v
-} catch {
+}
+catch {
   wsl --install
 }
 

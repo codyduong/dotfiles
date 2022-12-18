@@ -1,9 +1,9 @@
-[CmdletBinding(DefaultParametersetName='none')] 
+[CmdletBinding(DefaultParametersetName = 'none')] 
 param (
-    [Parameter(Position=0, ParameterSetName="remote")][boolean]$isBootstrappingFromRemote,
-    [Parameter(Position=1, ParameterSetName="remote", mandatory)][string]$sourceFile,
-    [Parameter(ParameterSetName="update")][boolean]$update,
-    [Parameter(ParameterSetName="skip")][boolean]$skip
+  [Parameter(Position = 0, ParameterSetName = "remote")][boolean]$isBootstrappingFromRemote,
+  [Parameter(Position = 1, ParameterSetName = "remote", mandatory)][string]$sourceFile,
+  [Parameter(ParameterSetName = "update")][boolean]$update,
+  [Parameter(ParameterSetName = "skip")][boolean]$skip
 )
 
 . $PSScriptRoot\utils.ps1
@@ -25,8 +25,9 @@ track updates and boostrap new profiles from
 
 if ($update) {
   . $PSScriptRoot\install.ps1 $true
-} else {
-  $installDeps = if ($skip) {$false} else {PromptBooleanQuestion "Would you like to install the required dependencies" $true}
+}
+else {
+  $installDeps = if ($skip) { $false } else { PromptBooleanQuestion "Would you like to install the required dependencies" $true }
   if ($installDeps) {
     . $PSScriptRoot\install.ps1
   }
