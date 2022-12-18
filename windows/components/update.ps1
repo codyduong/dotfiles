@@ -20,7 +20,7 @@ function promptProfileUpdate {
 function isProfileOutdated {
   if ([System.IO.File]::Exists($latestVersionFile)) {
     $latestVersion = [System.IO.File]::ReadAllText($latestVersionFile)
-    $currentProfile = [System.IO.File]::ReadAllText($profile)
+    $currentProfile = [System.IO.File]::ReadAllText((Join-Path (Split-Path -parent $profile) "profile.ps1"))
     [version]$currentVersion = "0.0.0"
     if ($currentProfile -match $versionRegEx) {
       $currentVersion = $matches.Version

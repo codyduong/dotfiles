@@ -70,3 +70,5 @@ if ($update) {
     & .\windows\scripts\bootstrap.ps1 $true $sourceFile
 }
 Pop-Location
+
+Invoke-Command { & "pwsh.exe" -NoLogo } -NoNewScope

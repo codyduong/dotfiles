@@ -31,15 +31,15 @@ if ($update) {
   }
 }
 
-$profileDir = Split-Path -parent $profile
-$componentDir = Join-Path $profileDir "components"
+$script:profileDir = Split-Path -parent $profile
+$script:componentDir = Join-Path $profileDir "components"
+$script:setupDir = Join-Path $profileDir "setup"
 
 New-Item $profileDir -ItemType Directory -Force -ErrorAction SilentlyContinue
 New-Item $componentDir -ItemType Directory -Force -ErrorAction SilentlyContinue
+New-Item $setupDir -ItemType Directory -Force -ErrorAction SilentlyContinue
 
 Copy-Item -Path $PSScriptRoot/../*.ps1 -Destination $profileDir -Exclude "bootstrap.ps1"
 Copy-Item -Path $PSScriptRoot/../components/** -Destination $componentDir -Include **
+Copy-Item -Path $PSScriptRoot/../setup/remote.ps1 -Destination $setupDir -Include **
 # Copy-Item -Path ./home/** -Destination $home -Include **
-
-Remove-Variable componentDir
-Remove-Variable profileDir
