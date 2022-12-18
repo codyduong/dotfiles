@@ -36,13 +36,31 @@ function isProfileOutdated {
     param ($remoteVersionUrl, $latestVersionFile, $versionRegEx)
 
     $latestVersion = [System.IO.File]::ReadAllText($latestVersionFile)
-    $profileFile = Invoke-WebRequest -Uri $remoteVersionUrl -UseBasicParsing
 
+    if (Test-Path "$dotfiles\.git") {
+      # Check via repo if we have
+      param ($dotfiles)
+      Set-Location $dotfiles
+      [boolean]$stashed = $false
+      [string]$stashName = New-Guid
+      try {
+        $stashed = (git stash push -m $stashName -u)
+      } catch {}
+      git fetch
+      git pull
+      $profileFile = [System.IO.File]::ReadAllText("$dotfiles\windows\profile.ps1")
+      try {
+        git stash pop $stashName
+      } catch {}
+      write-host 'git-check'
+    } else {
+      # Check via remote if we can
+      $profileFile = Invoke-WebRequest -Uri $remoteVersionUrl -UseBasicParsing
+    }
     [version]$remoteVersion = "0.0.0"
     if ($profileFile -match $versionRegEx) {
       $remoteVersion = $matches.Version
       if ($remoteVersion -gt [version]$latestVersion) {
-        Write-Host 'foobar'
         Set-Content -Path $latestVersionFile -Value $remoteVersion
       }
     }
