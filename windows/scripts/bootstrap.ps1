@@ -2,8 +2,8 @@
 param (
     [Parameter(Position=0, ParameterSetName="remote")][boolean]$isBootstrappingFromRemote,
     [Parameter(Position=1, ParameterSetName="remote", mandatory)][string]$sourceFile,
-    [Parameter(Position=0, ParameterSetName="update")][boolean]$update,
-    [Parameter(Position=1, ParameterSetName="update")][boolean]$skip
+    [Parameter(ParameterSetName="update")][boolean]$update,
+    [Parameter(ParameterSetName="skip")][boolean]$skip
 )
 
 . $PSScriptRoot\utils.ps1
