@@ -18,6 +18,7 @@ function promptProfileUpdate {
 }
 
 function isProfileOutdated {
+  [boolean]$isOutdated = $false
   if ([System.IO.File]::Exists($latestVersionFile)) {
     $latestVersion = [System.IO.File]::ReadAllText($latestVersionFile)
     $currentProfile = [System.IO.File]::ReadAllText((Join-Path (Split-Path -parent $profile) "profile.ps1"))
@@ -25,10 +26,9 @@ function isProfileOutdated {
     if ($currentProfile -match $versionRegEx) {
       $currentVersion = $matches.Version
     }
-    Write-Host "Current version: $currentVersion`nLatest version: $latestVersion"
-  
     if ([version]$latestVersion -gt $currentVersion) {
-      return $true
+      Write-Host "Current version: $currentVersion`nLatest version: $latestVersion"
+      $isOutdated = $true
     }
   }
 
@@ -42,12 +42,13 @@ function isProfileOutdated {
     if ($profileFile -match $versionRegEx) {
       $remoteVersion = $matches.Version
       if ($remoteVersion -gt [version]$latestVersion) {
+        Write-Host 'foobar'
         Set-Content -Path $latestVersionFile -Value $remoteVersion
       }
     }
   }
   
-  $false
+  $isOutdated
 }
 
 function updateProfile() {
