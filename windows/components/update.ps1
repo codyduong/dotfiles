@@ -82,6 +82,7 @@ function isProfileOutdated {
 
 function updateProfile() {
   if (Test-Path "$dotfiles\.git") {
+    $old_location = Get-Location
     Set-Location $dotfiles
     try {
       [boolean]$stashed = $false
@@ -99,7 +100,7 @@ function updateProfile() {
         git stash pop
       }
     } finally {
-      Pop-Location
+      Set-Location $old_location
     }
   } else {
     . $PSScriptRoot/../setup/remote.ps1 $true
