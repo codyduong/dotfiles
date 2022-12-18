@@ -36,14 +36,17 @@ function forceProfileCheck {
       [boolean]$stashed = $false
       [string]$stashName = New-Guid
       try {
-        $stashed = (git stash push -m $stashName -u)
+        $stashed = (git stash push -u -m $stashName)
       } catch {}
+      $old_branch = (git rev-parse --abbrev-ref HEAD)
+      git checkout $branch
       git fetch
       git pull
       $profileFile = [System.IO.File]::ReadAllText("$dotfiles\windows\profile.ps1")
-      try {
-        git stash pop $stashName
-      } catch {}
+      git checkout $old_branch
+      if ($stashed) {
+        git stash pop
+      }
     } else {
       # Check via remote if we can
       $profileFile = Invoke-WebRequest -Uri $remoteVersionUrl -UseBasicParsing
@@ -84,14 +87,17 @@ function updateProfile() {
       [boolean]$stashed = $false
       [string]$stashName = New-Guid
       try {
-        $stashed = (git stash push -m $stashName -u)
+        $stashed = (git stash push -u -m $stashName)
       } catch {}
+      $old_branch = (git rev-parse --abbrev-ref HEAD)
+      git checkout $branch
       git fetch
       git pull
       . .\windows\scripts\bootstrap.ps1 -update $true;
-      try {
-        git stash pop $stashName
-      } catch {}
+      git checkout $old_branch
+      if ($stashed) {
+        git stash pop
+      }
     } finally {
       Pop-Location
     }

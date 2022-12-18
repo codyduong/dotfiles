@@ -1,4 +1,4 @@
-# version 1.1.2
+# version 1.1.3
 
 # https://github.com/gluons/powershell-git-aliases/issues/27#issuecomment-1041301323
 # Be aware that posh-git should be imported after git-aliases or any self-defined git alias/function, which is mentioned in this issue and solved in PR.
