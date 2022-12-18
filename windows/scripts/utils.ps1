@@ -9,40 +9,83 @@ $script:InstallationIndicatorColorInstalling    = "DarkCyan"
 $script:InstallationIndicatorColorUpdating      = "DarkGreen"
 $script:InstallationIndicatorColorFound         = "DarkGray"
 
+function script:WingetListAll {
+    $currentEncoding = [Console]::OutputEncoding
+    try {
+        [Console]::OutputEncoding = [Text.Encoding]::UTF8
+            
+        [array]$output_lines = $(winget list -s winget) | Where-Object { $_ -match "^\S+.*$" }
+        $table_header = $output_lines[0]
+        $valid_lines = $output_lines[2..($output_lines.Count - 1)]
+
+        $global:winget_table = @{}
+        $id_index = $table_header.IndexOf("Id")
+        $version_index = $table_header.IndexOf("Version")
+        ForEach ($line in $valid_lines) {
+            $name = $line.substring($id_index, $version_index-$id_index-1).Trim()
+            $line = $line.substring($version_index).Trim()
+            $line = $line -replace "\s(?=\s{1,})", ""
+            # Write-Output $name $line
+            $version = $line -split " "
+            if ($version -is [String]) {
+                $version = $version, $null
+            }
+            $winget_table[$name] = $version
+        }
+    }
+    finally {
+        [Console]::OutputEncoding = $currentEncoding
+    }
+}
+
 function script:WingetIsPackageInstalled {
     param (
         [parameter(mandatory)][string]$packageStr
     )
 
-    $output_lines = $(winget list -e --id $packageStr) | 
-    Where-Object { $_ -match "^\S+.*$" }
-    $table_header = $output_lines[0]
-    $application_str = $output_lines[2]
-    $application_str = ($application_str -replace "\s(?=\s{1,})", "")
-    $regex = if ($table_header -match "Available") {
-        "((unknown )|([\w\.]* ))[\w\.]*(?= winget$)"
+    $global:winget_table = $winget_table ?? @{}
+    if ($winget_table.count -le 0) {
+        WingetListAll
+    }
+
+    $version = [version]"0.0.0", [version]"0.0.0"
+    [boolean]$installed = $false
+    if ($winget_table[$packageStr]) {
+        $installed = $true
+        $version = $winget_table[$packageStr]
     } else {
-        "((unknown )|([\w\.]*))(?= winget$)"
-    }
+        $output_lines = $(winget list -e --id $packageStr) | 
+        Where-Object { $_ -match "^\S+.*$" }
+        $table_header = $output_lines[0]
+        $application_str = $output_lines[2]
+        $application_str = ($application_str -replace "\s(?=\s{1,})", "")
+        $regex = if ($table_header -match "Available") {
+            "((unknown )|([\w\.]* ))[\w\.]*(?= winget$)"
+        } else {
+            "((unknown )|([\w\.]*))(?= winget$)"
+        }
+        if ($application_str -match $packageStr) {
+            $installed = $true
+        }
 
-    $version = try {
-        ($application_str | select-string -allmatches $regex).
-        Matches[0] -split " "
-    } catch [InvalidOperationException] {
-        $false
+        $version = try {
+            ($application_str | select-string -allmatches $regex).
+            Matches[0] -split " "
+        } catch [InvalidOperationException] {
+            $false
+        }
     }
-
     if ($version -is [String]) {
         $version = $version, $null
     }
 
-    if ($application_str -notmatch $packageStr) {
+    if (-not $installed) {
         return [PackageIs]::notinstalled, $null
     }
     elseif ($version[0] -eq "unknown") {
         return [PackageIs]::unknown, $version
     }
-    elseif ($table_header -match "Available" -and ($version[1] -gt $version[0])) {
+    elseif ($table_header -match "Available" -and ([version]($version[1] ?? "0.0.0") -gt [version]($version[0] ?? "0.0.0"))) {
         return [PackageIs]::outdated, $version
     }
     else {

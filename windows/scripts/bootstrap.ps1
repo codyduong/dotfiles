@@ -2,7 +2,8 @@
 param (
     [Parameter(Position=0, ParameterSetName="remote")][boolean]$isBootstrappingFromRemote,
     [Parameter(Position=1, ParameterSetName="remote", mandatory)][string]$sourceFile,
-    [Parameter(Position=0, ParameterSetName="update")][boolean]$update
+    [Parameter(Position=0, ParameterSetName="update")][boolean]$update,
+    [Parameter(Position=1, ParameterSetName="update")][boolean]$skip
 )
 
 . $PSScriptRoot\utils.ps1
@@ -25,7 +26,7 @@ track updates and boostrap new profiles from
 if ($update) {
   . $PSScriptRoot\install.ps1 $true
 } else {
-  $installDeps = PromptBooleanQuestion "Would you like to install the required dependencies" $true
+  $installDeps = if ($skip) {$false} else {PromptBooleanQuestion "Would you like to install the required dependencies" $true}
   if ($installDeps) {
     . $PSScriptRoot\install.ps1
   }
