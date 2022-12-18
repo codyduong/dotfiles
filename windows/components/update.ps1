@@ -8,25 +8,28 @@ $script:latestVersionFile = [System.IO.Path]::Combine("$HOME",'.latest_profile_v
 $script:versionRegEx      = "# [vV]ersion (?<version>\d+\.\d+\.\d+)"
 $script:dotfiles          = [System.IO.Path]::Combine("$HOME","$repo")
 
-# Either git pull the local directory and copy the files
-# or do a a fresh install to %TEMP%
-function isProfileOutdated() {
+function promptProfileUpdate {
+  if (isProfileOutdated) {
+    $choice = PromptBooleanQuestion "Found newer profile, install" $true
+    if ($choice) {
+      updateProfile
+    }
+  }
+}
+
+function isProfileOutdated {
   if ([System.IO.File]::Exists($latestVersionFile)) {
     $latestVersion = [System.IO.File]::ReadAllText($latestVersionFile)
     $currentProfile = [System.IO.File]::ReadAllText($profile)
-    [version]$currentVersion = "-1000.0.0"
+    [version]$currentVersion = "0.0.0"
     if ($currentProfile -match $versionRegEx) {
       $currentVersion = $matches.Version
     }
+    Write-Host "Current version: $currentVersion`nLatest version: $latestVersion"
   
     if ([version]$latestVersion -gt $currentVersion) {
-      $choice = PromptBooleanQuestion "Found newer profile, install" $true
-      if ($choice) {
-        updateProfile
-      }
       return $true
     }
-    $null
   }
 
   $null = Start-ThreadJob -Name "Get remote version" -StreamingHost $Host -ArgumentList $remoteVersionUrl, $latestVersionFile, $versionRegEx -ScriptBlock {
@@ -43,6 +46,8 @@ function isProfileOutdated() {
       }
     }
   }
+  
+  $false
 }
 
 function updateProfile() {
@@ -67,4 +72,4 @@ function updateProfile() {
   }
 }
 
-$null = isProfileOutdated
+$null = promptProfileUpdate

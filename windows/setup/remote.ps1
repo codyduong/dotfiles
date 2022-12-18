@@ -64,7 +64,9 @@ Read-File $sourceFile $dotfilesTempDir
 # }
 
 Push-Location $dotfilesInstallDir
-& .\windows\scripts\bootstrap.ps1 $true $sourceFile $update
+if ($update) {
+    & .\windows\scripts\bootstrap.ps1 -update $true
+} else {
+    & .\windows\scripts\bootstrap.ps1 $true $sourceFile
+}
 Pop-Location
-
-Invoke-Command { & "pwsh.exe" -NoLogo } -NoNewScope
