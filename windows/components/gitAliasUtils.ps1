@@ -151,13 +151,13 @@ function aliasRun([ScriptBlock]$cmd, $a, $show, $color) {
 	$formattedArgs = ""
 	foreach ($b in $a) {
 		if ($b -like '-*') {
-			$formattedArgs += "$b"
+			$formattedArgs += "$b "
 		}
 		else {
-			$formattedArgs += " `"$b`""
+			$formattedArgs += "`"$b`" "
 		}
 	}
-	$formattedCommand = $cmd.ToString().Replace('$args', $formattedArgs)
+	$formattedCommand = $cmd.ToString().Replace('$args', $formattedArgs).Trim(' ')
 	IIf $alias_indicator (Write-Host $formattedCommand -ForegroundColor $alias_indicator_color)
 	$currentEncoding = [Console]::OutputEncoding
 	try {

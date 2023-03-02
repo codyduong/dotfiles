@@ -315,6 +315,9 @@ function grrm {
 function grs {
 	aliasRun { git restore $args } $args $alias_indicator $alias_indicator_color
 }
+function grst {
+	aliasRun { git restore --staged $args } $args $alias_indicator $alias_indicator_color
+}
 function grset {
 	aliasRun { git remote set-url $args } $args $alias_indicator $alias_indicator_color
 }
