@@ -123,7 +123,7 @@ function gcmsg {
 	aliasRun { git commit -m $args } $args $alias_indicator $alias_indicator_color
 }
 function gco {
-	aliasRun { git checkout $args } $args $alias_indicator $alias_indicator_color
+	aliasRun { git checkout $args } $args
 }
 function gcount {
 	aliasRun { git shortlog -sn $args } $args $alias_indicator $alias_indicator_color

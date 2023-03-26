@@ -79,6 +79,7 @@ WingetInstall Rustlang.Rustup
 WingetInstall Git.Git
 WingetInstall Microsoft.GitCredentialManagerCore
 WingetInstall GnuWin32.Grep
+WingetInstall Docker.DockerDesktop
 
 # Node Setup
 Write-Host "`nInstalling Node Packages..." -ForegroundColor "Yellow"
