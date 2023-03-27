@@ -65,7 +65,7 @@ Read-File $sourceFile $dotfilesTempDir
 
 Push-Location $dotfilesInstallDir
 if ($update) {
-    & .\windows\scripts\bootstrap.ps1 -update $true
+    & .\windows\scripts\bootstrap.ps1 -update
     Pop-Location
 } else {
     & .\windows\scripts\bootstrap.ps1 $true $sourceFile

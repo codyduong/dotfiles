@@ -98,7 +98,7 @@ function updateProfile() {
       git checkout $branch
       git fetch
       git pull
-      . .\windows\scripts\bootstrap.ps1 -update $true;
+      . .\windows\scripts\bootstrap.ps1 -update;
       git checkout $old_branch
       if ($stashed) {
         git stash pop
