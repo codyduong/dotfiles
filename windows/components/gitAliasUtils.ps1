@@ -153,9 +153,7 @@ $script:alias_indicator_color = "Yellow"
 function aliasRun{
 	param(
 		[ScriptBlock]$cmd,
-		[object[]]$a,
-		$alias_indicator,
-		$alias_indicator_color
+		[object[]]$a
 	)
 	foreach ($b in $a) {
 		if ($b -like '-*') {
