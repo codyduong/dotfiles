@@ -166,7 +166,7 @@ function aliasRun{
 		}
 	}
 	$formattedCommand = $cmd.ToString().Replace('$args', $a).Trim(' ')
-	# IIf $alias_indicator (Write-Host $formattedCommand -ForegroundColor $alias_indicator_color)
+	IIf $alias_indicator (Write-Host $formattedCommand -ForegroundColor $alias_indicator_color)
 	$currentEncoding = [Console]::OutputEncoding
 	try {
 		[Console]::OutputEncoding = [Text.Encoding]::UTF8
