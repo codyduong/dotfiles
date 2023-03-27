@@ -147,22 +147,30 @@ function script:IIf($If, $Then, $Else) {
 	Else { If ($Else -is "ScriptBlock") { &$Else } Else { $Else } }
 }
 
-function aliasRun([ScriptBlock]$cmd, $a, $show, $color) {
-	$formattedArgs = ""
+$script:alias_indicator = $true
+$script:alias_indicator_color = "Yellow"
+
+function aliasRun{
+	param(
+		[ScriptBlock]$cmd,
+		[object[]]$a,
+		$alias_indicator,
+		$alias_indicator_color
+	)
 	foreach ($b in $a) {
 		if ($b -like '-*') {
-			$formattedArgs += "$b "
+			$formattedArgsStr += "$b "
 		}
 		else {
-			$formattedArgs += "`"$b`" "
+			$formattedArgsStr += "$b "
 		}
 	}
-	$formattedCommand = $cmd.ToString().Replace('$args', $formattedArgs).Trim(' ')
+	$formattedCommand = $cmd.ToString().Replace('$args', $a).Trim(' ')
 	IIf $alias_indicator (Write-Host $formattedCommand -ForegroundColor $alias_indicator_color)
 	$currentEncoding = [Console]::OutputEncoding
 	try {
 		[Console]::OutputEncoding = [Text.Encoding]::UTF8
-		Invoke-Expression "& $formattedCommand"
+		& $cmd @a
 	}
 	finally {
 		[Console]::OutputEncoding = $currentEncoding

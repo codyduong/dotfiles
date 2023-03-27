@@ -53,9 +53,9 @@ PowershellInstall -Name CompletionPredictor -Scope CurrentUser -Force -SkipPubli
 PowershellInstall -Name Terminal-Icons -Repository PSGallery -Force -Verbose
 oh-my-posh font install Meslo
 
-################
-#Developer Tools
-################
+#################
+# Developer Tools
+#################
 Write-Host "`nInstalling IDEs/Editors..." -ForegroundColor "Yellow"
 WingetInstall Microsoft.VisualStudioCode
 WingetInstall vim.vim
@@ -72,6 +72,7 @@ WingetInstall Microsoft.PowerToys
 WingetInstall OpenJS.NodeJS
 WingetInstall CoreyButler.NVMforWindows
 WingetInstall Python.Python.3.9
+pip install thefuck
 WingetInstall Rustlang.Rustup
 # https://github.com/microsoft/winget-pkgs/issues/17988
 # choco install pyenv-win
@@ -79,6 +80,7 @@ WingetInstall Rustlang.Rustup
 WingetInstall Git.Git
 WingetInstall Microsoft.GitCredentialManagerCore
 WingetInstall GnuWin32.Grep
+WingetInstall Docker.DockerDesktop
 
 # Node Setup
 Write-Host "`nInstalling Node Packages..." -ForegroundColor "Yellow"
