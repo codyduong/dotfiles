@@ -40,6 +40,7 @@ else {
 Write-Host "`nInstalling PowerShell Extensions..." -ForegroundColor "Yellow"
 PowershellInstall PSWindowsUpdate -Scope CurrentUser -Force -Verbose
 PowershellInstall PSProfiler -Scope CurrentUser -Force -SkipPublisherCheck -AllowPrerelease -Verbose
+PowershellInstall git-aliases-plus -Scope CurrentUser -Force -Verbose -AllowClobber
 PowershellInstall Posh-Git -Scope CurrentUser -Force -Verbose
 
 ### Install oh-my-posh and others
