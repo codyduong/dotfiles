@@ -13,3 +13,4 @@ Import-Module Terminal-Icons
 
 # profiling
 Import-Module PSProfiler
+Import-Module alias-tips
