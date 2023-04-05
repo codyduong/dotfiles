@@ -83,7 +83,7 @@ function isProfileOutdated {
   $isOutdated
 }
 
-function updateProfile() {
+function updateProfile {
   if (Test-Path "$dotfiles\.git") {
     $old_location = Get-Location
     Set-Location $dotfiles

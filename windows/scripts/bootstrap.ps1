@@ -1,9 +1,21 @@
 [CmdletBinding(DefaultParametersetName = 'none')] 
 param (
-  [Parameter(Position = 0, ParameterSetName = "remote")][boolean]$isBootstrappingFromRemote,
-  [Parameter(Position = 1, ParameterSetName = "remote", mandatory)][string]$sourceFile,
-  [Parameter(ParameterSetName = "update")][switch]$update,
-  [Parameter(ParameterSetName = "skip")][switch]$skip
+  [Parameter(Position = 0, ParameterSetName = "remote")]
+  [boolean]
+  $isBootstrappingFromRemote,
+
+  [Parameter(Position = 1, ParameterSetName = "remote", mandatory)]
+  [ValidateNotNullOrEmpty()]
+  [string]
+  $sourceFile,
+
+  [Parameter(ParameterSetName = "update")]
+  [switch]
+  $update,
+
+  [Parameter(ParameterSetName = "skip")]
+  [switch]
+  $skip
 )
 
 . $PSScriptRoot\utils.ps1
