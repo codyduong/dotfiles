@@ -105,28 +105,24 @@ function Install-Winget {
     param(
         [Parameter(ParameterSetName='NameParameterSet', Mandatory=$true, Position=0, ValueFromPipelineByPropertyName=$true)]
         [ValidateNotNullOrEmpty()]
-        [string[]]
+        [string]
         ${Name}
     )
 
-    $PSBoundParameters.Remove('Name')
-
-    foreach ($name in $Name) {
-        $installed = Find-Winget $name
-        $i = $installed[0]
-        $a = $installed[1]
-        $updateOutdated = $Env:UPDATE_OUTDATED_DEPS
-        if ($i -eq [PackageIs]::notinstalled) {
-            Write-Host "Installing $($name)..." -ForegroundColor $InstallationIndicatorColorInstalling
-            winget install -e --id $name
-        }
-        elseif ($i -eq [PackageIs]::outdated -and $updateOutdated -eq $true) {
-            Write-Host "Updating $($name) from $($a[0]) to $($a[1])..." -ForegroundColor $InstallationIndicatorColorUpdating
-            winget install -e --id $name
-        }
-        else {
-            Write-Host "$($name) $($a[0]) found, skipping..." -ForegroundColor $InstallationIndicatorColorFound
-        }
+    $installed = Find-Winget $Name
+    $i = $installed[0]
+    $a = $installed[1]
+    $updateOutdated = $Env:UPDATE_OUTDATED_DEPS
+    if ($i -eq [PackageIs]::notinstalled) {
+        Write-Host "Installing $($Name)..." -ForegroundColor $InstallationIndicatorColorInstalling
+        winget install -e --id $Name
+    }
+    elseif ($i -eq [PackageIs]::outdated -and $updateOutdated -eq $true) {
+        Write-Host "Updating $($Name) from $($a[0]) to $($a[1])..." -ForegroundColor $InstallationIndicatorColorUpdating
+        winget install -e --id $Name
+    }
+    else {
+        Write-Host "$($Name) $($a[0]) found, skipping..." -ForegroundColor $InstallationIndicatorColorFound
     }
 }
 
@@ -168,7 +164,7 @@ function script:Find-PowerShellModule {
         ${AllowPrerelease}
     )
 
-    $str_data = [string]$(Get-InstalledModule -Name $Name -ErrorAction SilentlyContinue)
+    $str_data = [string]$(Get-InstalledModule -Name $Name -AllowPrerelease:$AllowPrerelease -ErrorAction SilentlyContinue)
     if ($null -eq $str_data -or "" -eq ($str_data -replace "\s", "")) {
         return [PackageIs]::notinstalled
     }
@@ -201,13 +197,8 @@ function Install-PowerShell {
     param(
         [Parameter(ParameterSetName='NameParameterSet', Mandatory=$true, Position=0, ValueFromPipelineByPropertyName=$true)]
         [ValidateNotNullOrEmpty()]
-        [string[]]
+        [string]
         ${Name},
-    
-        [Parameter(ParameterSetName='InputObject', Mandatory=$true, Position=0, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true)]
-        [ValidateNotNull()]
-        [psobject[]]
-        ${InputObject},
     
         [Parameter(ParameterSetName='NameParameterSet', ValueFromPipelineByPropertyName=$true)]
         [ValidateNotNull()]
@@ -268,24 +259,22 @@ function Install-PowerShell {
         ${PassThru}
     )
 
-    $PSBoundParameters.Remove('Name')
+    $PSBoundParameters.Remove("Name") | Out-Null
 
     $updateOutdated = $Env:UPDATE_OUTDATED_DEPS
-    foreach ($name in $Name) {
-        $installed = Find-PowerShellModule $name -AllowPrerelease:$AllowPrerelease
-        $i = $installed[0]
-        $a = $installed[1]
+    $installed = Find-PowerShellModule $Name -AllowPrerelease:$AllowPrerelease
+    $i = $installed[0]
+    $a = $installed[1]
 
-        if ($i -eq [PackageIs]::notinstalled) {
-            Write-Host "Installing $($name)..." -ForegroundColor $InstallationIndicatorColorInstalling
-            Install-Module $name @PSBoundParameters
-        }
-        elseif ($i -eq [PackageIs]::outdated -and $updateOutdated -eq $true) {
-            Write-Host "Updating $($Name) from $($a[0]) to $($a[1])..." -ForegroundColor $InstallationIndicatorColorUpdating
-            Install-Module $name @PSBoundParameters
-        }
-        else {
-            Write-Host "$($name) $($a[0]) found, skipping..." -ForegroundColor $InstallationIndicatorColorFound
-        }
+    if ($i -eq [PackageIs]::notinstalled) {
+        Write-Host "Installing $($Name)..." -ForegroundColor $InstallationIndicatorColorInstalling
+        Install-Module @($Name) @PSBoundParameters
+    }
+    elseif ($i -eq [PackageIs]::outdated -and $updateOutdated -eq $true) {
+        Write-Host "Updating $($Name) from $($a[0]) to $($a[1])..." -ForegroundColor $InstallationIndicatorColorUpdating
+        Install-Module @($Name) @PSBoundParameters
+    }
+    else {
+        Write-Host "$($Name) $($a[0]) found, skipping..." -ForegroundColor $InstallationIndicatorColorFound
     }
 }
