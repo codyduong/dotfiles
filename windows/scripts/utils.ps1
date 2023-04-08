@@ -278,3 +278,54 @@ function Install-PowerShell {
         Write-Host "$($Name) $($a[0]) found, skipping..." -ForegroundColor $InstallationIndicatorColorFound
     }
 }
+
+function Install-WinGetPackage {
+    [CmdletBinding()]
+    param()
+
+    $winget = Get-Command winget -ErrorAction SilentlyContinue | Select-Object -ExpandProperty "Name" -ErrorAction SilentlyContinue
+    if ($winget) {
+        Update-WinGetPackage
+    } else {
+        Update-WinGetPackage [version]0.0.0
+    }
+}
+
+function Update-WinGetPackage {
+    [CmdletBinding()]
+    param(
+        [Parameter(Position=0, ValueFromPipelineByPropertyName=$true)]
+        [version]
+        ${Version}
+    )
+
+    # check local version
+    $localVersion = $Version ?? [version]$("$(winget -v)".TrimStart("v"))
+
+    # get remote version
+    $remote = Invoke-RestMethod https://api.github.com/repos/microsoft/winget-cli/releases/latest
+    $latestVersion = [version]$($remote.tag_name.TrimStart("v"))
+
+    Write-Verbose "Local winget version: v$localVersion"
+    Write-Verbose "Latest winget version: v$latestVersion"
+
+    if ($latestVersion -eq $localVersion) {
+        Write-Host "winget $localVersion found, skipping..." -ForegroundColor $InstallationIndicatorColorFound
+        return $null
+    }
+
+    $asset = $remote.assets | Where-Object {$_.name -match "Microsoft\.DesktopAppInstaller_.*\.msixbundle$"}
+    $url = $asset.browser_download_url
+    $file = Join-Path $env:TEMP "WinGet" $asset.name
+    Invoke-WebRequest -Uri $url -OutFile $file
+
+    if ($latestVersion -eq 0.0.0) {
+        Write-Host "Installing $($Name)..." -ForegroundColor $InstallationIndicatorColorInstalling
+    }
+    elseif ($latestVersion -gt $localVersion) {
+        Write-Host "Updating winget from $localVersion to $latestVersion..." -ForegroundColor $InstallationIndicatorColorUpdating
+    }
+    Add-AppxPackage -Path $file
+
+    return $null
+}

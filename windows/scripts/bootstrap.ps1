@@ -36,7 +36,7 @@ track updates and boostrap new profiles from
 }
 
 if ($update.IsPresent) {
-  . $PSScriptRoot\install.ps1 $true
+  . $PSScriptRoot\install.ps1 -update
 }
 else {
   $installDeps = if ($skip.IsPresent) { $false } else { PromptBooleanQuestion "Would you like to install the required dependencies" $true }
