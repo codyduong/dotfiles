@@ -279,53 +279,102 @@ function Install-PowerShell {
     }
 }
 
-function Install-WinGetPackage {
-    [CmdletBinding()]
-    param()
-
-    $winget = Get-Command winget -ErrorAction SilentlyContinue | Select-Object -ExpandProperty "Name" -ErrorAction SilentlyContinue
-    if ($winget) {
-        Update-WinGetPackage
-    } else {
-        Update-WinGetPackage [version]0.0.0
-    }
-}
-
-function Update-WinGetPackage {
-    [CmdletBinding()]
+function Install-GitHubRelease {
+    [CmdletBinding(DefaultParameterSetName='NameParameterSet')]
     param(
-        [Parameter(Position=0, ValueFromPipelineByPropertyName=$true)]
-        [version]
+        [Parameter(ParameterSetName='NameParameterSet', Mandatory, Position=0, ValueFromPipelineByPropertyName)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        ${Name},
+
+        [Parameter(Mandatory, Position=1, ValueFromPipelineByPropertyName)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        ${Repository},
+
+        [Parameter(Mandatory, Position=2, ValueFromPipelineByPropertyName)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        ${Match},
+
+        [Parameter(ValueFromPipelineByPropertyName)]
+        [semver]
         ${Version}
     )
 
-    # check local version
-    $localVersion = $Version ?? [version]$("$(winget -v)".TrimStart("v"))
+    if ($Version) {
+        Update-GitHubRelease @PSBoundParameters
+    } else {
+        $Installed = Get-Command $Name -ErrorAction SilentlyContinue | Select-Object -ExpandProperty "Name" -ErrorAction SilentlyContinue
+
+        if ($Installed) {
+            $Version = [semver]$(Invoke-Expression "$Name --version").TrimStart("v")
+            Update-GitHubRelease $Version @PSBoundParameters
+        } else {
+            Update-GitHubRelease $([semver]$("0.0.0")) @PSBoundParameters
+        }
+    }
+}
+
+function Update-GitHubRelease {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory, Position=0, ValueFromPipelineByPropertyName)]
+        [semver]
+        ${Version},
+
+        [Parameter(Mandatory, Position=1, ValueFromPipelineByPropertyName)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        ${Name},
+
+        [Parameter(Mandatory, Position=2, ValueFromPipelineByPropertyName)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        ${Repository},
+
+        [Parameter(Mandatory, Position=3, ValueFromPipelineByPropertyName)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        ${Match}
+    )
 
     # get remote version
-    $remote = Invoke-RestMethod https://api.github.com/repos/microsoft/winget-cli/releases/latest
-    $latestVersion = [version]$($remote.tag_name.TrimStart("v"))
+    $Remote = Invoke-RestMethod https://api.github.com/repos/$Repository/releases/latest
+    $LatestVersion = [semver]$($Remote.tag_name.TrimStart("v"))
 
-    Write-Verbose "Local winget version: v$localVersion"
-    Write-Verbose "Latest winget version: v$latestVersion"
+    Write-Verbose "Local $Name version: v$Version"
+    Write-Verbose "Latest $Name version: v$LatestVersion"
 
-    if ($latestVersion -eq $localVersion) {
-        Write-Host "winget $localVersion found, skipping..." -ForegroundColor $InstallationIndicatorColorFound
+    if ($LatestVersion -eq $Version) {
+        Write-Host "$Name $Version found, skipping..." -ForegroundColor $InstallationIndicatorColorFound
         return $null
     }
 
-    $asset = $remote.assets | Where-Object {$_.name -match "Microsoft\.DesktopAppInstaller_.*\.msixbundle$"}
-    $url = $asset.browser_download_url
-    $file = Join-Path $env:TEMP "WinGet" $asset.name
-    Invoke-WebRequest -Uri $url -OutFile $file
+    $Asset = $Remote.assets | Where-Object {$_.name -match $Match}
+    $Url = $asset.browser_download_url
+    $Temp = Join-Path $env:TEMP "Github"
+    $File = Join-Path $Temp $Asset.name
+    New-Item $Temp -ItemType Directory -Force -ErrorAction SilentlyContinue | Out-Null
+    Invoke-WebRequest -Uri $Url -OutFile $File
 
-    if ($latestVersion -eq 0.0.0) {
-        Write-Host "Installing $($Name)..." -ForegroundColor $InstallationIndicatorColorInstalling
+    if ($LatestVersion -eq [semver]"0.0.0") {
+        Write-Host "Installing $Name..." -ForegroundColor $InstallationIndicatorColorInstalling
     }
-    elseif ($latestVersion -gt $localVersion) {
-        Write-Host "Updating winget from $localVersion to $latestVersion..." -ForegroundColor $InstallationIndicatorColorUpdating
+    elseif ($LatestVersion -gt $Version) {
+        Write-Host "Updating $Name from $Version to $LatestVersion..." -ForegroundColor $InstallationIndicatorColorUpdating
     }
-    Add-AppxPackage -Path $file
+    
+    # Handle .msixbundle with AppX
+    if ($File -match ".*\.msixbundle$") {
+        Add-AppxPackage -Path $File
+    }
+    # Handle .exe
+    elseif ($File -match ".*\.exe$") {
+        Start-Process -FilePath $File
+    } else {
+        Write-Warning "Unsupported file extension on file: $File"
+    }
 
     return $null
 }

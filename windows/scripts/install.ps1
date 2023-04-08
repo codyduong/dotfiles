@@ -40,7 +40,7 @@ else {
 # Terminal
 ##########
 Write-Host "`nInstalling PowerShell and Extensions..." -ForegroundColor "Yellow"
-Install-WinGetPackage
+Install-GitHubRelease winget microsoft/winget-cli "Microsoft\.DesktopAppInstaller_.*\.msixbundle$"
 Install-Winget Microsoft.Powershell
 Install-PowerShell PSWindowsUpdate -Scope CurrentUser -Force
 Install-PowerShell PSProfiler -Scope CurrentUser -Force -SkipPublisherCheck -AllowPrerelease
@@ -66,7 +66,8 @@ Install-Winget Neovim.Neovim
 Write-Host "`nInstalling Developer Tools..." -ForegroundColor "Yellow"
 Install-Winget Microsoft.PowerToys
 Install-Winget Git.Git
-Install-Winget Microsoft.GitCredentialManagerCore
+Install-GitHubRelease git-credential-manager git-ecosystem/git-credential-manager "gcmuser-win-x.*\.exe$" -version $(git credential-manager --version)
+git credential-manager configure
 Install-Winget GnuWin32.Grep
 Install-Winget Docker.DockerDesktop
 
