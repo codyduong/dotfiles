@@ -84,8 +84,9 @@ try {
 Write-Host "`nPython" -ForegroundColor "Cyan"
 # Python
 Install-Winget Python.Python.3.9
-pip install thefuck
-pip install pyenv-win --target $HOME\\.pyenv
+python.exe -m pip install --upgrade pip -q
+pip install thefuck -q
+pip install pyenv-win --target $HOME\\.pyenv -q
 
 Write-Host "`nRust" -ForegroundColor "Cyan"
 # Rust
