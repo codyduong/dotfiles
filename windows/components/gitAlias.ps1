@@ -1,1 +1,0 @@
-Import-Module git-aliases-plus -DisableNameChecking

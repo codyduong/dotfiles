@@ -1,14 +1,24 @@
-# These components will be loaded for all PowerShell instances
+Get-ChildItem -Path "./components" | Where-Object { $_.extension -eq ".ps1" } | ForEach-Object -process { Invoke-Expression ". $_" }
 
-Push-Location (Join-Path (Split-Path -parent $profile) "components")
+# oh-my-posh
+oh-my-posh init pwsh --config "$env:POSH_THEMES_PATH\M365Princess.omp.json" | Invoke-Expression
+Import-Module PSReadLine
+Import-Module CompletionPredictor
+Import-Module Terminal-Icons
 
-# From within the ./components directory...
-. .\fuck.ps1
-# . .\console.ps1
-. .\gitAlias.ps1
-. .\poshGit.ps1
-. .\update.ps1
-. .\ipmo.ps1
-. .\rmo.ps1
+# PS-Readline
+$PSReadLineOptions = @{
+  PredictionSource    = "HistoryAndPlugin"
+  PredictionViewStyle = "ListView"
+}
+Set-PSReadLineOption @PSReadLineOptions
 
-Pop-Location
+# git
+Import-Module git-aliases-plus -DisableNameChecking
+if (($null -ne (Get-Command git -ErrorAction SilentlyContinue)) -and ($null -ne (Get-Module -ListAvailable Posh-Git -ErrorAction SilentlyContinue))) {
+  Import-Module Posh-Git -arg 0,0,1
+}
+
+# profiling
+Import-Module PSProfiler
+Import-Module alias-tips

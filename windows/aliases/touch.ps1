@@ -1,0 +1,1 @@
+function touch($file) { "" | Out-File $file -Encoding ASCII }
