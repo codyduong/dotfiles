@@ -1,4 +1,4 @@
-[CmdletBinding(DefaultParametersetName = 'none')] 
+[CmdletBinding(DefaultParametersetName = 'update')] 
 param (
   [Parameter(Position = 0, ParameterSetName = "update")]$update
 )
@@ -38,51 +38,51 @@ else {
 
 ### Install PowerShell Modules
 Write-Host "`nInstalling PowerShell Extensions..." -ForegroundColor "Yellow"
-PowershellInstall PSWindowsUpdate -Scope CurrentUser -Force -Verbose
-PowershellInstall PSProfiler -Scope CurrentUser -Force -SkipPublisherCheck -AllowPrerelease -Verbose
-PowershellInstall git-aliases-plus -Scope CurrentUser -Force -Verbose -AllowClobber
-PowershellInstall alias-tips -Scope CurrentUser -Force -Verbose -AllowClobber
-PowershellInstall Posh-Git -Scope CurrentUser -Force -Verbose
+Install-PowerShell PSWindowsUpdate -Scope CurrentUser -Force -Verbose
+Install-PowerShell PSProfiler -Scope CurrentUser -Force -SkipPublisherCheck -AllowPrerelease -Verbose
+Install-PowerShell git-aliases-plus -Scope CurrentUser -Force -Verbose -AllowClobber
+Install-PowerShell alias-tips -Scope CurrentUser -Force -Verbose -AllowClobber -AllowPrerelease
+Install-PowerShell Posh-Git -Scope CurrentUser -Force -Verbose
 
 ### Install oh-my-posh and others
 # Write-Host "`nInstalling OhMyPosh and Extensions" -ForegroundColor "Yellow"
-WingetInstall JanDeDobbeleer.OhMyPosh
+Install-Winget JanDeDobbeleer.OhMyPosh
 # autocomplete
-PowershellInstall PSReadLine -AllowPrerelease -Scope CurrentUser -Force -SkipPublisherCheck -Verbose
+Install-PowerShell PSReadLine -AllowPrerelease -Scope CurrentUser -Force -SkipPublisherCheck -Verbose
 # predictor for autocomplete
-PowershellInstall -Name CompletionPredictor -Scope CurrentUser -Force -SkipPublisherCheck -Verbose
+Install-PowerShell -Name CompletionPredictor -Scope CurrentUser -Force -SkipPublisherCheck -Verbose
 # terminal icons
-PowershellInstall -Name Terminal-Icons -Repository PSGallery -Force -Verbose
+Install-PowerShell -Name Terminal-Icons -Repository PSGallery -Force -Verbose
 oh-my-posh font install Meslo
 
 #################
 # Developer Tools
 #################
 Write-Host "`nInstalling IDEs/Editors..." -ForegroundColor "Yellow"
-WingetInstall Microsoft.VisualStudioCode
-WingetInstall vim.vim
-WingetInstall Neovim.Neovim
+Install-Winget Microsoft.VisualStudioCode
+Install-Winget vim.vim
+Install-Winget Neovim.Neovim
 
 Write-Host "`nInstalling Languages & Tools..." -ForegroundColor "Yellow"
-WingetInstall Microsoft.PowerToys
+Install-Winget Microsoft.PowerToys
 # if ($null -eq (which cinst)) {
 #    iex (new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1')
 #    Refresh-Environment
 #    choco feature enable -n=allowGlobalConfirmation
 # }
 # curl is included by default
-WingetInstall OpenJS.NodeJS
-WingetInstall CoreyButler.NVMforWindows
-WingetInstall Python.Python.3.9
+Install-Winget OpenJS.NodeJS
+Install-Winget CoreyButler.NVMforWindows
+Install-Winget Python.Python.3.9
 pip install thefuck
-WingetInstall Rustlang.Rustup
+Install-Winget Rustlang.Rustup
 # https://github.com/microsoft/winget-pkgs/issues/17988
 # choco install pyenv-win
-# WingetInstall GitHub.GitHubDesktop
-WingetInstall Git.Git
-WingetInstall Microsoft.GitCredentialManagerCore
-WingetInstall GnuWin32.Grep
-WingetInstall Docker.DockerDesktop
+# Install-Winget GitHub.GitHubDesktop
+Install-Winget Git.Git
+Install-Winget Microsoft.GitCredentialManagerCore
+Install-Winget GnuWin32.Grep
+Install-Winget Docker.DockerDesktop
 
 # Node Setup
 Write-Host "`nInstalling Node Packages..." -ForegroundColor "Yellow"
@@ -101,24 +101,24 @@ catch {}
 ###################
 Write-Host "`nInstalling Desktop Apps..." -ForegroundColor "Yellow"
 # PERSONAL
-WingetInstall Discord.Discord
-WingetInstall Valve.Steam
+Install-Winget Discord.Discord
+Install-Winget Valve.Steam
 
 # BROWSERS
-WingetInstall Google.Chrome
-WingetInstall Google.Chrome.Canary
-WingetInstall Mozilla.Firefox.ESR # Extended Support Release
-WingetInstall Mozilla.Firefox.DeveloperEdition 
+Install-Winget Google.Chrome
+Install-Winget Google.Chrome.Canary
+Install-Winget Mozilla.Firefox.ESR # Extended Support Release
+Install-Winget Mozilla.Firefox.DeveloperEdition 
 
 # WORK/PRODUCTIVE
-WingetInstall Zoom.Zoom
-WingetInstall Microsoft.Teams
-WingetInstall SlackTechnologies.Slack
+Install-Winget Zoom.Zoom
+Install-Winget Microsoft.Teams
+Install-Winget SlackTechnologies.Slack
 
 # PATCH W11
 # https://learn.microsoft.com/en-us/windows/release-health/windows11-release-information
 if (([Environment]::OSVersion.Version).Build -ge 22621) {
-  WingetInstall valinet.ExplorerPatcher
+  Install-Winget valinet.ExplorerPatcher
 }
 
 #######
