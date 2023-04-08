@@ -1,8 +1,3 @@
 function sudo() {
-  if ($args.Length -eq 1) {
-      start-process $args[0] -verb "runAs"
-  }
-  if ($args.Length -gt 1) {
-      start-process $args[0] -ArgumentList $args[1..$args.Length] -verb "runAs"
-  }
+  Start-Process powershell.exe -verb runAs -ArgumentList '-WindowStyle', 'Hidden', '-Command', "cd $(Get-Location); $args"
 }
