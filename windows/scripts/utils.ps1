@@ -278,3 +278,111 @@ function Install-PowerShell {
         Write-Host "$($Name) $($a[0]) found, skipping..." -ForegroundColor $InstallationIndicatorColorFound
     }
 }
+
+function Install-GitHubRelease {
+    [CmdletBinding(DefaultParameterSetName='NameParameterSet')]
+    param(
+        [Parameter(ParameterSetName='NameParameterSet', Mandatory, Position=0, ValueFromPipelineByPropertyName)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        ${Name},
+
+        [Parameter(Mandatory, Position=1, ValueFromPipelineByPropertyName)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        ${Repository},
+
+        [Parameter(Mandatory, Position=2, ValueFromPipelineByPropertyName)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        ${Match},
+
+        [Parameter(ValueFromPipelineByPropertyName)]
+        [semver]
+        ${Version},
+
+        [Parameter(ValueFromPipelineByPropertyName)]
+        [switch]
+        ${WhatIf}
+    )
+
+    if ($Version) {
+        Update-GitHubRelease @PSBoundParameters
+    } else {
+        $Installed = Get-Command $Name -ErrorAction SilentlyContinue | Select-Object -ExpandProperty "Name" -ErrorAction SilentlyContinue
+
+        if ($Installed) {
+            $Version = [semver]$(Invoke-Expression "$Name --version").TrimStart("v")
+            Update-GitHubRelease $Version @PSBoundParameters
+        } else {
+            Update-GitHubRelease $([semver]$("0.0.0")) @PSBoundParameters
+        }
+    }
+}
+
+function Update-GitHubRelease {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory, Position=0, ValueFromPipelineByPropertyName)]
+        [semver]
+        ${Version},
+
+        [Parameter(Mandatory, Position=1, ValueFromPipelineByPropertyName)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        ${Name},
+
+        [Parameter(Mandatory, Position=2, ValueFromPipelineByPropertyName)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        ${Repository},
+
+        [Parameter(Mandatory, Position=3, ValueFromPipelineByPropertyName)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        ${Match},
+
+        [Parameter(ValueFromPipelineByPropertyName)]
+        [switch]
+        ${WhatIf}
+    )
+
+    # get remote version
+    $Remote = Invoke-RestMethod https://api.github.com/repos/$Repository/releases/latest
+    $LatestVersion = [semver]$($Remote.tag_name.TrimStart("v"))
+
+    Write-Verbose "Local $Name version: v$Version"
+    Write-Verbose "Latest $Name version: v$LatestVersion"
+
+    if ($LatestVersion -eq $Version) {
+        Write-Host "$Name $Version found, skipping..." -ForegroundColor $InstallationIndicatorColorFound
+        return $null
+    }
+
+    $Asset = $Remote.assets | Where-Object {$_.name -match $Match}
+    $Url = $asset.browser_download_url
+    $Temp = Join-Path $env:TEMP "Github"
+    $File = Join-Path $Temp $Asset.name
+    New-Item $Temp -ItemType Directory -Force -ErrorAction SilentlyContinue | Out-Null
+    Invoke-WebRequest -Uri $Url -OutFile $File
+
+    if ($LatestVersion -eq [semver]"0.0.0") {
+        Write-Host "Installing $Name..." -ForegroundColor $InstallationIndicatorColorInstalling
+    }
+    elseif ($LatestVersion -gt $Version) {
+        Write-Host "Updating $Name from $Version to $LatestVersion..." -ForegroundColor $InstallationIndicatorColorUpdating
+    }
+
+    # Handle .msixbundle with AppX
+    if ($File -match ".*\.msixbundle$") {
+        Add-AppxPackage -Path $File -WhatIf:$WhatIf
+    }
+    # Handle .exe
+    elseif ($File -match ".*\.exe$") {
+        Start-Process -FilePath $File -WhatIf:$WhatIf
+    } else {
+        Write-Warning "Unsupported file extension on file: $File"
+    }
+
+    return $null
+}

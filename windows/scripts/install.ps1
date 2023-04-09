@@ -1,6 +1,7 @@
-[CmdletBinding(DefaultParametersetName = 'update')] 
+[CmdletBinding()]
 param (
-  [Parameter(Position = 0, ParameterSetName = "update")]$update
+  [switch]
+  $update
 )
 
 . $PSScriptRoot\utils.ps1
@@ -16,7 +17,7 @@ param (
 #   exit
 # }
 
-if ($null -ne $update) {
+if ($update.IsPresent) {
   $Env:UPDATE_OUTDATED_DEPS = $update
 }
 else {
@@ -35,24 +36,23 @@ else {
 # Get-PackageProvider Chocolatey -Force
 # Set-PackageSource -Name chocolatey -Trusted
 
+##########
+# Terminal
+##########
+Write-Host "`nInstalling PowerShell and Extensions..." -ForegroundColor "Yellow"
+Install-GitHubRelease winget microsoft/winget-cli "Microsoft\.DesktopAppInstaller_.*\.msixbundle$"
+Install-Winget Microsoft.Powershell
+Install-PowerShell PSWindowsUpdate -Scope CurrentUser -Force
+Install-PowerShell PSProfiler -Scope CurrentUser -Force -SkipPublisherCheck -AllowPrerelease
+Install-PowerShell git-aliases-plus -Scope CurrentUser -Force -AllowClobber
+Install-PowerShell alias-tips -Scope CurrentUser -Force -AllowClobber -AllowPrerelease
+Install-PowerShell Posh-Git -Scope CurrentUser -Force
+Install-PowerShell PSReadLine -AllowPrerelease -Scope CurrentUser -Force -SkipPublisherCheck
+Install-PowerShell -Name CompletionPredictor -Scope CurrentUser -Force -SkipPublisherCheck
 
-### Install PowerShell Modules
-Write-Host "`nInstalling PowerShell Extensions..." -ForegroundColor "Yellow"
-Install-PowerShell PSWindowsUpdate -Scope CurrentUser -Force -Verbose
-Install-PowerShell PSProfiler -Scope CurrentUser -Force -SkipPublisherCheck -AllowPrerelease -Verbose
-Install-PowerShell git-aliases-plus -Scope CurrentUser -Force -Verbose -AllowClobber
-Install-PowerShell alias-tips -Scope CurrentUser -Force -Verbose -AllowClobber -AllowPrerelease
-Install-PowerShell Posh-Git -Scope CurrentUser -Force -Verbose
-
-### Install oh-my-posh and others
-# Write-Host "`nInstalling OhMyPosh and Extensions" -ForegroundColor "Yellow"
+### Install oh-my-posh and dependencies
 Install-Winget JanDeDobbeleer.OhMyPosh
-# autocomplete
-Install-PowerShell PSReadLine -AllowPrerelease -Scope CurrentUser -Force -SkipPublisherCheck -Verbose
-# predictor for autocomplete
-Install-PowerShell -Name CompletionPredictor -Scope CurrentUser -Force -SkipPublisherCheck -Verbose
-# terminal icons
-Install-PowerShell -Name Terminal-Icons -Repository PSGallery -Force -Verbose
+Install-PowerShell -Name Terminal-Icons -Repository PSGallery -Force
 oh-my-posh font install Meslo
 
 #################
@@ -63,42 +63,39 @@ Install-Winget Microsoft.VisualStudioCode
 Install-Winget vim.vim
 Install-Winget Neovim.Neovim
 
-Write-Host "`nInstalling Languages & Tools..." -ForegroundColor "Yellow"
+Write-Host "`nInstalling Developer Tools..." -ForegroundColor "Yellow"
 Install-Winget Microsoft.PowerToys
-# if ($null -eq (which cinst)) {
-#    iex (new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1')
-#    Refresh-Environment
-#    choco feature enable -n=allowGlobalConfirmation
-# }
-# curl is included by default
-Install-Winget OpenJS.NodeJS
-Install-Winget CoreyButler.NVMforWindows
-Install-Winget Python.Python.3.9
-pip install thefuck
-Install-Winget Rustlang.Rustup
-# https://github.com/microsoft/winget-pkgs/issues/17988
-# choco install pyenv-win
-# Install-Winget GitHub.GitHubDesktop
 Install-Winget Git.Git
-Install-Winget Microsoft.GitCredentialManagerCore
+Install-GitHubRelease git-credential-manager git-ecosystem/git-credential-manager "gcmuser-win-x.*\.exe$" -version $(git credential-manager --version)
+git credential-manager configure
 Install-Winget GnuWin32.Grep
 Install-Winget Docker.DockerDesktop
+Install-Winget jftuga.less
 
-# Node Setup
-Write-Host "`nInstalling Node Packages..." -ForegroundColor "Yellow"
-try {
-  npm install -g npm@latest
-  npm install -g yarn
-}
-catch {}
-# $nodeLtsVersion = choco search nodejs-lts --limit-output | ConvertFrom-String -TemplateContent "{Name:package-name}\|{Version:1.11.1}" | Select -ExpandProperty "Version"
-# nvm install $nodeLtsVersion
-# nvm use $nodeLtsVersion
-# Remove-Variable nodeLtsVersion
+Write-Host "`nInstalling Languages..." -ForegroundColor "Yellow"
+Write-Host "NodeJS" -ForegroundColor "Cyan"
+# NodeJS
+# Install-Winget OpenJS.NodeJS
+Install-Winget CoreyButler.NVMforWindows
+npm install -g npm@latest
+npm install -g yarn
 
-###################
-# Desktop Utilities
-###################
+Write-Host "`nPython" -ForegroundColor "Cyan"
+# Python
+Install-Winget Python.Python.3.9
+python.exe -m pip install --upgrade pip -q
+pip install thefuck -q
+pip install pyenv-win --target $HOME\\.pyenv -q
+(Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | py -
+
+Write-Host "`nRust" -ForegroundColor "Cyan"
+# Rust
+Install-Winget Rustlang.Rustup
+cargo install ripgrep
+
+##############
+# Desktop Apps
+##############
 Write-Host "`nInstalling Desktop Apps..." -ForegroundColor "Yellow"
 # PERSONAL
 Install-Winget Discord.Discord
@@ -114,6 +111,7 @@ Install-Winget Mozilla.Firefox.DeveloperEdition
 Install-Winget Zoom.Zoom
 Install-Winget Microsoft.Teams
 Install-Winget SlackTechnologies.Slack
+Install-Winget OBSProject.OBSStudio
 
 # PATCH W11
 # https://learn.microsoft.com/en-us/windows/release-health/windows11-release-information
@@ -121,16 +119,10 @@ if (([Environment]::OSVersion.Version).Build -ge 22621) {
   Install-Winget valinet.ExplorerPatcher
 }
 
-#######
-# OTHER
-#######
-
-# SCOOP
-# irm get.scoop.sh | iex
-
 #####
 # WSL
 #####
+Write-Host "`nInstalling WSL" -ForegroundColor "Yellow"
 try {
   wsl -v
 }

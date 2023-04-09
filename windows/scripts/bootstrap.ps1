@@ -36,7 +36,7 @@ track updates and boostrap new profiles from
 }
 
 if ($update.IsPresent) {
-  . $PSScriptRoot\install.ps1 $true
+  . $PSScriptRoot\install.ps1 -update
 }
 else {
   $installDeps = if ($skip.IsPresent) { $false } else { PromptBooleanQuestion "Would you like to install the required dependencies" $true }
@@ -53,14 +53,20 @@ function script:createDir {
 # Powershell Profile
 ####################
 $script:profileDir = Split-Path -parent $profile
+$script:aliasesDir = Join-Path $profileDir "aliases"
 $script:componentDir = Join-Path $profileDir "components"
 $script:setupDir = Join-Path $profileDir "setup"
 
-createDir $profileDir 
+Remove-Item $aliasesDir -Recurse -ErrorAction SilentlyContinue
+Remove-Item $componentDir -Recurse -ErrorAction SilentlyContinue
+
+createDir $profileDir
+createDir $aliasesDir
 createDir $componentDir
 createDir $setupDir
 
 Copy-Item -Path $PSScriptRoot/../*.ps1 -Destination $profileDir -Exclude "bootstrap.ps1"
+Copy-Item -Path $PSScriptRoot/../aliases/** -Destination $aliasesDir -Include **
 Copy-Item -Path $PSScriptRoot/../components/** -Destination $componentDir -Include **
 Copy-Item -Path $PSScriptRoot/../setup/remote.ps1 -Destination $setupDir -Include **
 # Copy-Item -Path ./home/** -Destination $home -Include **
@@ -69,7 +75,7 @@ Copy-Item -Path $PSScriptRoot/../setup/remote.ps1 -Destination $setupDir -Includ
 # Config Files
 ##############
 $script:config = Join-Path $HOME ".config"
-createDir $profileDir
+createDir $config
 
 # thefuck
 $script:thefuck = Join-Path $config "thefuck"
