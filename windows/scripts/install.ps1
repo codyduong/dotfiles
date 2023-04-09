@@ -109,6 +109,7 @@ Install-Winget Mozilla.Firefox.DeveloperEdition
 Install-Winget Zoom.Zoom
 Install-Winget Microsoft.Teams
 Install-Winget SlackTechnologies.Slack
+Install-Winget OBSProject.OBSStudio
 
 # PATCH W11
 # https://learn.microsoft.com/en-us/windows/release-health/windows11-release-information
