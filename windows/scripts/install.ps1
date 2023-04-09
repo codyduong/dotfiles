@@ -1,4 +1,4 @@
-[CmdletBinding()] 
+[CmdletBinding()]
 param (
   [switch]
   $update
@@ -76,10 +76,8 @@ Write-Host "NodeJS" -ForegroundColor "Cyan"
 # NodeJS
 # Install-Winget OpenJS.NodeJS
 Install-Winget CoreyButler.NVMforWindows
-try {
-  npm install -g npm@latest
-  npm install -g yarn
-} catch {}
+npm install -g npm@latest
+npm install -g yarn
 
 Write-Host "`nPython" -ForegroundColor "Cyan"
 # Python

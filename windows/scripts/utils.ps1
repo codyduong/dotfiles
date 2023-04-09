@@ -299,7 +299,11 @@ function Install-GitHubRelease {
 
         [Parameter(ValueFromPipelineByPropertyName)]
         [semver]
-        ${Version}
+        ${Version},
+
+        [Parameter(ValueFromPipelineByPropertyName)]
+        [switch]
+        ${WhatIf}
     )
 
     if ($Version) {
@@ -336,7 +340,11 @@ function Update-GitHubRelease {
         [Parameter(Mandatory, Position=3, ValueFromPipelineByPropertyName)]
         [ValidateNotNullOrEmpty()]
         [string]
-        ${Match}
+        ${Match},
+
+        [Parameter(ValueFromPipelineByPropertyName)]
+        [switch]
+        ${WhatIf}
     )
 
     # get remote version
@@ -364,14 +372,14 @@ function Update-GitHubRelease {
     elseif ($LatestVersion -gt $Version) {
         Write-Host "Updating $Name from $Version to $LatestVersion..." -ForegroundColor $InstallationIndicatorColorUpdating
     }
-    
+
     # Handle .msixbundle with AppX
     if ($File -match ".*\.msixbundle$") {
-        Add-AppxPackage -Path $File
+        Add-AppxPackage -Path $File -WhatIf:$WhatIf
     }
     # Handle .exe
     elseif ($File -match ".*\.exe$") {
-        Start-Process -FilePath $File
+        Start-Process -FilePath $File -WhatIf:$WhatIf
     } else {
         Write-Warning "Unsupported file extension on file: $File"
     }
