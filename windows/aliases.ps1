@@ -28,6 +28,5 @@ Set-Alias unmute Set-SoundUnmute
 Set-Alias update System-Update
 
 Set-Alias vim nvim
-Set-Alias less 'C:\Program Files (x86)\Less\less.exe'
 Set-Alias grep findstr
 Set-Alias _ sudo

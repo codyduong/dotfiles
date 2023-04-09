@@ -70,6 +70,7 @@ Install-GitHubRelease git-credential-manager git-ecosystem/git-credential-manage
 git credential-manager configure
 Install-Winget GnuWin32.Grep
 Install-Winget Docker.DockerDesktop
+Install-Winget jftuga.less
 
 Write-Host "`nInstalling Languages..." -ForegroundColor "Yellow"
 Write-Host "NodeJS" -ForegroundColor "Cyan"
