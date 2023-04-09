@@ -3,11 +3,11 @@ name: windows/lint
 on:
   workflow_dispatch:
   push:
-    branches: [ master ]
+    branches: [ main ]
     paths:
       - 'windows/**/*.ps1'
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 defaults:
   run:
