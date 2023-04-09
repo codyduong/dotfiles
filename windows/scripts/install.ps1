@@ -85,6 +85,7 @@ Install-Winget Python.Python.3.9
 python.exe -m pip install --upgrade pip -q
 pip install thefuck -q
 pip install pyenv-win --target $HOME\\.pyenv -q
+(Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | py -
 
 Write-Host "`nRust" -ForegroundColor "Cyan"
 # Rust
