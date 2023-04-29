@@ -55,6 +55,12 @@ Install-Winget JanDeDobbeleer.OhMyPosh
 Install-PowerShell -Name Terminal-Icons -Repository PSGallery -Force
 oh-my-posh font install Meslo
 
+###########################
+# Tiling Manager (komorebi)
+###########################
+Install-Winget LGUG2Z.whkd
+Install-Winget LGUG2Z.komorebi
+
 #################
 # Developer Tools
 #################
@@ -71,6 +77,8 @@ git credential-manager configure
 Install-Winget GnuWin32.Grep
 Install-Winget Docker.DockerDesktop
 Install-Winget jftuga.less
+# Install-Powershell GoogleCloud -Scope CurrentUser
+# Todo enable once we configure a gcloud init prompt (see https://cloud.google.com/tools/powershell/docs/quickstart)
 
 Write-Host "`nInstalling Languages..." -ForegroundColor "Yellow"
 Write-Host "NodeJS" -ForegroundColor "Cyan"

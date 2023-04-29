@@ -20,7 +20,6 @@ dotfiles/linux/bootstrap.sh
 ```
 
 ## Windows
-Based off [Jay Harris's dotfiles for Windows](https://github.com/jayharris/dotfiles-windows)
 
 ### Pre-reqs
 * [Powershell 7.2^](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell)
@@ -39,6 +38,9 @@ iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.co
 ```powershell
 iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/codyduong/dotfiles/main/windows/setup/git.ps1'))
 ```
+
+### Acknowledgements
+Based off [Jay Harris's dotfiles for Windows](https://github.com/jayharris/dotfiles-windows)
 
 <!---
 ## Windows 10

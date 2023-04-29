@@ -18,6 +18,7 @@ param (
   $skip
 )
 
+try {
 . $PSScriptRoot\utils.ps1
 
 $installDeps = $false
@@ -74,15 +75,20 @@ Copy-Item -Path $PSScriptRoot/../setup/remote.ps1 -Destination $setupDir -Includ
 ##############
 # Config Files
 ##############
-$script:config = Join-Path $HOME ".config"
-createDir $config
+$script:localFiles = '../.files'
 
-# thefuck
-$script:thefuck = Join-Path $config "thefuck"
-$script:thefuckrules = Join-Path $thefuck "rules" 
-createDir $thefuck
-createDir $thefuckrules
-Copy-Item -Path $PSScriptRoot/../.config/thefuck/rules/*.py -Destination $thefuckrules
+Copy-Item $PSScriptRoot/$localFiles/%USERPROFILE%/* -Recurse -Exclude *.md -Destination $HOME -ErrorAction SilentlyContinue
 
+#############
+# Other Files
+#############
+Copy-Item $PSScriptRoot/$localFiles/%LOCALAPPDATA%/* -Recurse -Exclude *.md -Destination $Env:LOCALAPPDATA -ErrorAction SilentlyContinue
+
+}
+catch {
+  Write-Host $_
+}
+finally {
 # Reload the shell
 Invoke-Command { & "pwsh.exe" -NoLogo } -NoNewScope
+}

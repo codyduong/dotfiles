@@ -1,0 +1,77 @@
+.shell powershell
+
+# reload configuration
+win + shift + c         : komorebic reload-configuration && taskkill /f /im whkd.exe && Start-Process whkd -WindowStyle hidden
+
+# app shortcuts - these require shell to be pwsh / powershell
+# the apps will be focused if open, or launched if not open
+# win + f                 : if ($wshell.AppActivate('Firefox') -eq $False) { start firefox }
+# win + b                 : if ($wshell.AppActivate('Chrome') -eq $False) { start chrome }
+
+# focus windows
+win + h                 : komorebic focus left
+win + j                 : komorebic focus down
+win + k                 : komorebic focus up
+win + l                 : komorebic focus right
+win + shift + oem_4     : komorebic cycle-focus previous # oem_4 is [
+win + shift + oem_6     : komorebic cycle-focus next # oem_6 is ]
+
+# move windows
+win + shift + h         : komorebic move left
+win + shift + j         : komorebic move down
+win + shift + k         : komorebic move up
+win + shift + l         : komorebic move right
+win + shift + return    : komorebic promote
+
+# stack windows
+win + left              : komorebic stack left
+win + down              : komorebic stack down
+win + up                : komorebic stack up
+win + right             : komorebic stack right
+win + oem_1             : komorebic unstack # oem_1 is ;
+win + oem_4             : komorebic cycle-stack previous # oem_4 is [
+win + oem_6             : komorebic cycle-stack next # oem_6 is ]
+
+# resize
+win + oem_plus          : komorebic resize-axis horizontal increase
+win + oem_minus         : komorebic resize-axis horizontal decrease
+win + shift + oem_plus  : komorebic resize-axis vertical increase
+win + shift + oem_minus : komorebic resize-axis vertical decrease
+
+# manipulate windows
+win + shift + space     : komorebic toggle-float
+win + shift + f         : komorebic toggle-monocle
+
+# window manager options
+win + shift + r         : komorebic retile
+win + p                 : komorebic toggle-pause
+win + f12               : komorebic toggle-focus-follows-mouse
+
+# layouts
+# borizontal 😂
+win + b                 : komorebic flip-layout horizontal
+win + v                 : komorebic flip-layout vertical
+
+# workspaces
+win + 1                 : komorebic focus-workspace 0
+win + 2                 : komorebic focus-workspace 1
+win + 3                 : komorebic focus-workspace 2
+win + 4                 : komorebic focus-workspace 3
+win + 5                 : komorebic focus-workspace 4
+win + 6                 : komorebic focus-workspace 5
+win + 7                 : komorebic focus-workspace 6
+win + 8                 : komorebic focus-workspace 7
+win + 9                 : komorebic focus-workspace 8
+win + 0                 : komorebic focus-workspace 9
+
+# move windows across workspaces
+win + shift + 1         : komorebic move-to-workspace 0
+win + shift + 2         : komorebic move-to-workspace 1
+win + shift + 3         : komorebic move-to-workspace 2
+win + shift + 4         : komorebic move-to-workspace 3
+win + shift + 5         : komorebic move-to-workspace 4
+win + shift + 6         : komorebic move-to-workspace 5
+win + shift + 7         : komorebic move-to-workspace 6
+win + shift + 8         : komorebic move-to-workspace 7
+win + shift + 9         : komorebic move-to-workspace 8
+win + shift + 0         : komorebic move-to-workspace 9
