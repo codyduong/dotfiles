@@ -2,7 +2,9 @@ Get-ChildItem -Path "./components" | Where-Object { $_.extension -eq ".ps1" } | 
 
 # oh-my-posh
 oh-my-posh init pwsh --config "$env:POSH_THEMES_PATH\M365Princess.omp.json" | Invoke-Expression
-Import-Module PSReadLine
+try {
+  Import-Module PSReadLine
+} catch [System.IO.FileLoadException] {}
 Import-Module CompletionPredictor
 Import-Module Terminal-Icons
 
