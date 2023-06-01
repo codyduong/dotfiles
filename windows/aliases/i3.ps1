@@ -4,14 +4,19 @@ function i3 {
     [Parameter()]
     [boolean]
     $start,
-    [Parameter(position=0, ValueFromRemainingArguments)]$Remaining = @("start")
+    [Parameter(position = 0, ValueFromRemainingArguments)]$Remaining = @("start")
   )
 
   if ("start" -in $Remaining) {
     komorebic start -a
     # load config
     & $(Join-Path $HOME '.config/komorebi/komorebi.ps1')
-  } else {
-    komorebic stop
+  }
+  elseif ("reload" -in $Remaining) {
+    # load config
+    & $(Join-Path $HOME '.config/komorebi/komorebi.ps1')
+  }
+  else {
+    komorebic @Remaining
   }
 }

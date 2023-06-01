@@ -8,7 +8,7 @@ if (!(Get-Process whkd -ErrorAction SilentlyContinue))
 Import-Module $(Join-Path $(Split-Path -parent $profile) "aliases/ahk.ps1")
 
 if (!(Get-Process ahk -ErrorAction SilentlyContinue)) {
-    ahk $(Join-Path $PSScriptRoot 'config.ahk')
+    ahk $(Join-Path $PSScriptRoot 'komorebi.ahk')
 }
 
 # . $PSScriptRoot\komorebi.generated.ps1
