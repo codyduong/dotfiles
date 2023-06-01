@@ -39,8 +39,25 @@ iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.co
 iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/codyduong/dotfiles/main/windows/setup/git.ps1'))
 ```
 
+### Features
+TO-DO
+
+### Issues
+* **Problem**: Powershell profile is not saved in start menu.
+* **Solution**: Run powershell as admin, copy working `.lnk`
+  ```powershell
+  cp "$PROFILE\AppData\Roaming\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\PowerShell 7-preview (x64).lnk" "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\PowerShell\" 
+  ```
+<!--- https://superuser.com/a/171129 
+Pinned Menu: %AppData%\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar
+Start Menu (loc 1): %AppData%\Microsoft\Internet Explorer\Quick Launch\User Pinned\StartMenu
+Start Menu (loc 2): C:\ProgramData\Microsoft\Windows\Start Menu\Programs
+-->
+
 ### Acknowledgements
 Based off [Jay Harris's dotfiles for Windows](https://github.com/jayharris/dotfiles-windows)
+
+
 
 <!---
 ## Windows 10

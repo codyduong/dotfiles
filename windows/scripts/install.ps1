@@ -60,6 +60,8 @@ oh-my-posh font install Meslo
 ###########################
 Install-Winget LGUG2Z.whkd
 Install-Winget LGUG2Z.komorebi
+# AutoHotkey
+Install-GitHubRelease ahk AutoHotkey/AutoHotkey ".*\.exe"
 
 #################
 # Developer Tools

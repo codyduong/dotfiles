@@ -3,7 +3,7 @@ Set-Environment "EDITOR" "nvim"
 Set-Environment "GIT_EDITOR" $Env:EDITOR
 
 # Move komorebi directory
-Set-Environment "KOMOREBI_CONFIG_HOME" "~/.config/komorebi"
+Set-Environment "KOMOREBI_CONFIG_HOME" $(Join-Path -Path $Env:USERPROFILE -ChildPath '.config\komorebi\') 
 
 # pyenv-windows
 Set-Environment "PYENV" $(Join-Path -Path $Env:USERPROFILE -ChildPath '.pyenv\pyenv-win\')
