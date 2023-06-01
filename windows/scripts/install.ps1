@@ -83,7 +83,7 @@ Install-Winget jftuga.less
 Write-Host "`nInstalling Languages..." -ForegroundColor "Yellow"
 Write-Host "NodeJS" -ForegroundColor "Cyan"
 # NodeJS
-# Install-Winget OpenJS.NodeJS
+Install-Winget OpenJS.NodeJS
 Install-Winget CoreyButler.NVMforWindows
 npm install -g npm@latest
 npm install -g yarn

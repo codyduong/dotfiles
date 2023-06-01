@@ -1,4 +1,4 @@
-Get-ChildItem -Path "./aliases" | Where-Object { $_.extension -eq ".ps1" } | ForEach-Object -process { Invoke-Expression ". $_" }
+Get-ChildItem -Path "./aliases" | Where-Object { $_.extension -eq ".ps1" } | ForEach-Object -process { Invoke-Expression ". '$_'" }
 
 # curl: Use `curl.exe` if available
 if (Get-Command curl.exe -ErrorAction SilentlyContinue | Test-Path) {

@@ -1,6 +1,6 @@
 # version 1.7.1
 
-Push-Location (Split-Path -parent $profile)
+Push-Location (Split-Path -parent "$profile")
 "components",
 "functions",
 "aliases",

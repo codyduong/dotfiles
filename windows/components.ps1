@@ -1,4 +1,4 @@
-Get-ChildItem -Path "./components" | Where-Object { $_.extension -eq ".ps1" } | ForEach-Object -process { Invoke-Expression ". $_" }
+Get-ChildItem -Path "./components" | Where-Object { $_.extension -eq ".ps1" } | ForEach-Object -process { Invoke-Expression ". '$_'" }
 
 # oh-my-posh
 oh-my-posh init pwsh --config "$env:POSH_THEMES_PATH\M365Princess.omp.json" | Invoke-Expression
