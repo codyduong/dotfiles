@@ -11,7 +11,7 @@ if (!(Get-Process ahk -ErrorAction SilentlyContinue)) {
     ahk $(Join-Path $PSScriptRoot 'komorebi.ahk')
 }
 
-# . $PSScriptRoot\komorebi.generated.ps1
+. $PSScriptRoot\komorebi.generated.ps1
 
 # Send the ALT key whenever changing focus to force focus changes
 komorebic alt-focus-hack enable
