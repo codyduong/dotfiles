@@ -1,13 +1,25 @@
-$AutoHotkeyDir = $(Get-ItemProperty -Path "Registry::HKEY_CURRENT_USER\SOFTWARE\AutoHotkey" -Name "InstallDir").InstallDir
-$AutoHotkeyVersion = $(Get-ItemProperty -Path "Registry::HKEY_CURRENT_USER\SOFTWARE\AutoHotkey" -Name "Version").Version
-$Bits = if ([Environment]::Is64BitOperatingSystem) { "64" } else { "32" }
-$TestPath = "$AutoHotkeyDir\v2\AutoHotkey$Bits.exe"
-$ExecutablePath = if (Test-Path $TestPath) {
-  $TestPath
+$script:AHKdir = $false
+$script:AHKver = "0.0.0"
+
+
+$script:AHKRegistryDir0 = "HKLM:\HKEY_LOCAL_MACHINE\SOFTWARE\AutoHotkey"
+$script:AHKRegistryDir1 = "HKLM:\HKEY_CURRENT_USER\SOFTWARE\AutoHotkey"
+if (Test-Path -Path $AHKRegistryDir0) {
+  $script:AHKdir = $(Get-ItemProperty -Path $AHKRegistryDir0 -Name "InstallDir").InstallDir
+  $script:AHKver = $(Get-ItemProperty -Path $AHKRegistryDir0 -Name "Version").Version
 }
-else {
-  $false
+elseif (Test-Path -Path $AHKRegistryDir1) {
+  $script:AHKdir = $(Get-ItemProperty -Path $AHKRegistryDir1 -Name "InstallDir").InstallDir
+  $script:AHKver = $(Get-ItemProperty -Path $AHKRegistryDir1 -Name "Version").Version
 }
+Remove-Variable AHKRegistryDir0
+Remove-Variable AHKRegistryDir1
+
+
+$script:AHKExecutablePath = "$AHKdir\v2\AutoHotkey$(if ([Environment]::Is64BitOperatingSystem) { "64" } else { "32" }).exe"
+$script:AHKExecutablePathIsValid = Test-Path $AHKExecutablePath
+Remove-Variable AHKdir
+
 
 function ahk() {
   [CmdletBinding(DefaultParametersetName = 'none')] 
@@ -15,7 +27,7 @@ function ahk() {
     [Parameter(ValueFromPipelineByPropertyName)]
     [switch]
     $Version,
-    [Parameter(Mandatory, position=0, ValueFromRemainingArguments)]$Remaining
+    [Parameter(Mandatory, position = 0, ValueFromRemainingArguments)]$Remaining
   )
 
   $GettingVersion = if ($Version) {
@@ -26,12 +38,15 @@ function ahk() {
   }
 
   if ($GettingVersion) {
-    $AutoHotkeyVersion
-  } else {
-    if ($ExecutablePath) {
-      Start-Process $ExecutablePath -ArgumentList $($Remaining + $MyInvocation.UnboundArguments)
-    } else {
-      Write-Warning Failed to find AutoHotkey at $TestPath
+    $AHKver
+  }
+  else {
+    if ($AHKExecutablePathIsValid) {
+      Start-Process $AHKExecutablePath -ArgumentList $($Remaining + $MyInvocation.UnboundArguments)
+    }
+    else {
+      Write-Warning -Message "Failed to find AutoHotkey at $AHKExecutablePath"
+      exit 1
     }
   }
 }

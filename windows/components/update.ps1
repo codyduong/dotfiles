@@ -1,117 +1,132 @@
 . $PSScriptRoot\utils.ps1
+$script:account                                     = "codyduong"
+$script:repo                                        = "Dotfiles"
+$script:branch                                      = "main"
+$script:DotfilesRemoteProfileUrl                    = "https://raw.githubusercontent.com/$account/$repo/$branch/windows/profile.ps1"
+$script:DotfilesAvailableProfileVersionFile         = [System.IO.Path]::Combine("$HOME", '.latest_profile_version')
+$script:VersionRegEx                                = "# [vV]ersion (?<version>\d+\.\d+\.\d+)"
+$script:Dotfiles                                    = [System.IO.Path]::Combine("$HOME", "$repo")
+Remove-Variable account
+Remove-Variable repo
+Remove-Variable branch
 
-$script:account           = "codyduong"
-$script:repo              = "dotfiles"
-$script:branch            = "main"
-$script:remoteVersionUrl  = "https://raw.githubusercontent.com/$account/$repo/$branch/windows/profile.ps1"
-$script:latestVersionFile = [System.IO.Path]::Combine("$HOME",'.latest_profile_version')
-$script:versionRegEx      = "# [vV]ersion (?<version>\d+\.\d+\.\d+)"
-$script:dotfiles          = [System.IO.Path]::Combine("$HOME","$repo")
-
-function getProfileVersions {
-  "Current: $currentVersion    Available: $latestVersion"
+function Write-ProfileVersionsToHost {
+  "Current: $DotfilesProfileCurrentVersion    Available: $DotfilesAvailableProfileVersion"
 }
 
-function promptProfileUpdate {
-  if (isProfileOutdated) {
-    $choice = PromptBooleanQuestion "Profile update available $currentVersion -> $latestVersion, install" $true
+function Sync-Profile {
+  if (Get-ProfileUpdateAvailable) {
+    $choice = PromptBooleanQuestion "Profile update available $DotfilesProfileCurrentVersion -> $DotfilesAvailableProfileVersion, install" $true
     if ($choice) {
-      updateProfile
+      Update-Profile
     }
   }
   else {
-    # Write-Host "Powershell Profile $currentVersion ($(Join-Path (Split-Path -parent $profile) "profile.ps1"))" 
+    # Write-Host "Powershell Profile $DotfilesProfileCurrentVersion ($(Join-Path (Split-Path -parent $profile) "profile.ps1"))" 
   }
 }
 
-function forceProfileCheck {
-  $null = Start-ThreadJob -Name "Get remote version" -StreamingHost $Host -ArgumentList $remoteVersionUrl, $latestVersionFile, $versionRegEx -ScriptBlock {
-    param ($remoteVersionUrl, $latestVersionFile, $versionRegEx)
+function Update-AvailableProfile {
+  $ArgsToPassToThreadJob = @(
+    $DotfilesRemoteProfileUrl, 
+    $DotfilesAvailableProfileVersionFile, 
+    $VersionRegEx,
+    $Dotfiles
+  )
 
-    $latestVersion = [System.IO.File]::ReadAllText($latestVersionFile)
+  $null = Start-ThreadJob -Name "Get remote version" -StreamingHost $Host -ArgumentList $ArgsToPassToThreadJob -ScriptBlock {
+    param ($DotfilesRemoteProfileUrl, $DotfilesAvailableProfileVersionFile, $VersionRegEx, $Dotfiles)
 
-    if (Test-Path "$dotfiles\.git") {
-      # Check via repo if we have
-      param ($dotfiles)
-      Set-Location $dotfiles
-      [boolean]$stashed = $false
+    $DotfilesAvailableProfileVersion = [System.IO.File]::ReadAllText($DotfilesAvailableProfileVersionFile)
+
+    if (Test-Path "$Dotfiles\.git") {
+      Set-Location $Dotfiles
+      $stashed = $false
       [string]$stashName = New-Guid
       try {
-        $stashed = (git stash push -u -m $stashName)
+        $stashed = $(git stash push -u -m $stashName)
       }
-      catch {}
-      $old_branch = (git rev-parse --abbrev-ref HEAD)
+      catch {
+        Write-Warning $_
+      }
+      $old_branch = $(git rev-parse --abbrev-ref HEAD)
       git checkout $branch
       git fetch
       git pull
-      $profileFile = [System.IO.File]::ReadAllText("$dotfiles\windows\profile.ps1")
+      $profileFile = [System.IO.File]::ReadAllText("$Dotfiles\windows\profile.ps1")
       git checkout $old_branch
-      if ($stashed) {
+      if ($stashed -ne $false) {
         git stash pop
       }
     }
     else {
       # Check via remote if we can
-      $profileFile = Invoke-WebRequest -Uri $remoteVersionUrl -UseBasicParsing
+      $profileFile = Invoke-WebRequest -Uri $DotfilesRemoteProfileUrl -UseBasicParsing
     }
     [version]$remoteVersion = "0.0.0"
-    if ($profileFile -match $versionRegEx) {
+    if ($profileFile -match $VersionRegEx) {
       $remoteVersion = $matches.Version
-      if ($remoteVersion -gt [version]$latestVersion) {
-        Set-Content -Path $latestVersionFile -Value $remoteVersion
+      if ($remoteVersion -gt [version]$DotfilesAvailableProfileVersion) {
+        Set-Content -Path $DotfilesAvailableProfileVersionFile -Value $remoteVersion
       }
     }
   }
 }
 
-function isProfileOutdated {
+function Get-ProfileUpdateAvailable {
   [boolean]$isOutdated = $false
-  if ([System.IO.File]::Exists($latestVersionFile)) {
-    $global:latestVersion = [version][System.IO.File]::ReadAllText($latestVersionFile)
-    $global:currentProfile = [System.IO.File]::ReadAllText((Join-Path (Split-Path -parent $profile) "profile.ps1"))
-    [version]$global:currentVersion = "0.0.0"
+  if ([System.IO.File]::Exists($DotfilesAvailableProfileVersionFile)) {
+    $global:DotfilesAvailableProfileVersion = [version][System.IO.File]::ReadAllText($DotfilesAvailableProfileVersionFile)
+    $global:currentProfile = [System.IO.File]::ReadAllText((Join-Path (Split-Path -parent "$profile") "profile.ps1"))
+    [version]$global:DotfilesProfileCurrentVersion = "0.0.0"
     if ($currentProfile -match $versionRegEx) {
-      $global:currentVersion = $matches.Version
+      $global:DotfilesProfileCurrentVersion = $matches.Version
     }
-    if ([version]$latestVersion -gt $currentVersion) {
+    if ([version]$DotfilesAvailableProfileVersion -gt $DotfilesProfileCurrentVersion) {
       $isOutdated = $true
     }
   }
 
-  forceProfileCheck
+  Update-AvailableProfile
   
   $isOutdated
 }
 
-function updateProfile {
-  if (Test-Path "$dotfiles\.git") {
-    $old_location = Get-Location
-    Set-Location $dotfiles
-    try {
-      [boolean]$stashed = $false
+function Update-Profile {
+  try {
+    if (Test-Path "$Dotfiles\.git") {
+      $old_location = Get-Location
+      Set-Location $Dotfiles
+      $stashed = $false
       [string]$stashName = New-Guid
       try {
-        $stashed = (git stash push -u -m $stashName)
+        $stashed = $(git stash push -u -m $stashName)
       }
-      catch {}
-      $old_branch = (git rev-parse --abbrev-ref HEAD)
+      catch {
+        Write-Warning $_
+      }
+      $old_branch = $(git rev-parse --abbrev-ref HEAD)
       git checkout $branch
       git fetch
       git pull
       . .\windows\scripts\bootstrap.ps1 -update;
       git checkout $old_branch
-      if ($stashed) {
+      if ($stashed -ne $false) {
         git stash pop
       }
     }
-    finally {
-      Invoke-Command { & "pwsh.exe" -NoLogo -command "& Set-Location $old_location" } -NoNewScope
-    }
+    else {
+      . $PSScriptRoot/../setup/remote.ps1 $true
+      Invoke-Command { & "pwsh.exe" -NoLogo } -NoNewScope
+    } 
   }
-  else {
-    . $PSScriptRoot/../setup/remote.ps1 $true
-    Invoke-Command { & "pwsh.exe" -NoLogo } -NoNewScope
+  finally {
+    Invoke-Command { & "pwsh.exe" -NoLogo -command "& Set-Location $old_location" } -NoNewScope
   }
 }
 
-$null = promptProfileUpdate
+
+Remove-Variable $VersionRegEx
+
+
+# $null = Sync-Profile

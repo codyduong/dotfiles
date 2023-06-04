@@ -53,7 +53,11 @@ Install-PowerShell -Name CompletionPredictor -Scope CurrentUser -Force -SkipPubl
 ### Install oh-my-posh and dependencies
 Install-Winget JanDeDobbeleer.OhMyPosh
 Install-PowerShell -Name Terminal-Icons -Repository PSGallery -Force
-oh-my-posh font install Meslo
+# Install Meslo if not already installed
+$script:fonts = Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts'
+if (-not ($fonts.PSObject.Properties.name -contains 'Meslo LG S Bold Italic Nerd Font Complete Mono Windows Compatible (TrueType)')) {
+  Invoke-ElevatedScript { oh-my-posh font install Meslo }
+}
 
 ###########################
 # Tiling Manager (komorebi)
@@ -74,8 +78,13 @@ Install-Winget Neovim.Neovim
 Write-Host "`nInstalling Developer Tools..." -ForegroundColor "Yellow"
 Install-Winget Microsoft.PowerToys
 Install-Winget Git.Git
-Install-GitHubRelease git-credential-manager git-ecosystem/git-credential-manager "gcmuser-win-x.*\.exe$" -version $(git credential-manager --version)
-git credential-manager configure
+# TODO add script which properly updates git-credential-manager
+# Note that gcmuser is for user install only! Use gcm-win-x for admin installs
+Install-GitHubRelease git-credential-manager git-ecosystem/git-credential-manager "gcmuser-win-x.*\.exe$" -version $(
+  "$(git credential-manager --version)" -replace "\+.*", "")
+# TODO set up configuration step
+# Make sure the credential helper is pointed in the right location
+# git credential-manager configure
 Install-Winget GnuWin32.Grep
 Install-Winget Docker.DockerDesktop
 Install-Winget jftuga.less
@@ -84,46 +93,63 @@ Install-Winget jftuga.less
 
 Write-Host "`nInstalling Languages..." -ForegroundColor "Yellow"
 Write-Host "NodeJS" -ForegroundColor "Cyan"
-# NodeJS
-Install-Winget OpenJS.NodeJS
+### NodeJS
+# TODO fix nodejs install
+# Install-Winget OpenJS.NodeJS.LTS
+# Install-Winget OpenJS.NodeJS
 Install-Winget CoreyButler.NVMforWindows
 npm install -g npm@latest
 npm install -g yarn
 
 Write-Host "`nPython" -ForegroundColor "Cyan"
-# Python
+### Python
 Install-Winget Python.Python.3.9
 python.exe -m pip install --upgrade pip -q
+# TODO these won't be in execution context upon first install
 pip install thefuck -q
 pip install pyenv-win --target $HOME\\.pyenv -q
 (Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | py -
 
 Write-Host "`nRust" -ForegroundColor "Cyan"
-# Rust
-Install-Winget Rustlang.Rustup
+### Rust
+# See https://github.com/rust-lang/rustup/pull/3047, on occasion it will read Unknown, add a custom GetCurrent ScriptBlock
+Install-Winget Rustlang.Rustup -GetCurrent {
+  try {
+    if ((Get-Command rustup -ErrorAction SilentlyContinue) -and ($(rustup --version) -match "(?<=rustup)\s*[\d\.]+")) {
+      [version]($matches[0])
+    }
+    else {
+      [version]"0.0.0"
+    }
+  }
+  catch {
+    Write-Warning $_
+    [version]"0.0.0"
+  }
+}
 cargo install ripgrep
 
 ##############
 # Desktop Apps
 ##############
 Write-Host "`nInstalling Desktop Apps..." -ForegroundColor "Yellow"
-# PERSONAL
+### PERSONAL
 Install-Winget Discord.Discord
 Install-Winget Valve.Steam
 
-# BROWSERS
+### BROWSERS
 Install-Winget Google.Chrome
 Install-Winget Google.Chrome.Canary
 Install-Winget Mozilla.Firefox.ESR # Extended Support Release
 Install-Winget Mozilla.Firefox.DeveloperEdition 
 
-# WORK/PRODUCTIVE
+### WORK/PRODUCTIVE
 Install-Winget Zoom.Zoom
 Install-Winget Microsoft.Teams
 Install-Winget SlackTechnologies.Slack
 Install-Winget OBSProject.OBSStudio
 
-# PATCH W11
+### PATCH W11
 # https://learn.microsoft.com/en-us/windows/release-health/windows11-release-information
 if (([Environment]::OSVersion.Version).Build -ge 22621) {
   Install-Winget valinet.ExplorerPatcher

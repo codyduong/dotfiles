@@ -2,8 +2,8 @@
 
 # Elevate if needed
 if (-Not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')) {
-  $CommandLine = "-File `"" + $MyInvocation.MyCommand.Path + "`" " # + $MyInvocation.UnboundArguments
-  Start-Process -FilePath PowerShell.exe -Verb Runas -ArgumentList $CommandLine
+  $CommandLine = "-File `"" + $MyInvocation.MyCommand.Path + "`" -NoProfile" # + $MyInvocation.UnboundArguments
+  Start-Process -WindowStyle Hidden -FilePath PowerShell.exe -Verb Runas -ArgumentList $CommandLine
   Exit
 }
 
