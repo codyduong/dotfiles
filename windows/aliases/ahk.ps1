@@ -2,13 +2,13 @@ $script:AHKdir = $false
 $script:AHKver = "0.0.0"
 
 
-$script:AHKRegistryDir0 = "HKLM:\HKEY_LOCAL_MACHINE\SOFTWARE\AutoHotkey"
-$script:AHKRegistryDir1 = "HKLM:\HKEY_CURRENT_USER\SOFTWARE\AutoHotkey"
-if (Test-Path -Path $AHKRegistryDir0) {
+$script:AHKRegistryDir0 = "Registry::HKEY_LOCAL_MACHINE\SOFTWARE\AutoHotkey"
+$script:AHKRegistryDir1 = "Registry::HKEY_CURRENT_USER\SOFTWARE\AutoHotkey"
+if ((Test-Path -Path $AHKRegistryDir0) -and $false) {
   $script:AHKdir = $(Get-ItemProperty -Path $AHKRegistryDir0 -Name "InstallDir").InstallDir
   $script:AHKver = $(Get-ItemProperty -Path $AHKRegistryDir0 -Name "Version").Version
 }
-elseif (Test-Path -Path $AHKRegistryDir1) {
+if (Test-Path -Path $AHKRegistryDir1) {
   $script:AHKdir = $(Get-ItemProperty -Path $AHKRegistryDir1 -Name "InstallDir").InstallDir
   $script:AHKver = $(Get-ItemProperty -Path $AHKRegistryDir1 -Name "Version").Version
 }
