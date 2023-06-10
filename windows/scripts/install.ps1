@@ -90,6 +90,7 @@ Install-Winget Docker.DockerDesktop
 Install-Winget jftuga.less
 # Install-Powershell GoogleCloud -Scope CurrentUser
 # Todo enable once we configure a gcloud init prompt (see https://cloud.google.com/tools/powershell/docs/quickstart)
+Install-Winget Microsoft.Sysinternals.ProcessExplorer
 
 Write-Host "`nInstalling Languages..." -ForegroundColor "Yellow"
 Write-Host "NodeJS" -ForegroundColor "Cyan"

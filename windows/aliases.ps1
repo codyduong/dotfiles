@@ -33,3 +33,4 @@ Set-Alias update System-Update
 Set-Alias vim nvim
 Set-Alias grep findstr
 Set-Alias _ sudo
+Set-Alias procexp procexp64

@@ -4,14 +4,17 @@ $script:AHKver = "0.0.0"
 
 $script:AHKRegistryDir0 = "Registry::HKEY_LOCAL_MACHINE\SOFTWARE\AutoHotkey"
 $script:AHKRegistryDir1 = "Registry::HKEY_CURRENT_USER\SOFTWARE\AutoHotkey"
-if ((Test-Path -Path $AHKRegistryDir0) -and $false) {
-  $script:AHKdir = $(Get-ItemProperty -Path $AHKRegistryDir0 -Name "InstallDir").InstallDir
-  $script:AHKver = $(Get-ItemProperty -Path $AHKRegistryDir0 -Name "Version").Version
+try {
+  if (Test-Path -Path $AHKRegistryDir0) {
+    $script:AHKdir = $(Get-ItemProperty -Path $AHKRegistryDir0 -Name "InstallDir" -ErrorAction Stop).InstallDir
+    $script:AHKver = $(Get-ItemProperty -Path $AHKRegistryDir0 -Name "Version" -ErrorAction Stop).Version
+  }
+  if (Test-Path -Path $AHKRegistryDir1) {
+    $script:AHKdir = $(Get-ItemProperty -Path $AHKRegistryDir1 -Name "InstallDir" -ErrorAction Stop).InstallDir
+    $script:AHKver = $(Get-ItemProperty -Path $AHKRegistryDir1 -Name "Version" -ErrorAction Stop).Version
+  }
 }
-if (Test-Path -Path $AHKRegistryDir1) {
-  $script:AHKdir = $(Get-ItemProperty -Path $AHKRegistryDir1 -Name "InstallDir").InstallDir
-  $script:AHKver = $(Get-ItemProperty -Path $AHKRegistryDir1 -Name "Version").Version
-}
+catch [System.ArgumentException] {}
 Remove-Variable AHKRegistryDir0
 Remove-Variable AHKRegistryDir1
 
