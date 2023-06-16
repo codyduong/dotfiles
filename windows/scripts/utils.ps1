@@ -95,7 +95,7 @@ function script:Find-Winget {
     }
     if ($GetCurrent) {
         $version = @($(Invoke-Command -ScriptBlock $GetCurrent), $version[1])
-    } 
+    }
     if ($GetAvailable) {
         $version = @($version[0], $(Invoke-Command -ScriptBlock $GetAvailable))
     }

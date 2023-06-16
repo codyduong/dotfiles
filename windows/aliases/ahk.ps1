@@ -25,7 +25,7 @@ Remove-Variable AHKdir
 
 
 function ahk() {
-  [CmdletBinding(DefaultParametersetName = 'none')] 
+  [CmdletBinding(DefaultParametersetName = 'none')]
   param (
     [Parameter(ValueFromPipelineByPropertyName)]
     [switch]

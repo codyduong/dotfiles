@@ -1,5 +1,5 @@
 function i3 {
-  [CmdletBinding(DefaultParametersetName = 'none')] 
+  [CmdletBinding(DefaultParametersetName = 'none')]
   param (
     [Parameter()]
     [boolean]

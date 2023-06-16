@@ -28,8 +28,8 @@ function Sync-Profile {
 
 function Update-AvailableProfile {
   $ArgsToPassToThreadJob = @(
-    $DotfilesRemoteProfileUrl, 
-    $DotfilesAvailableProfileVersionFile, 
+    $DotfilesRemoteProfileUrl,
+    $DotfilesAvailableProfileVersionFile,
     $VersionRegEx,
     $Dotfiles
   )
@@ -118,7 +118,7 @@ function Update-Profile {
     else {
       . $PSScriptRoot/../setup/remote.ps1 $true
       Invoke-Command { & "pwsh.exe" -NoLogo } -NoNewScope
-    } 
+    }
   }
   finally {
     Invoke-Command { & "pwsh.exe" -NoLogo -command "& Set-Location $old_location" } -NoNewScope

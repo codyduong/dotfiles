@@ -1,5 +1,5 @@
 function winkey {
-  [CmdletBinding(DefaultParametersetName = 'none')] 
+  [CmdletBinding(DefaultParametersetName = 'none')]
   param (
     [Parameter(Mandatory, Position = 0)]
     [boolean]
@@ -8,7 +8,7 @@ function winkey {
 
   if ($enable) {
     & $PSScriptRoot/.winenable.ps1
-  } 
+  }
   else {
     & $PSScriptRoot/.windisable.ps1
   }
