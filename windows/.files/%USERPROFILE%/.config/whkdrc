@@ -1,5 +1,9 @@
 .shell powershell
 
+# USE AHK instead
+
+# keycodes - https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
+
 # reload configuration
 win + shift + c         : komorebic reload-configuration && taskkill /f /im whkd.exe && Start-Process whkd -WindowStyle hidden
 
@@ -7,6 +11,7 @@ win + shift + c         : komorebic reload-configuration && taskkill /f /im whkd
 # the apps will be focused if open, or launched if not open
 # win + f                 : if ($wshell.AppActivate('Firefox') -eq $False) { start firefox }
 # win + b                 : if ($wshell.AppActivate('Chrome') -eq $False) { start chrome }
+win + return             : start PowerShell.exe
 
 # focus windows
 win + h                 : komorebic focus left

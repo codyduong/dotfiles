@@ -1,9 +1,11 @@
-# version 1.7.1
+# version 1.8.0
 
-Push-Location (Split-Path -parent $profile)
+Push-Location (Split-Path -parent "$profile")
 "components",
 "functions",
 "aliases",
 "exports"
-| Where-Object { Test-Path "$_.ps1" } | ForEach-Object -process { Invoke-Expression ". .\$_.ps1" }
+| Where-Object { Test-Path "$_.ps1" } | ForEach-Object -process {
+  Write-Output "$_ : $(Measure-Command { Invoke-Expression ". .\$_.ps1" })"
+}
 Pop-Location

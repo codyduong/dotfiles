@@ -49,7 +49,6 @@ else {
 function script:createDir {
   New-Item $args -ItemType Directory -Force -ErrorAction SilentlyContinue | Out-Null
 }
-
 ####################
 # Powershell Profile
 ####################

@@ -5,9 +5,9 @@ enum PackageIs {
     unknown
 }
 
-$script:InstallationIndicatorColorInstalling    = "DarkCyan"
-$script:InstallationIndicatorColorUpdating      = "DarkGreen"
-$script:InstallationIndicatorColorFound         = "DarkGray"
+$script:InstallationIndicatorColorInstalling = "DarkCyan"
+$script:InstallationIndicatorColorUpdating = "DarkGreen"
+$script:InstallationIndicatorColorFound = "DarkGray"
 
 function script:Find-WingetAll {
     $currentEncoding = [Console]::OutputEncoding
@@ -39,12 +39,20 @@ function script:Find-WingetAll {
 }
 
 function script:Find-Winget {
-    [CmdletBinding(DefaultParameterSetName='NameParameterSet')]
+    [CmdletBinding(DefaultParameterSetName = 'NameParameterSet')]
     param(
-        [Parameter(ParameterSetName='NameParameterSet', Mandatory=$true, Position=0, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ParameterSetName = 'NameParameterSet', Mandatory = $true, Position = 0, ValueFromPipelineByPropertyName = $true)]
         [ValidateNotNullOrEmpty()]
         [string]
-        ${Name}
+        ${Name},
+
+        [Parameter(ParameterSetName = 'NameParameterSet')]
+        [scriptblock]
+        ${GetCurrent},
+
+        [Parameter(ParameterSetName = 'NameParameterSet')]
+        [scriptblock]
+        ${GetAvailable}
     )
 
     $global:winget_table = $winget_table ?? @{}
@@ -85,6 +93,12 @@ function script:Find-Winget {
     if ($version -is [String]) {
         $version = $version, $null
     }
+    if ($GetCurrent) {
+        $version = @($(Invoke-Command -ScriptBlock $GetCurrent), $version[1])
+    }
+    if ($GetAvailable) {
+        $version = @($version[0], $(Invoke-Command -ScriptBlock $GetAvailable))
+    }
 
     if (-not $installed) {
         return [PackageIs]::notinstalled, $null
@@ -101,15 +115,33 @@ function script:Find-Winget {
 }
 
 function Install-Winget {
-    [CmdletBinding(DefaultParameterSetName='NameParameterSet')]
+    <#
+    .SYNOPSIS
+    Custom install winget function, handling automatic updating
+
+    .PARAMETER GetCurrent
+    Specifies a custom ScriptBlock to determine the current verison. Useful if a package
+    is installed, but the version reads as unknown.
+
+    The expected ScriptBlock should have no parameters, and a return of Version or SemanticVersion
+    #>
+    [CmdletBinding(DefaultParameterSetName = 'NameParameterSet')]
     param(
-        [Parameter(ParameterSetName='NameParameterSet', Mandatory=$true, Position=0, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ParameterSetName = 'NameParameterSet', Mandatory = $true, Position = 0, ValueFromPipelineByPropertyName = $true)]
         [ValidateNotNullOrEmpty()]
         [string]
-        ${Name}
+        ${Name},
+
+        [Parameter(ParameterSetName = 'NameParameterSet')]
+        [scriptblock]
+        ${GetCurrent},
+
+        [Parameter(ParameterSetName = 'NameParameterSet')]
+        [scriptblock]
+        ${GetAvailable}
     )
 
-    $installed = Find-Winget $Name
+    $installed = Find-Winget $Name -GetCurrent $GetCurrent -GetAvailable $GetAvailable
     $i = $installed[0]
     $a = $installed[1]
     $updateOutdated = $Env:UPDATE_OUTDATED_DEPS
@@ -153,9 +185,9 @@ function script:PrepModuleToStr {
 }
 
 function script:Find-PowerShellModule {
-    [CmdletBinding(DefaultParameterSetName='NameParameterSet')]
+    [CmdletBinding(DefaultParameterSetName = 'NameParameterSet')]
     param (
-        [Parameter(ParameterSetName='NameParameterSet', Mandatory, Position=0)]
+        [Parameter(ParameterSetName = 'NameParameterSet', Mandatory, Position = 0)]
         [ValidateNotNullOrEmpty()]
         [string]
         ${Name},
@@ -193,48 +225,48 @@ function script:Find-PowerShellModule {
 }
 
 function Install-PowerShell {
-    [CmdletBinding(DefaultParameterSetName='NameParameterSet', SupportsShouldProcess=$true, ConfirmImpact='Medium', HelpUri='https://go.microsoft.com/fwlink/?LinkID=398573')]
+    [CmdletBinding(DefaultParameterSetName = 'NameParameterSet', SupportsShouldProcess = $true, ConfirmImpact = 'Medium', HelpUri = 'https://go.microsoft.com/fwlink/?LinkID=398573')]
     param(
-        [Parameter(ParameterSetName='NameParameterSet', Mandatory=$true, Position=0, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ParameterSetName = 'NameParameterSet', Mandatory = $true, Position = 0, ValueFromPipelineByPropertyName = $true)]
         [ValidateNotNullOrEmpty()]
         [string]
         ${Name},
     
-        [Parameter(ParameterSetName='NameParameterSet', ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ParameterSetName = 'NameParameterSet', ValueFromPipelineByPropertyName = $true)]
         [ValidateNotNull()]
         [string]
         ${MinimumVersion},
     
-        [Parameter(ParameterSetName='NameParameterSet', ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ParameterSetName = 'NameParameterSet', ValueFromPipelineByPropertyName = $true)]
         [ValidateNotNull()]
         [string]
         ${MaximumVersion},
     
-        [Parameter(ParameterSetName='NameParameterSet', ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ParameterSetName = 'NameParameterSet', ValueFromPipelineByPropertyName = $true)]
         [ValidateNotNull()]
         [string]
         ${RequiredVersion},
     
-        [Parameter(ParameterSetName='NameParameterSet')]
+        [Parameter(ParameterSetName = 'NameParameterSet')]
         [ValidateNotNullOrEmpty()]
         [string[]]
         ${Repository},
     
-        [Parameter(ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ValueFromPipelineByPropertyName = $true)]
         [pscredential]
         [System.Management.Automation.CredentialAttribute()]
         ${Credential},
     
-        [ValidateSet('CurrentUser','AllUsers')]
+        [ValidateSet('CurrentUser', 'AllUsers')]
         [string]
         ${Scope},
     
-        [Parameter(ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ValueFromPipelineByPropertyName = $true)]
         [ValidateNotNullOrEmpty()]
         [uri]
         ${Proxy},
     
-        [Parameter(ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ValueFromPipelineByPropertyName = $true)]
         [pscredential]
         [System.Management.Automation.CredentialAttribute()]
         ${ProxyCredential},
@@ -248,7 +280,7 @@ function Install-PowerShell {
         [switch]
         ${Force},
     
-        [Parameter(ParameterSetName='NameParameterSet')]
+        [Parameter(ParameterSetName = 'NameParameterSet')]
         [switch]
         ${AllowPrerelease},
     
@@ -280,19 +312,19 @@ function Install-PowerShell {
 }
 
 function Install-GitHubRelease {
-    [CmdletBinding(DefaultParameterSetName='NameParameterSet')]
+    [CmdletBinding(DefaultParameterSetName = 'NameParameterSet')]
     param(
-        [Parameter(ParameterSetName='NameParameterSet', Mandatory, Position=0, ValueFromPipelineByPropertyName)]
+        [Parameter(ParameterSetName = 'NameParameterSet', Mandatory, Position = 0, ValueFromPipelineByPropertyName)]
         [ValidateNotNullOrEmpty()]
         [string]
         ${Name},
 
-        [Parameter(Mandatory, Position=1, ValueFromPipelineByPropertyName)]
+        [Parameter(Mandatory, Position = 1, ValueFromPipelineByPropertyName)]
         [ValidateNotNullOrEmpty()]
         [string]
         ${Repository},
 
-        [Parameter(Mandatory, Position=2, ValueFromPipelineByPropertyName)]
+        [Parameter(Mandatory, Position = 2, ValueFromPipelineByPropertyName)]
         [ValidateNotNullOrEmpty()]
         [string]
         ${Match},
@@ -308,13 +340,15 @@ function Install-GitHubRelease {
 
     if ($Version) {
         Update-GitHubRelease @PSBoundParameters
-    } else {
+    }
+    else {
         $Installed = Get-Command $Name -ErrorAction SilentlyContinue | Select-Object -ExpandProperty "Name" -ErrorAction SilentlyContinue
 
         if ($Installed) {
             $Version = [semver]$(Invoke-Expression "$Name --version").TrimStart("v")
             Update-GitHubRelease $Version @PSBoundParameters
-        } else {
+        }
+        else {
             Update-GitHubRelease $([semver]$("0.0.0")) @PSBoundParameters
         }
     }
@@ -323,21 +357,21 @@ function Install-GitHubRelease {
 function Update-GitHubRelease {
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory, Position=0, ValueFromPipelineByPropertyName)]
+        [Parameter(Mandatory, Position = 0, ValueFromPipelineByPropertyName)]
         [semver]
         ${Version},
 
-        [Parameter(Mandatory, Position=1, ValueFromPipelineByPropertyName)]
+        [Parameter(Mandatory, Position = 1, ValueFromPipelineByPropertyName)]
         [ValidateNotNullOrEmpty()]
         [string]
         ${Name},
 
-        [Parameter(Mandatory, Position=2, ValueFromPipelineByPropertyName)]
+        [Parameter(Mandatory, Position = 2, ValueFromPipelineByPropertyName)]
         [ValidateNotNullOrEmpty()]
         [string]
         ${Repository},
 
-        [Parameter(Mandatory, Position=3, ValueFromPipelineByPropertyName)]
+        [Parameter(Mandatory, Position = 3, ValueFromPipelineByPropertyName)]
         [ValidateNotNullOrEmpty()]
         [string]
         ${Match},
@@ -359,7 +393,7 @@ function Update-GitHubRelease {
         return $null
     }
 
-    $Asset = $Remote.assets | Where-Object {$_.name -match $Match}
+    $Asset = $Remote.assets | Where-Object { $_.name -match $Match }
     $Url = $asset.browser_download_url
     $Temp = Join-Path $env:TEMP "Github"
     $File = Join-Path $Temp $Asset.name
@@ -380,9 +414,44 @@ function Update-GitHubRelease {
     # Handle .exe
     elseif ($File -match ".*\.exe$") {
         Start-Process -FilePath $File -WhatIf:$WhatIf
-    } else {
+    }
+    else {
         Write-Warning "Unsupported file extension on file: $File"
     }
 
     return $null
+}
+
+
+function Invoke-ElevatedScript {
+    param(
+        [Parameter(Mandatory, Position = 0)]
+        [scriptblock]
+        ${script},
+
+        [ValidateSet("Normal", "Minimized", "Maximized", "Hidden")]
+        [string]
+        ${WindowStyle} = "Hidden"
+    )
+
+    $PSBoundParameters.Remove("script") | Out-Null
+
+    # Elevate if needed
+    try {
+        if (-Not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')) {
+            $CommandLine = @(
+                "-NoExit",
+                # "-File `"" + $MyInvocation.MyCommand.Path + "`"",
+                # https://stackoverflow.com/a/76043154
+                "-Command `"Invoke-Command -ScriptBlock { $($script -replace '(?<!\\)(\\*)"', '$1$1\"') }`""
+            )
+            Start-Process @PSBoundParameters -FilePath PowerShell.exe -Verb Runas -ArgumentList $CommandLine
+            return
+        }
+
+        Invoke-Command -ScriptBlock $script
+    }
+    catch [System.InvalidOperationException] {
+        return
+    }
 }

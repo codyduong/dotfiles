@@ -5,6 +5,10 @@
   "remapShortcuts": {
     "global": [
       {
+        "originalKeys": "91;68",
+        "newRemapKeys": "164;68"
+      },
+      {
         "originalKeys": "260;160;87",
         "newRemapKeys": "164;115"
       }

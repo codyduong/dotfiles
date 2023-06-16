@@ -1,6 +1,14 @@
 if (!(Get-Process whkd -ErrorAction SilentlyContinue))
 {
-    Start-Process whkd -WindowStyle hidden
+    # Start-Process whkd -WindowStyle hidden
+    # use AHK2 instead
+}
+
+# Load ahk if possible
+Import-Module $(Join-Path $(Split-Path -parent $profile) "aliases/ahk.ps1")
+
+if (!(Get-Process ahk -ErrorAction SilentlyContinue)) {
+    ahk $(Join-Path $PSScriptRoot 'komorebi.ahk')
 }
 
 . $PSScriptRoot\komorebi.generated.ps1
@@ -15,7 +23,7 @@ komorebic cross-monitor-move-behaviour insert
 komorebic watch-configuration enable
 
 # create named workspaces I-V on monitor 0
-komorebic ensure-named-workspaces 0 I II III IV V
+# komorebic ensure-named-workspaces 0 I II III IV V
 # you can do the same thing for secondary monitors too
 # komorebic ensure-named-workspaces 1 A B C D E F
 
@@ -35,9 +43,20 @@ komorebic named-workspace-container-padding I 20
 komorebic invisible-borders 7 0 14 7
 
 # Uncomment the next lines if you want a visual border around the active window
-# komorebic active-window-border-colour 66 165 245 --window-kind single
-# komorebic active-window-border-colour 256 165 66 --window-kind stack
-# komorebic active-window-border-colour 255 51 153 --window-kind monocle
-# komorebic active-window-border enable
+komorebic active-window-border-colour 66 165 245 --window-kind single
+komorebic active-window-border-colour 256 165 66 --window-kind stack
+komorebic active-window-border-colour 255 51 153 --window-kind monocle
+komorebic active-window-border enable
+
+# Tile console/pwsh
+komorebic manage-rule exe PowerShell.exe
+komorebic manage-rule exe conhost.exe
+komorebic manage-rule exe pwsh.exe
+
+# Focus follows mouse
+komorebic toggle-focus-follows-mouse --implementation komorebi  
+
+# Retile
+komorebic retile
 
 komorebic complete-configuration

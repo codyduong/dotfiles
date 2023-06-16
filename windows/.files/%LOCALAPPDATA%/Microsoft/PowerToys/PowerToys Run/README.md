@@ -1,2 +1,6 @@
 # PowerToys Run
-Rebinds from <kbd>alt</kbd>+<kbd>space</kbd> to <kbd>win</kbd>+<kbd>d</kbd>
+Binds start key to <kbd>win</kbd>+<kbd>d</kbd>
+
+<!--
+"%LOCALAPPDATA%\Microsoft\PowerToys\PowerToys Run"
+-->
