@@ -1,5 +1,27 @@
 #!/usr/bin/env bash
 
+MAJOR_VERSION=$(uname -r | awk -F '.' '{print $1}')
+MINOR_VERSION=$(uname -r | awk -F '.' '{print $2}')
+
+is_wsl() {
+  # Check for the presence of the WSLInterop file.
+  if [[ -f /proc/sys/fs/binfmt_misc/WSLInterop ]]; then
+    return 0
+  fi
+
+  # Check for the presence of the WSL_DISTRO_NAME environment variable.
+  if [[ -n "$WSL_DISTRO_NAME" ]]; then
+    return 0
+  fi
+
+  # Check if the kernel name contains the string "Microsoft".
+  if [[ $(uname -r) =~ Microsoft ]]; then
+    return 0
+  fi
+
+  return 1
+}
+
 _curl() {
   which curl >/dev/null &&
     echo "\033[1;33mcurl found, skipping...\033[0m" ||
@@ -19,6 +41,8 @@ _git() {
 }
 
 _i3() {
+  is_wsl && return 0;
+
   which i3 >/dev/null &&
     echo "\033[1;33mi3 found, skipping...\033[0m" ||
     (
@@ -144,6 +168,8 @@ _gpg() {
 }
 
 _code() {
+  is_wsl && return 0;
+
   which code >/dev/null &&
     echo "\033[1;33mcode found, skipping\033...[0m" ||
     (
@@ -177,6 +203,8 @@ _ripgrep() {
 }
 
 _pavucontrol() {
+  is_wsl && return 0;
+
   which pavucontrol >/dev/null &&
     echo "\033[1;33mpavucontrol found, skipping...\033[0m" ||
     (
@@ -186,6 +214,8 @@ _pavucontrol() {
 }
 
 _brightnessctl() {
+  is_wsl && return 0;
+
   which brightnessctl >/dev/null &&
     echo "\033[1;33mbrightnessctl found, skipping...\033[0m" ||
     (
@@ -195,6 +225,8 @@ _brightnessctl() {
 }
 
 _theme() {
+  is_wsl && return 0;
+
   echo "\033[1;34mAdding solarized themes to \\usr\\share\\themes\\033[0m"
   mkdir ~/tmp/solarized-themes
   git clone -n Solarized-Dark-gtk-theme-colorpack https://github.com/rtlewis88/rtl88-Themes.git ~/tmp/solarized-themes --depth 1
@@ -202,6 +234,37 @@ _theme() {
   rm ~/tmp/solarized-themes/README.md
   sudo cp -a ~/tmp/solarized-themes/ /usr/share/themes/
   rm ~/tmp/solarized-themes -r
+}
+
+_bun() {
+  which unzip >/dev/null && (
+    echo "\033[1;34minstalling unzip...\033[0m"
+    sudo apt install unzip -y
+  ) || echo "\033[1;33unzip found, skipping...\033[0m"
+
+  ! which curl >dev/null && (
+    echo "\033[1;31mcurl not found! Required for bun installation...\033[0m"
+    return 0;
+  )
+
+  # Minimum for bun is 5.1
+  if [ $MAJOR_VERSION -ge 5 ] && [ $MINOR_VERSION -ge 1 ]; then
+    which bun >/dev/null &&
+      echo "\033[1;33mbun found, skipping...\033[0m" ||
+      (
+        echo "\033[1;34minstalling bun...\033[0m"
+        curl -fsSL https://bun.sh/install | bash
+      )
+  fi
+}
+
+_gcloud() {
+  which gcloud >/dev/null &&
+    echo "\033[1;33minstalling gcloud...\033[0m" ||
+    (
+      echo "\033[1;34minstalling gcloud...\033[0m"
+      curl https://sdk.cloud.google.com | bash
+    )
 }
 
 _dotfiles() {
@@ -233,5 +296,7 @@ _ripgrep
 _pavucontrol
 _brightnessctl
 _theme
+_bun
+_gcloud
 _dotfiles
 _otherfiles
