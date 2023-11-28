@@ -1,1 +1,1 @@
-function which($name) { Get-Command $name -ErrorAction SilentlyContinue | Select-Object Definition }
+function which($name) { Get-Command $name -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Definition }
