@@ -334,6 +334,10 @@ function Install-GitHubRelease {
         ${Version},
 
         [Parameter(ValueFromPipelineByPropertyName)]
+        [semver]
+        ${RemoteVersion},
+
+        [Parameter(ValueFromPipelineByPropertyName)]
         [switch]
         ${WhatIf}
     )
@@ -377,18 +381,22 @@ function Update-GitHubRelease {
         ${Match},
 
         [Parameter(ValueFromPipelineByPropertyName)]
+        [semver]
+        ${RemoteVersion},
+
+        [Parameter(ValueFromPipelineByPropertyName)]
         [switch]
         ${WhatIf}
     )
 
     # get remote version
     $Remote = Invoke-RestMethod https://api.github.com/repos/$Repository/releases/latest
-    $LatestVersion = [semver]$($Remote.tag_name.TrimStart("v"))
+    $LatestVersion = $RemoteVersion ?? [semver]$($Remote.tag_name.TrimStart("v"))
 
     Write-Verbose "Local $Name version: v$Version"
     Write-Verbose "Latest $Name version: v$LatestVersion"
 
-    if ($LatestVersion -eq $Version) {
+    if ($LatestVersion -eq $Version -or $Version -ge $LatestVersion) {
         Write-Host "$Name $Version found, skipping..." -ForegroundColor $InstallationIndicatorColorFound
         return $null
     }
@@ -400,15 +408,23 @@ function Update-GitHubRelease {
     New-Item $Temp -ItemType Directory -Force -ErrorAction SilentlyContinue | Out-Null
     Invoke-WebRequest -Uri $Url -OutFile $File
 
-    if ($LatestVersion -eq [semver]"0.0.0") {
+    if ($Version -eq [semver]"0.0.0") {
         Write-Host "Installing $Name..." -ForegroundColor $InstallationIndicatorColorInstalling
     }
     elseif ($LatestVersion -gt $Version) {
         Write-Host "Updating $Name from $Version to $LatestVersion..." -ForegroundColor $InstallationIndicatorColorUpdating
     }
 
+    # Handle zipped files
+    if ($File -match ".*\.zip") {
+        $Destination = ($File -replace "\.zip$", "")
+        Expand-Archive -LiteralPath $File -DestinationPath $Temp
+        $File = $Destination
+        # Todo iterate over inside files to find msixbundle or exe. If the .exe is an installer specify with installer flag
+        # otherwise add binary to path
+    }
     # Handle .msixbundle with AppX
-    if ($File -match ".*\.msixbundle$") {
+    elseif ($File -match ".*\.msixbundle$") {
         Add-AppxPackage -Path $File -WhatIf:$WhatIf
     }
     # Handle .exe

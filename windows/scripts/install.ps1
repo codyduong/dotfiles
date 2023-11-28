@@ -24,10 +24,11 @@ else {
   InstallerPromptUpdateOutdated
 }
 
+$script:currentPath = [System.Environment]::GetEnvironmentVariable('PATH', [System.EnvironmentVariableTarget]::User)
+
 ### Update Help for Modules
 # Write-Host "Updating Help..." -ForegroundColor "Yellow"
 # Update-Help -Force
-
 
 ### Package Providers
 # Write-Host "`nInstalling Package Providers" -ForegroundColor "Yellow"
@@ -91,13 +92,12 @@ Install-Winget jftuga.less
 # Install-Powershell GoogleCloud -Scope CurrentUser
 # Todo enable once we configure a gcloud init prompt (see https://cloud.google.com/tools/powershell/docs/quickstart)
 Install-Winget Microsoft.Sysinternals.ProcessExplorer
+Install-Winget BurntSushi.ripgrep.MSVC
 
 Write-Host "`nInstalling Languages..." -ForegroundColor "Yellow"
 Write-Host "NodeJS" -ForegroundColor "Cyan"
 ### NodeJS
-# TODO fix nodejs install
-# Install-Winget OpenJS.NodeJS.LTS
-# Install-Winget OpenJS.NodeJS
+Install-Winget OpenJS.NodeJS.LTS
 Install-Winget CoreyButler.NVMforWindows
 npm install -g npm@latest
 npm install -g yarn
@@ -128,7 +128,49 @@ Install-Winget Rustlang.Rustup -GetCurrent {
     [version]"0.0.0"
   }
 }
-cargo install ripgrep
+
+Write-Host "`nC/C++" -ForegroundColor "Cyan"
+$script:msys2Path = "C:\msys64\usr\bin"
+$script:mingwPath = "C:\msys64\ucrt64\bin"
+# This has an superfluous call but idgaf. We really only care when the gcc version is updated, so use that as our baseline lib for when to upgrade
+$script:msys2Remote = Invoke-RestMethod https://api.github.com/repos/msys2/msys2-installer/releases/latest
+$script:msys2PackagesAsset = $msys2Remote.assets | Where-Object { $_.name -match "msys2-base-x86_64-latest.packages.txt" }
+$script:msys2PackagesTxt = Join-Path $env:TEMP "Github" $msys2PackagesAsset.name
+Invoke-WebRequest -Uri $msys2PackagesAsset.browser_download_url -OutFile $msys2PackagesTxt
+$script:msys2RemoteVersion = if (Get-Content -Path $msys2PackagesTxt | Where-Object { $_ -match "(?<=gcc-libs )(\d+\.\d+\.\d+)" }) { $matches[0] } else { "0.0.0" }
+# We use head instead of cat because there is some fuckery going on with Neovim/bin/cat.exe being on PATH that sometimes blows up msys2 bash cat
+$script:msys2LocalVersion = "0.0.0"
+try {
+  $script:msys2LocalVersion = if (
+    $(& $msys2Path\bash.exe -c "head /proc/version") -match "(?<=gcc version )\d+\.\d+\.\d+"
+  ) { $matches[0] } else { "0.0.0" }
+}
+catch { Write-Warning $_ }
+Install-GitHubRelease msys2 msys2/msys2-installer "msys2-x86_64-latest\.exe$" -version $msys2LocalVersion -remoteVersion $msys2RemoteVersion
+
+# install mingw
+Write-Verbose $(& $msys2Path\bash.exe -c "pacman -Syu base-devel mingw-w64-ucrt-x86_64-toolchain --noconfirm")
+
+# Check if the path is already in the PATH variable
+if ($currentPath -notlike "*$msys2Path*") {
+  # Add the MSYS2 path to the PATH variable
+  $newPath = $currentPath + ";" + $msys2Path
+  [System.Environment]::SetEnvironmentVariable('PATH', $newPath, [System.EnvironmentVariableTarget]::User)
+  Write-Host "$msys2Path added to the PATH" -ForegroundColor "Green"
+}
+else {
+  Write-Verbose "$msys2Path is already in the PATH"
+}
+
+if ($currentPath -notlike "*$mingwPath*") {
+  # Add the MSYS2 path to the PATH variable
+  $newPath = $currentPath + ";" + $mingwPath
+  [System.Environment]::SetEnvironmentVariable('PATH', $newPath, [System.EnvironmentVariableTarget]::User)
+  Write-Host "$mingwPath added to the PATH" -ForegroundColor "Green"
+}
+else {
+  Write-Verbose "$mingwPath is already in the PATH"
+}
 
 ##############
 # Desktop Apps

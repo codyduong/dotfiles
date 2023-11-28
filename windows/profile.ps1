@@ -1,4 +1,4 @@
-# version 1.8.1
+# version 1.9.0
 
 Push-Location (Split-Path -parent "$profile")
 "components",
