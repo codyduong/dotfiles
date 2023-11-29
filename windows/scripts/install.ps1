@@ -68,6 +68,12 @@ Install-Winget LGUG2Z.komorebi
 # AutoHotkey
 Install-GitHubRelease ahk AutoHotkey/AutoHotkey ".*\.exe"
 
+###################
+# WezTerm
+# tmux for windows!
+###################
+Install-Winget wez.wezterm
+
 #################
 # Developer Tools
 #################

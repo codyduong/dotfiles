@@ -15,7 +15,11 @@ param (
 
   [Parameter(ParameterSetName = "skip")]
   [switch]
-  $skip
+  $skip,
+
+  [Parameter(ParameterSetName = "linux")]
+  [switch]
+  $linux
 )
 
 try {
@@ -82,6 +86,17 @@ Copy-Item $PSScriptRoot/$localFiles/%USERPROFILE%/* -Recurse -Exclude *.md -Dest
 # Other Files
 #############
 Copy-Item $PSScriptRoot/$localFiles/%LOCALAPPDATA%/* -Recurse -Exclude *.md -Destination $Env:LOCALAPPDATA -ErrorAction SilentlyContinue
+
+#####
+# WSL
+#####
+if (wsl --list -and $linux.IsPresent) {
+  $script:linux = Join-Path $PSScriptRoot '/../../linux/home/'
+  # Make sure the path is in the correct format for WSL
+  $script:wslLinux = wsl -e bash -ic "wslpath -u '$linux'"
+  Write-Host "<wsl password>" $wslLinux
+  wsl sudo rsync -av --progress "$wslLinux" '~/'
+}
 
 }
 catch {

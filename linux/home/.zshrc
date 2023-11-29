@@ -125,5 +125,28 @@ alias reload="exec zsh"
 
 export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
 export PYENV_ROOT="$HOME/.pyenv"
-command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
+export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
+
+# bun completions
+[ -s "/home/codyduong/.bun/_bun" ] && source "/home/codyduong/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
+# Configure this to export xterm like variables for wezterm
+function tmux_entry() {
+  local tmux_config="~/.tmux.config"
+
+  # Check if -f option is present
+  if [[ "$#" -gt 0 && "$1" == "-f" ]]; then
+    tmux_config="$2"
+    shift 2
+  fi
+
+  printf "\033]1337;SetUserVar=%s=%s\007" "TMUX" $(echo -n "1" | base64)
+  command tmux -f "$tmux_config" "$@"
+  printf "\033]1337;SetUserVar=%s=%s\007" "TMUX" $(echo -n "0" | base64)
+}
+alias tmux='tmux_entry'
