@@ -137,7 +137,7 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 
 # Configure this to export xterm like variables for wezterm
 function tmux_entry() {
-  local tmux_config="~/.tmux.config"
+  local tmux_config="$HOME/.tmux.conf"
 
   # Check if -f option is present
   if [[ "$#" -gt 0 && "$1" == "-f" ]]; then

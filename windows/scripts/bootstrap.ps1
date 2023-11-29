@@ -9,7 +9,7 @@ param (
   [string]
   $sourceFile,
 
-  [Parameter(ParameterSetName = "update")]
+  [Parameter(ParameterSetName = "skip")]
   [switch]
   $update,
 
@@ -17,7 +17,7 @@ param (
   [switch]
   $skip,
 
-  [Parameter(ParameterSetName = "linux")]
+  [Parameter(ParameterSetName = "skip")]
   [switch]
   $linux
 )
@@ -90,12 +90,12 @@ Copy-Item $PSScriptRoot/$localFiles/%LOCALAPPDATA%/* -Recurse -Exclude *.md -Des
 #####
 # WSL
 #####
-if (wsl --list -and $linux.IsPresent) {
-  $script:linux = Join-Path $PSScriptRoot '/../../linux/home/'
+if ((wsl --list) -and $linux) {
+  $script:dest = Join-Path $PSScriptRoot '/../../linux/home/'
   # Make sure the path is in the correct format for WSL
-  $script:wslLinux = wsl -e bash -ic "wslpath -u '$linux'"
-  Write-Host "<wsl password>" $wslLinux
-  wsl sudo rsync -av --progress "$wslLinux" '~/'
+  $script:fixDest = wsl -e bash -ic "wslpath -u '$dest'"
+  Write-Host "<wsl password>" $fixDest
+  wsl sudo rsync -av --progress "$fixDest" '~/'
 }
 
 }
