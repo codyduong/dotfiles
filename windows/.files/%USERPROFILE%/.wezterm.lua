@@ -63,22 +63,23 @@ local config = {
     leader = { key="Space", mods="CTRL" },
     disable_default_key_bindings = true,
     keys = {
-        { key = 'L',      mods = 'SHIFT|CTRL',        action = act.ShowDebugOverlay },
+        { key = 'D',      mods = 'SHIFT|CTRL|ALT',    action = act.ShowDebugOverlay },
 
         -- sensible defaults
         { key = "v",      mods = "SHIFT|CTRL",        action = act.PasteFrom 'Clipboard'},
         { key = "c",      mods = "SHIFT|CTRL",        action = act.CopyTo 'Clipboard'},
+        { key = "-",      mods = "CTRL",              action = act.DecreaseFontSize },
+        { key = "=",      mods = "CTRL",              action = act.IncreaseFontSize },
 
         -- non leader keys
         { key = "n",      mods = "SHIFT|CTRL",        action = "ToggleFullScreen" },
         { key = "p",      mods = "SHIFT|CTRL",        action = act.ActivateCommandPalette},
-        { key = "w",      mods = "CTRL",              action = act.CloseCurrentPane { confirm = true }},
-        { key = "w",      mods = "SHIFT|CTRL",        action = act.CloseCurrentPane { confirm = false }},
-        { key = "t",      mods = "CTRL",              action = act{SpawnTab="CurrentPaneDomain"}},
 
-        -------
-        -- TABS
-        -------
+        ----------------
+        -- tmux overlaps
+        ----------------
+        { key = "w",      mods = "CTRL",              action = act.CloseCurrentPane { confirm = true }},
+        { key = "t",      mods = "CTRL",              action = act{SpawnTab="CurrentPaneDomain"}},
         { key = "1",      mods = "CTRL",              action = act{ActivateTab=0}},
         { key = "2",      mods = "CTRL",              action = act{ActivateTab=1}},
         { key = "3",      mods = "CTRL",              action = act{ActivateTab=2}},
@@ -103,7 +104,22 @@ local config = {
         { key = 'Escape',                             action = 'PopKeyTable' },
         { key = 'c',      mods = "CTRL",              action = 'PopKeyTable' },
       },
+      -- leader keys
       tmux = {},
+      -- non leader keys
+      tmux2 = {
+        { key = "w",      mods = "CTRL",              action = act.SendString("\x17")},
+        { key = "t",      mods = "CTRL",              action = act.SendString("\x14")},
+        { key = "1",      mods = "CTRL",              action = act.Multiple{ act.SendString("Ctrl"), act.SendString("1") }},
+        { key = "2",      mods = "CTRL",              action = act.Multiple{ act.SendString("Ctrl"), act.SendString("2") }},
+        { key = "3",      mods = "CTRL",              action = act.Multiple{ act.SendString("Ctrl"), act.SendString("3") }},
+        { key = "4",      mods = "CTRL",              action = act.Multiple{ act.SendString("Ctrl"), act.SendString("4") }},
+        { key = "5",      mods = "CTRL",              action = act.Multiple{ act.SendString("Ctrl"), act.SendString("5") }},
+        { key = "6",      mods = "CTRL",              action = act.Multiple{ act.SendString("Ctrl"), act.SendString("6") }},
+        { key = "7",      mods = "CTRL",              action = act.Multiple{ act.SendString("Ctrl"), act.SendString("7") }},
+        { key = "8",      mods = "CTRL",              action = act.Multiple{ act.SendString("Ctrl"), act.SendString("8") }},
+        { key = "9",      mods = "CTRL",              action = act.Multiple{ act.SendString("Ctrl"), act.SendString("9") }},
+      },
       wezterm = {},
     },
 }
@@ -127,8 +143,6 @@ end
 for _, value in ipairs(leader_keys) do
   table.insert(config.keys, shallowcopy(value))
 
-  wezterm.log_info(value)
-
   local mods = value.mods or ""
   mods = mods:gsub("LEADER", ""):gsub("^|*(.-)|*$", "%1")
 
@@ -138,16 +152,14 @@ for _, value in ipairs(leader_keys) do
     value.mods = mods
   end
 
-  wezterm.log_info(value)
-
   table.insert(config.key_tables.wezterm, value)
 end
-
-wezterm.log_info(config.key_tables.wezterm)
 
 ---------
 -- EVENTS
 ---------
+
+local tmuxPanes = {}
 
 wezterm.on('window-config-reloaded', function(window, pane)
   wezterm.log_info 'Configuration reloaded!'
@@ -199,12 +211,21 @@ wezterm.on('format-tab-title', function(tab, tabs, panes, config, hover, max_wid
       local inTmux = false
       local status, err = pcall(function() inTmux = panePane:get_user_vars()['TMUX'] == "1" and true or false end)
       if not status then
-        wezterm.log_info(err)
         goto continue
       end
       if (inTmux) then
         foreground = "#FFFFFF"
         background = "#86BBD8"
+        -- it is possible that we accidentally refreshed the config, in this case add back tmuxPane
+        local paneId = panePane:pane_id()
+        for _, v in ipairs(tmuxPanes) do
+          if (v.key == paneId) then
+            goto found
+          end
+        end
+        wezterm.log_info("Found orphaned tmux pane: " .. paneId .. ", adding back!")
+        table.insert(tmuxPanes, { key = paneId, pane = panePane })
+        ::found::
       end
     end
     ::continue::
@@ -239,8 +260,6 @@ wezterm.on('format-window-title', function(tab, pane, tabs, panes, config)
   return zoomed .. index .. tab.active_pane.title
 end)
 
-local tmuxPanes = {}
-
 wezterm.on('user-var-changed', function(window, pane, name, value)
   local overrides = window:get_config_overrides() or {}
 
@@ -250,8 +269,8 @@ wezterm.on('user-var-changed', function(window, pane, name, value)
     overrides.keys = overrides.keys or config.keys
     if (window:active_pane():pane_id() == pane:pane_id() and value == "1") then
       if (overrides.leader ~= nil) then return end
-      -- If we have TMUX inside a Pane, change the Wezterm Leader key to CTRL+ALT+SPACE
-      overrides.leader = { key = "Space", mods = "CTRL|ALT" }
+      -- If we have TMUX inside a Pane, change the Wezterm Leader key to CTRL+SHIFT+SPACE
+      overrides.leader = { key = "Space", mods = "CTRL|SHIFT" }
 
       table.insert(tmuxPanes, { key = pane:pane_id(), pane = pane })
       
@@ -259,6 +278,13 @@ wezterm.on('user-var-changed', function(window, pane, name, value)
       table.insert(overrides.keys, {
         key = "Space", mods = "CTRL", action = act.EmitEvent "check-tmux"
       })
+
+      -- override any non leader keys with the tmux equivalent
+      for _, value in ipairs(config.key_tables.tmux2) do
+        table.insert(overrides.keys, {
+          key = value.key, mods = value.mods, action = act.EmitEvent("check-tmux-nolead-" .. value.mods .. "+" .. value.key)
+        })
+      end
 
       wezterm.log_warn("[leader] clear")
       window:set_config_overrides(overrides)
@@ -273,40 +299,65 @@ wezterm.on('user-var-changed', function(window, pane, name, value)
           end
       end
 
+      -- exit tmux and tmux2 modes if we close the tab
+      local name = window:active_key_table()
+      if (name == 'tmux') or (name == 'tmux2') then
+        window.perform_action('PopKeyTable', pane)
+      end
+
       wezterm.log_warn("[leader] set")
       window:set_config_overrides(overrides)
     end
   end
 end)
 
--- wezterm.on('toggle-wezterm', function(window, pane)
---   local overrides = window:get_config_overrides() or {}
---   if (overrides.leader and overrides.leader.mods == "ALT") then
---     wezterm.log_warn("mode wezterm enabled")
---     overrides.leader = nil
---   else
---     wezterm.log_warn("mode wezterm disabled")
---     overrides.leader = newLeader
---   end
---   window:set_config_overrides(overrides)
--- end)
+function is_in_tmux_pane(pane_id)
+  for _, v in ipairs(tmuxPanes) do
+    if v.key == pane_id then
+      return true
+    end
+  end
+  return false
+end
 
 wezterm.on('check-tmux', function(window, pane)
-  wezterm.log_info('foobar')
-  if ((function() 
-    for _, v in ipairs(tmuxPanes) do
-        wezterm.log_info(v)
-        if v.key == pane:pane_id() then
-            return true
-        end
-    end
-    return false
-  end)()) then
+  if is_in_tmux_pane(pane:pane_id()) then
     window:perform_action(act.SendString("\x00"), pane)
     window:perform_action(act.ActivateKeyTable { name = 'tmux' }, pane)
+  else
+    window:perform_action(act.ActivateKeyTable { name = 'wezterm' }, pane)
   end
-  window:perform_action(act.ActivateKeyTable { name = 'wezterm' }, pane)
 end)
+
+-- dynamically generate a bunch of events
+for _, value in ipairs(config.key_tables.tmux2) do
+  wezterm.on("check-tmux-nolead-" .. value.mods .. "+" .. value.key, function(window, pane)
+    if is_in_tmux_pane(pane:pane_id()) then
+      wezterm.log_info("using tmux action: " .. value.mods .. "+" .. value.key)
+      if value.action then
+        window:perform_action(value.action, pane)
+      else
+        wezterm.log_warn("unable to find tmux action")
+      end
+    else
+      wezterm.log_info("using wezterm action: " .. value.mods .. "+" .. value.key)
+      -- attempt to find the wezterm action
+      local wezterm_action = (function()
+        for _, value2 in ipairs(config.keys) do
+          if (value2.key == value.key) and (value2.mods == value.mods) then
+            return value2.action
+          end
+        end
+        return nil
+      end)()
+      if wezterm_action then
+        window:perform_action(wezterm_action, pane)
+      else
+        wezterm.log_warn("unable to find wezterm action")
+      end
+    end
+  end)
+end
 
 wezterm.on('update-right-status', function(window, pane)
   local name = window:active_key_table()
