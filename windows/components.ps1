@@ -1,4 +1,7 @@
-Get-ChildItem -Path "./components" | Where-Object { $_.extension -eq ".ps1" } | ForEach-Object -process { Invoke-Expression ". '$_'" }
+Get-ChildItem -Path "./components" | Where-Object { $_.extension -eq ".ps1" } | ForEach-Object -process {
+  Invoke-Expression ". '$_'"
+  # Write-Host "components.$_ : $(Measure-Command { Invoke-Expression ". '$_'" })"
+}
 
 # oh-my-posh
 oh-my-posh init pwsh --config "$env:POSH_THEMES_PATH\M365Princess.omp.json" | Invoke-Expression
@@ -8,7 +11,15 @@ try {
 catch [System.IO.FileLoadException] {}
 Import-Module CompletionPredictor
 # Terminal-Icons is slow! https://github.com/devblackops/Terminal-Icons/issues/76#issuecomment-1147675907
-Import-Module Terminal-Icons
+# Use our own fork
+$script:TerminalIconsForkPath = (Join-Path $env:USERPROFILE "Terminal-Icons")
+if (Test-Path -Path $TerminalIconsForkPath -PathType Container) {
+  $script:TerminalIconsVersion = (Import-PowerShellDataFile (Join-Path $TerminalIconsForkPath "Terminal-Icons/Terminal-Icons.psd1")).ModuleVersion
+  Import-Module (Join-Path $TerminalIconsForkPath "Output/Terminal-Icons/$TerminalIconsVersion/Terminal-Icons.psd1")
+}
+else {
+  Import-Module Terminal-Icons
+}
 
 # PS-Readline
 $PSReadLineOptions = @{

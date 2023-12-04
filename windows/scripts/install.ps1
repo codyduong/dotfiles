@@ -5,17 +5,6 @@ param (
 )
 
 . $PSScriptRoot\utils.ps1
-. $PSScriptRoot/../components/console.ps1
-
-# Check to see if we are currently running "as Administrator"
-# if (!(Verify-Elevated)) {
-#   $newProcess = new-object System.Diagnostics.ProcessStartInfo "PowerShell";
-#   $newProcess.Arguments = $myInvocation.MyCommand.Definition;
-#   $newProcess.Verb = "runas";
-#   [System.Diagnostics.Process]::Start($newProcess);
-
-#   exit
-# }
 
 if ($update.IsPresent) {
   $Env:UPDATE_OUTDATED_DEPS = $update
@@ -29,13 +18,6 @@ $script:currentPath = [System.Environment]::GetEnvironmentVariable('PATH', [Syst
 ### Update Help for Modules
 # Write-Host "Updating Help..." -ForegroundColor "Yellow"
 # Update-Help -Force
-
-### Package Providers
-# Write-Host "`nInstalling Package Providers" -ForegroundColor "Yellow"
-# Get-PackageProvider NuGet -Force | Out-Null
-# # Chocolatey Provider is not ready yet. Use normal Chocolatey
-# Get-PackageProvider Chocolatey -Force
-# Set-PackageSource -Name chocolatey -Trusted
 
 ##########
 # Terminal
@@ -54,6 +36,84 @@ Install-PowerShell -Name CompletionPredictor -Scope CurrentUser -Force -SkipPubl
 ### Install oh-my-posh and dependencies
 Install-Winget JanDeDobbeleer.OhMyPosh
 Install-PowerShell -Name Terminal-Icons -Repository PSGallery -Force
+if ($true) {
+  # Actual deps
+  Install-PowerShell -Name PowershellHumanizer -Force
+
+  $script:TerminalIconsForkPath = (Join-Path $env:USERPROFILE "Terminal-Icons")
+  $script:TerminalIconsCloned = $false
+
+  # Clone a fork of Terminal-Icons
+  if (-not (Test-Path -Path $TerminalIconsForkPath -PathType Container)) {
+    Write-Host "Cloning Terminal-Icons (fork) v$TerminalIconsVersion..." -ForegroundColor $InstallationIndicatorColorInstalling
+    git clone https://github.com/codyduong/Terminal-Icons.git "$TerminalIconsForkPath"
+    $script:TerminalIconsCloned = $true
+  }
+
+  # Pull if possible
+  $script:gpOut = git -C "$TerminalIconsForkPath" pull
+  
+  if ($gitPullOutput -notlike '*Already up to date.*') {
+    Write-Host "Pulling Terminal-Icons (fork)..." -ForegroundColor $InstallationIndicatorColorUpdating
+  }
+  else {
+    Write-Host "Terminal-Icons (fork) up to date." -ForegroundColor $InstallationIndicatorColorFound
+  }
+
+  # Install actual deps
+  $script:manifestData = Import-PowerShellDataFile -Path (Join-Path $TerminalIconsForkPath "Terminal-Icons/Terminal-Icons.psd1")
+
+  foreach ($script:moduleName in $manifestData.RequiredModules) {
+    Install-PowerShell -Name $moduleName -Force -RequiredVersion $moduleVersion
+  }
+
+  # Install build deps
+  $script:manifestData = Import-PowerShellDataFile -Path (Join-Path $TerminalIconsForkPath "requirements.psd1")
+
+  $script:psDependOptions = $manifestData.PSDependOptions
+
+  $script:scope = if ($psDependOptions -and $psDependOptions.Target) {
+    $psDependOptions.Target
+  }
+  else {
+    'CurrentUser'
+  }
+
+  foreach ($script:moduleName in $manifestData.Keys) {
+    if ($moduleName -eq 'PSDependOptions') {
+      continue
+    }
+
+    $script:moduleVersion = $manifestData[$moduleName]
+
+    if ($moduleVersion -eq 'latest') {
+      Install-PowerShell -Name $moduleName -Force -Scope $scope
+    }
+    else {
+      Install-PowerShell -Name $moduleName -Force -RequiredVersion $moduleVersion -Scope $scope
+    }
+  }
+
+  $script:TerminalIconsVersion = (Import-PowerShellDataFile (Join-Path $TerminalIconsForkPath "Terminal-Icons/Terminal-Icons.psd1")).ModuleVersion
+
+  # Build only if we haven't built the current version
+  if (-not (Test-Path -Path (Join-Path $TerminalIconsForkPath "Output/Terminal-Icons/$TerminalIconsVersion") -PathType Container)) {
+    if ($TerminalIconsCloned) {
+      Write-Host "Building Terminal-Icons (fork) $TerminalIconsVersion..." -ForegroundColor $InstallationIndicatorColorInstalling
+    }
+    else {
+      Write-Host "Building Terminal-Icons (fork) $TerminalIconsVersion..." -ForegroundColor $InstallationIndicatorColorUpdating
+    }
+    Push-Location
+    Set-Location $TerminalIconsForkPath
+    & (Join-Path $TerminalIconsForkPath "build.ps1")
+    Pop-Location
+  }
+  else {
+    Write-Host "Terminal-Icons (fork) $TerminalIconsVersion found, skipping build..." -ForegroundColor $InstallationIndicatorColorFound
+  }
+}
+
 # Install Meslo if not already installed
 $script:fonts = Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts'
 if (-not ($fonts.PSObject.Properties.name -contains 'Meslo LG S Bold Italic Nerd Font Complete Mono Windows Compatible (TrueType)')) {
@@ -110,7 +170,7 @@ npm install -g yarn
 
 Write-Host "`nPython" -ForegroundColor "Cyan"
 ### Python
-Install-Winget Python.Python.3.9
+Install-Winget Python.Python.3.11
 python.exe -m pip install --upgrade pip -q
 # TODO these won't be in execution context upon first install
 pip install thefuck -q
