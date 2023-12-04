@@ -54,9 +54,6 @@ Start Menu (loc 1): %AppData%\Microsoft\Internet Explorer\Quick Launch\User Pinn
 Start Menu (loc 2): C:\ProgramData\Microsoft\Windows\Start Menu\Programs
 -->
 
-### Acknowledgements
-Based off [Jay Harris's dotfiles for Windows](https://github.com/jayharris/dotfiles-windows)
-
 
 
 <!---
