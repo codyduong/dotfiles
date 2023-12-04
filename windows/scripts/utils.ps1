@@ -5,9 +5,9 @@ enum PackageIs {
     unknown
 }
 
-$script:InstallationIndicatorColorInstalling = "DarkCyan"
-$script:InstallationIndicatorColorUpdating = "DarkGreen"
-$script:InstallationIndicatorColorFound = "DarkGray"
+$InstallationIndicatorColorInstalling = "DarkCyan"
+$InstallationIndicatorColorUpdating = "DarkGreen"
+$InstallationIndicatorColorFound = "DarkGray"
 
 function script:Find-WingetAll {
     $currentEncoding = [Console]::OutputEncoding
