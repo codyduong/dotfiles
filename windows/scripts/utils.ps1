@@ -9,6 +9,42 @@ $InstallationIndicatorColorInstalling = "DarkCyan"
 $InstallationIndicatorColorUpdating = "DarkGreen"
 $InstallationIndicatorColorFound = "DarkGray"
 
+function script:Convert-Version {
+    [CmdletBinding(DefaultParameterSetName = 'NameParameterSet')]
+    param(
+        [Parameter(ParameterSetName = 'NameParameterSet', Mandatory = $true, Position = 0, ValueFromPipelineByPropertyName = $true)]
+        [string]
+        ${version}
+    )
+
+    return if ($null -ne $version) {$version -as [version]$version -or [double]$version} else {$null}
+}
+
+function script:Convert-Versions {
+    [CmdletBinding(DefaultParameterSetName = 'NameParameterSet')]
+    param (
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
+        [Alias("version")]
+        [object]
+        $versions
+    )
+
+    process {
+        # If a single string is provided, treat it as an array with a single element
+        if ($versions -is [string]) {
+            $versions = @($versions)
+        }
+
+        $convertedVersions = $versions | ForEach-Object {
+            # Your conversion logic here...
+            # For example: [version]$_
+            $_
+        }
+
+        return $convertedVersions
+    }
+}
+
 function script:Find-WingetAll {
     $currentEncoding = [Console]::OutputEncoding
     try {
@@ -25,11 +61,21 @@ function script:Find-WingetAll {
             $name = $line.substring($id_index, $version_index - $id_index - 1).Trim()
             $line = $line.substring($version_index).Trim()
             $line = $line -replace "\s(?=\s{1,})", ""
-            # Write-Output $name $line
-            $version = $line -split " "
-            if ($version -is [String]) {
+
+            if (($inputString -split '-').Count - 1 -eq 1) {
+                # Valid semver revision strings will only have one dash and remove the text
+                $line = $inputString -replace '-\D*', '.'
+            }
+
+            $version = $line -split " " | ForEach-Object {$_ -replace "[^\d\.]*", ""}
+
+            if ($version -is [string]) {
                 $version = $version, $null
             }
+
+            # Replace first empty string (second indicates unknown update, which is never shown) with "Unknown" 
+            if ($version[0] -match '^\s*$') {$version = "Unknown", $version[1]}
+
             $winget_table[$name] = $version
         }
     }
@@ -91,6 +137,7 @@ function script:Find-Winget {
         }
     }
     if ($version -is [String]) {
+        # If we only have one version, it means there was no version to update to
         $version = $version, $null
     }
     if ($GetCurrent) {
@@ -100,13 +147,15 @@ function script:Find-Winget {
         $version = @($version[0], $(Invoke-Command -ScriptBlock $GetAvailable))
     }
 
+    $version = Convert-Versions $version
+
     if (-not $installed) {
         return [PackageIs]::notinstalled, $null
     }
     elseif ($version[0] -match "unknown") {
         return [PackageIs]::unknown, $version
     }
-    elseif ($table_header -match "Available" -and ([version]($version[1] ?? "0.0.0") -gt [version]($version[0] ?? "0.0.0"))) {
+    elseif ($version[1] -gt $version[0]) {
         return [PackageIs]::outdated, $version
     }
     else {
