@@ -2,29 +2,6 @@
 function Edit-Hosts { Invoke-Expression "sudo $(if($null -ne $env:EDITOR)  {$env:EDITOR } else { 'notepad' }) $env:windir\system32\drivers\etc\hosts" }
 function Edit-Profile { Invoke-Expression "$(if($null -ne $env:EDITOR)  {$env:EDITOR } else { 'notepad' }) $profile" }
 
-# # System Update - Update RubyGems, NPM, and their installed packages
-# function System-Update() {
-#     Install-WindowsUpdate -IgnoreUserInput -IgnoreReboot -AcceptAll
-#     Update-Module
-#     Update-Help -Force
-#     gem update --system
-#     gem update
-#     npm install npm -g
-#     npm update -g
-# }
-
-# Download a file into a temporary folder
-function curlex($url) {
-    $uri = new-object system.uri $url
-    $filename = $uri.segments | Select-Object -Last 1
-    $path = join-path $env:Temp $filename
-    if ( test-path $path ) { Remove-Item -force $path }
-
-    (new-object net.webclient).DownloadFile($url, $path)
-
-    return new-object io.fileinfo $path
-}
-
 # # Empty the Recycle Bin on all drives
 # function Empty-RecycleBin {
 #     $RecBin = (New-Object -ComObject Shell.Application).Namespace(0xA)
@@ -38,16 +15,6 @@ function curlex($url) {
 function CreateDirectory([String] $path) { New-Item $path -ItemType Directory -ErrorAction SilentlyContinue }
 function CreateAndSet-Directory([String] $path) { New-Item $path -ItemType Directory -ErrorAction SilentlyContinue; Set-Location $path }
 
-# Determine size of a file or total size of a directory
-function Get-DiskUsage([string] $path = (Get-Location).Path) {
-    Convert-ToDiskSize `
-    ( `
-            Get-ChildItem .\ -recurse -ErrorAction SilentlyContinue `
-        | Measure-Object -property length -sum -ErrorAction SilentlyContinue
-    ).Sum `
-        1
-}
-
 # Cleanup all disks (Based on Registry Settings in `windows.ps1`)
 # function Clean-Disks {
 #     Start-Process "$(Join-Path $env:WinDir 'system32\cleanmgr.exe')" -ArgumentList "/sagerun:6174" -Verb "runAs"
@@ -55,23 +22,6 @@ function Get-DiskUsage([string] $path = (Get-Location).Path) {
 
 ### Environment functions
 ### ----------------------------
-
-# Reload the $env object from the registry
-function Refresh-Environment {
-    $locations = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Environment',
-    'HKCU:\Environment'
-
-    $locations | ForEach-Object {
-        $k = Get-Item $_
-        $k.GetValueNames() | ForEach-Object {
-            $name = $_
-            $value = $k.GetValue($_)
-            Set-Item -Path Env:\$name -Value $value
-        }
-    }
-
-    $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
-}
 
 # Set a permanent Environment variable, and reload it into $env
 function Set-Environment([String] $variable, [String] $value) {
@@ -90,34 +40,6 @@ function Append-EnvPathIfExists([String]$path) { if (Test-Path $path) { Append-E
 
 ### Utilities
 ### ----------------------------
-
-# Convert a number to a disk size (12.4K or 5M)
-function Convert-ToDiskSize {
-    param ( $bytes, $precision = '0' )
-    foreach ($size in ("B", "K", "M", "G", "T")) {
-        if (($bytes -lt 1000) -or ($size -eq "T")) {
-            $bytes = ($bytes).tostring("F0" + "$precision")
-            return "${bytes}${size}"
-        }
-        else { $bytes /= 1KB }
-    }
-}
-
-# Start IIS Express Server with an optional path and port
-# function Start-IISExpress {
-#     [CmdletBinding()]
-#     param (
-#         [String] $path = (Get-Location).Path,
-#         [Int32]  $port = 3000
-#     )
-
-#     if ((Test-Path "${env:ProgramFiles}\IIS Express\iisexpress.exe") -or (Test-Path "${env:ProgramFiles(x86)}\IIS Express\iisexpress.exe")) {
-#         $iisExpress = Resolve-Path "${env:ProgramFiles}\IIS Express\iisexpress.exe" -ErrorAction SilentlyContinue
-#         if ($iisExpress -eq $null) { $iisExpress = Get-Item "${env:ProgramFiles(x86)}\IIS Express\iisexpress.exe" }
-
-#         & $iisExpress @("/path:${path}") /port:$port
-#     } else { Write-Warning "Unable to find iisexpress.exe"}
-# }
 
 # Extract a .zip file
 function Unzip-File {
