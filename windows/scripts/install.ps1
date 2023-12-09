@@ -5,6 +5,7 @@ param (
 )
 
 . $PSScriptRoot\utils.ps1
+. $PSScriptRoot\..\functions.ps1
 
 if ($update.IsPresent) {
   $Env:UPDATE_OUTDATED_DEPS = $update
@@ -219,9 +220,7 @@ Write-Verbose $(& $msys2Path\bash.exe -c "pacman -Syu base-devel mingw-w64-ucrt-
 
 # Check if the path is already in the PATH variable
 if ($currentPath -notlike "*$msys2Path*") {
-  # Add the MSYS2 path to the PATH variable
-  $newPath = $currentPath + ";" + $msys2Path
-  [System.Environment]::SetEnvironmentVariable('PATH', $newPath, [System.EnvironmentVariableTarget]::User)
+  Append-EnvPath $msys2Path
   Write-Host "$msys2Path added to the PATH" -ForegroundColor "Green"
 }
 else {
@@ -230,8 +229,7 @@ else {
 
 if ($currentPath -notlike "*$mingwPath*") {
   # Add the MSYS2 path to the PATH variable
-  $newPath = $currentPath + ";" + $mingwPath
-  [System.Environment]::SetEnvironmentVariable('PATH', $newPath, [System.EnvironmentVariableTarget]::User)
+  Append-EnvPath $mingwPath
   Write-Host "$mingwPath added to the PATH" -ForegroundColor "Green"
 }
 else {
