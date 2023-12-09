@@ -123,7 +123,7 @@ if (-not ($fonts.PSObject.Properties.name -contains 'Meslo LG S Bold Italic Nerd
 ###########################
 # Tiling Manager (komorebi)
 ###########################
-Install-Winget LGUG2Z.whkd
+# Install-Winget LGUG2Z.whkd
 Install-Winget LGUG2Z.komorebi
 # AutoHotkey
 Install-GitHubRelease ahk AutoHotkey/AutoHotkey ".*\.exe"
