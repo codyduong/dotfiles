@@ -201,16 +201,6 @@ function InstallerPromptUpdateOutdated() {
 
 . $PSScriptRoot\..\components\utils.ps1
 
-filter quoteStringWithSpecialChars {
-    if ($_ -and ($_ -match '\s+|#|@|\$|;|,|''|\{|\}|\(|\)')) {
-        $str = $_ -replace "'", "''"
-        "'$str'"
-    }
-    else {
-        $_
-    }
-}
-
 function script:PrepModuleToStr {
     param (
         [Parameter(ValueFromPipeline)]
