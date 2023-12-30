@@ -11,17 +11,6 @@ $InstallationIndicatorColorFound = "DarkGray"
 
 function script:Convert-Version {
     [CmdletBinding(DefaultParameterSetName = 'NameParameterSet')]
-    param(
-        [Parameter(ParameterSetName = 'NameParameterSet', Mandatory = $true, Position = 0, ValueFromPipelineByPropertyName = $true)]
-        [string]
-        ${version}
-    )
-
-    return if ($null -ne $version) {$version -as [version]$version -or [double]$version} else {$null}
-}
-
-function script:Convert-Versions {
-    [CmdletBinding(DefaultParameterSetName = 'NameParameterSet')]
     param (
         [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
         [Alias("version")]
@@ -36,9 +25,7 @@ function script:Convert-Versions {
         }
 
         $convertedVersions = $versions | ForEach-Object {
-            # Your conversion logic here...
-            # For example: [version]$_
-            $_
+            if ($null -ne $_) {$_ -as [version]$_ -or [double]$_} else {$null}
         }
 
         return $convertedVersions
@@ -73,7 +60,7 @@ function script:Find-WingetAll {
                 $version = $version, $null
             }
 
-            # Replace first empty string (second indicates unknown update, which is never shown) with "Unknown" 
+            # Replace first empty string (second indicates unknown update, which is never shown) with "Unknown"
             if ($version[0] -match '^\s*$') {$version = "Unknown", $version[1]}
 
             $winget_table[$name] = $version
@@ -147,7 +134,7 @@ function script:Find-Winget {
         $version = @($version[0], $(Invoke-Command -ScriptBlock $GetAvailable))
     }
 
-    $version = Convert-Versions $version
+    $version = Convert-Version $version
 
     if (-not $installed) {
         return [PackageIs]::notinstalled, $null
@@ -388,21 +375,25 @@ function Install-GitHubRelease {
 
         [Parameter(ValueFromPipelineByPropertyName)]
         [switch]
-        ${WhatIf}
+        ${WhatIf},
+
+        [Parameter(ValueFromPipelineByPropertyName)]
+        [switch]
+        ${NoAction}
     )
 
     if ($Version) {
-        Update-GitHubRelease @PSBoundParameters
+        return Update-GitHubRelease @PSBoundParameters
     }
     else {
         $Installed = Get-Command $Name -ErrorAction SilentlyContinue | Select-Object -ExpandProperty "Name" -ErrorAction SilentlyContinue
 
         if ($Installed) {
             $Version = [semver]$(Invoke-Expression "$Name --version").TrimStart("v")
-            Update-GitHubRelease $Version @PSBoundParameters
+            return Update-GitHubRelease $Version @PSBoundParameters
         }
         else {
-            Update-GitHubRelease $([semver]$("0.0.0")) @PSBoundParameters
+            return Update-GitHubRelease $([semver]$("0.0.0")) @PSBoundParameters
         }
     }
 }
@@ -435,7 +426,11 @@ function Update-GitHubRelease {
 
         [Parameter(ValueFromPipelineByPropertyName)]
         [switch]
-        ${WhatIf}
+        ${WhatIf},
+
+        [Parameter(ValueFromPipelineByPropertyName)]
+        [switch]
+        ${NoAction}
     )
 
     # get remote version
@@ -464,10 +459,15 @@ function Update-GitHubRelease {
         Write-Host "Updating $Name from $Version to $LatestVersion..." -ForegroundColor $InstallationIndicatorColorUpdating
     }
 
+    # If we have a NoAction, return the path for the callee to handle
+    if ($NoAction) {
+        return $File
+    }
+
     # Handle zipped files
     if ($File -match ".*\.zip") {
         $Destination = ($File -replace "\.zip$", "")
-        Expand-Archive -LiteralPath $File -DestinationPath $Temp
+        Expand-Archive -LiteralPath $File -DestinationPath $Temp -Force
         $File = $Destination
         # Todo iterate over inside files to find msixbundle or exe. If the .exe is an installer specify with installer flag
         # otherwise add binary to path
@@ -479,6 +479,9 @@ function Update-GitHubRelease {
     # Handle .exe
     elseif ($File -match ".*\.exe$") {
         Start-Process -FilePath $File -WhatIf:$WhatIf
+    }
+    elseif ($File -match ".*\.msi$") {
+        Start-Process msiexec.exe -ArgumentList "/i $File" -Wait
     }
     else {
         Write-Warning "Unsupported file extension on file: $File"

@@ -9,11 +9,20 @@ Set-Environment "KOMOREBI_CONFIG_HOME" $(Join-Path -Path $Env:USERPROFILE -Child
 Set-Environment "PYENV" $(Join-Path -Path $Env:USERPROFILE -ChildPath '.pyenv\pyenv-win\')
 Set-Environment "PYENV_ROOT" $(Join-Path -Path $Env:USERPROFILE -ChildPath '.pyenv\pyenv-win\')
 Set-Environment "PYENV_HOME" $(Join-Path -Path $Env:USERPROFILE -ChildPath '.pyenv\pyenv-win\')
-Prepend-EnvPath $(Join-Path -Path $Env:USERPROFILE -ChildPath '.pyenv\pyenv-win\bin')
-Prepend-EnvPath $(Join-Path -Path $Env:USERPROFILE -ChildPath '.pyenv\pyenv-win\shims')
 
 # python scripts, ie. poetry
-Prepend-EnvPath $(Join-Path -Path $env:APPDATA -ChildPath 'Python\Scripts')
+# Prepend-EnvPath $(Join-Path -Path $env:APPDATA -ChildPath 'Python\Scripts')
+
+# alias-tips
+Set-Environment "ALIASTIPS_FUNCTION_INTROSPECTION" $true
 
 # Disable the Progress Bar
 # $ProgressPreference='SilentlyContinue'
+
+# PATH VARS
+Update-EnvPathIfNot $(Join-Path -Path $Env:USERPROFILE -ChildPath '.pyenv\pyenv-win\bin')
+Update-EnvPathIfNot $(Join-Path -Path $Env:USERPROFILE -ChildPath '.pyenv\pyenv-win\shims')
+Update-EnvPathIfNot $(Join-Path -Path $env:APPDATA -ChildPath 'Python\Scripts')
+Update-EnvPathIfNot $msys2Path
+Update-EnvPathIfNot $mingwPath
+Update-EnvPathIfNot $(Join-Path $env:LOCALAPPDATA "Programs\ILSpy")

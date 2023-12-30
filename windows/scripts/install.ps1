@@ -38,9 +38,6 @@ Install-PowerShell -Name CompletionPredictor -Scope CurrentUser -Force -SkipPubl
 Install-Winget JanDeDobbeleer.OhMyPosh
 Install-PowerShell -Name Terminal-Icons -Repository PSGallery -Force
 if ($true) {
-  # Actual deps
-  Install-PowerShell -Name PowershellHumanizer -Force
-
   $script:TerminalIconsForkPath = (Join-Path $env:USERPROFILE "Terminal-Icons")
   $script:TerminalIconsCloned = $false
 
@@ -54,7 +51,8 @@ if ($true) {
   # Pull if possible
   $script:gpOut = git -C "$TerminalIconsForkPath" pull
   
-  if ($gitPullOutput -notlike '*Already up to date.*') {
+  Write-Host $gpOut
+  if ($gpOut -notlike '*Already up to date.*') {
     Write-Host "Pulling Terminal-Icons (fork)..." -ForegroundColor $InstallationIndicatorColorUpdating
   }
   else {
@@ -69,9 +67,16 @@ if ($true) {
   }
 
   # Install build deps
-  $script:manifestData = Import-PowerShellDataFile -Path (Join-Path $TerminalIconsForkPath "requirements.psd1")
+  $script:manifestData2 = Import-PowerShellDataFile -Path (Join-Path $TerminalIconsForkPath "requirements.psd1")
 
-  $script:psDependOptions = $manifestData.PSDependOptions
+  # Remove similiar deps
+  foreach ($script:actDep in $manifestData.Keys) {
+    if ($manifestData2.ContainsKey($actDep)) {
+      $manifestData2.Remove($actDep)
+    }
+  }
+
+  $script:psDependOptions = $manifestData2.PSDependOptions
 
   $script:scope = if ($psDependOptions -and $psDependOptions.Target) {
     $psDependOptions.Target
@@ -80,12 +85,12 @@ if ($true) {
     'CurrentUser'
   }
 
-  foreach ($script:moduleName in $manifestData.Keys) {
+  foreach ($script:moduleName in $manifestData2.Keys) {
     if ($moduleName -eq 'PSDependOptions') {
       continue
     }
 
-    $script:moduleVersion = $manifestData[$moduleName]
+    $script:moduleVersion = $manifestData2[$moduleName]
 
     if ($moduleVersion -eq 'latest') {
       Install-PowerShell -Name $moduleName -Force -Scope $scope
@@ -145,6 +150,15 @@ Install-Winget Neovim.Neovim
 
 Write-Host "`nInstalling Developer Tools..." -ForegroundColor "Yellow"
 Install-Winget Microsoft.PowerToys
+## PowerToys plugins
+$script:PowerToysPluginsPath = Join-Path $Env:LOCALAPPDATA "Microsoft\PowerToys\PowerToys Run\Plugins\"
+New-Item $PowerToysPluginsPath -ItemType Directory -Force -ErrorAction SilentlyContinue | Out-Null
+# EverythingPowerToys
+Expand-Archive -LiteralPath $(Install-GitHubRelease lin-ycv/EverythingPowerToys lin-ycv/EverythingPowerToys ".*-x64\.zip$" -NoAction -Version $(
+  (Get-Content -Path $(Join-Path $PowerToysPluginsPath "Everything\plugin.json") -Raw -ErrorAction SilentlyContinue | ConvertFrom-Json -ErrorAction SilentlyContinue).Version ?? "0.0.0"
+)) -DestinationPath $env:TEMP -Force
+Copy-Item -Path $(Join-Path $env:TEMP "Everything") -Destination $PowerToysPluginsPath -Recurse -Force
+
 Install-Winget Git.Git
 # TODO add script which properly updates git-credential-manager
 # Note that gcmuser is for user install only! Use gcm-win-x for admin installs
@@ -205,10 +219,10 @@ $script:msys2PackagesAsset = $msys2Remote.assets | Where-Object { $_.name -match
 $script:msys2PackagesTxt = Join-Path $env:TEMP "Github" $msys2PackagesAsset.name
 Invoke-WebRequest -Uri $msys2PackagesAsset.browser_download_url -OutFile $msys2PackagesTxt
 $script:msys2RemoteVersion = if (Get-Content -Path $msys2PackagesTxt | Where-Object { $_ -match "(?<=gcc-libs )(\d+\.\d+\.\d+)" }) { $matches[0] } else { "0.0.0" }
-# We use head instead of cat because there is some fuckery going on with Neovim/bin/cat.exe being on PATH that sometimes blows up msys2 bash cat
 $script:msys2LocalVersion = "0.0.0"
 try {
   $script:msys2LocalVersion = if (
+    # We use head instead of cat because there is some fuckery going on with Neovim/bin/cat.exe being on PATH that sometimes blows up msys2 bash cat
     $(& $msys2Path\bash.exe -c "head /proc/version") -match "(?<=gcc version )\d+\.\d+\.\d+"
   ) { $matches[0] } else { "0.0.0" }
 }
@@ -218,23 +232,10 @@ Install-GitHubRelease msys2 msys2/msys2-installer "msys2-x86_64-latest\.exe$" -v
 # install mingw
 Write-Verbose $(& $msys2Path\bash.exe -c "pacman -Syu base-devel mingw-w64-ucrt-x86_64-toolchain --noconfirm")
 
-# Check if the path is already in the PATH variable
-if ($currentPath -notlike "*$msys2Path*") {
-  Append-EnvPath $msys2Path
-  Write-Host "$msys2Path added to the PATH" -ForegroundColor "Green"
-}
-else {
-  Write-Verbose "$msys2Path is already in the PATH"
-}
-
-if ($currentPath -notlike "*$mingwPath*") {
-  # Add the MSYS2 path to the PATH variable
-  Append-EnvPath $mingwPath
-  Write-Host "$mingwPath added to the PATH" -ForegroundColor "Green"
-}
-else {
-  Write-Verbose "$mingwPath is already in the PATH"
-}
+Write-Host "`nC#/DotNet" -ForegroundColor "Cyan"
+Install-Winget Microsoft.DotNet.SDK.8
+# Maybe install ilspycmd instead? https://github.com/icsharpcode/ILSpy/tree/master/ICSharpCode.ILSpyCmd
+# Install-GitHubRelease ilspy icsharpcode/ILSpy "ILSpy_Installer_.*-x64.msi$"
 
 ##############
 # Desktop Apps
