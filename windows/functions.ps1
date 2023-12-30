@@ -1,28 +1,3 @@
-# Common Editing needs
-function Edit-Hosts { Invoke-Expression "sudo $(if($null -ne $env:EDITOR)  {$env:EDITOR } else { 'notepad' }) $env:windir\system32\drivers\etc\hosts" }
-function Edit-Profile { Invoke-Expression "$(if($null -ne $env:EDITOR)  {$env:EDITOR } else { 'notepad' }) $profile" }
-
-# # Empty the Recycle Bin on all drives
-# function Empty-RecycleBin {
-#     $RecBin = (New-Object -ComObject Shell.Application).Namespace(0xA)
-#     $RecBin.Items() | %{Remove-Item $_.Path -Recurse -Confirm:$false}
-# }
-
-
-### File System functions
-### ----------------------------
-# Create a new directory and enter it
-function CreateDirectory([String] $path) { New-Item $path -ItemType Directory -ErrorAction SilentlyContinue }
-function CreateAndSet-Directory([String] $path) { New-Item $path -ItemType Directory -ErrorAction SilentlyContinue; Set-Location $path }
-
-# Cleanup all disks (Based on Registry Settings in `windows.ps1`)
-# function Clean-Disks {
-#     Start-Process "$(Join-Path $env:WinDir 'system32\cleanmgr.exe')" -ArgumentList "/sagerun:6174" -Verb "runAs"
-# }
-
-### Environment functions
-### ----------------------------
-
 # Set a permanent Environment variable, and reload it into $env
 function Set-Environment([String] $variable, [String] $value) {
     Set-ItemProperty "HKCU:\Environment" $variable $value
@@ -32,74 +7,22 @@ function Set-Environment([String] $variable, [String] $value) {
 }
 
 # Add a folder to $env:Path
-function Prepend-EnvPath([String]$path) { $env:PATH = $env:PATH + ";$path" }
-function Prepend-EnvPathIfExists([String]$path) { if (Test-Path $path) { Prepend-EnvPath $path } }
-function Append-EnvPath([String]$path) { $env:PATH = $env:PATH + ";$path" }
-function Append-EnvPathIfExists([String]$path) { if (Test-Path $path) { Append-EnvPath $path } }
-
-
-### Utilities
-### ----------------------------
-
-# Extract a .zip file
-function Unzip-File {
-    <#
-    .SYNOPSIS
-       Extracts the contents of a zip file.
-    .DESCRIPTION
-       Extracts the contents of a zip file specified via the -File parameter to the
-    location specified via the -Destination parameter.
-    .PARAMETER File
-        The zip file to extract. This can be an absolute or relative path.
-    .PARAMETER Destination
-        The destination folder to extract the contents of the zip file to.
-    .PARAMETER ForceCOM
-        Switch parameter to force the use of COM for the extraction even if the .NET Framework 4.5 is present.
-    .EXAMPLE
-       Unzip-File -File archive.zip -Destination .\d
-    .EXAMPLE
-       'archive.zip' | Unzip-File
-    .EXAMPLE
-        Get-ChildItem -Path C:\zipfiles | ForEach-Object {$_.fullname | Unzip-File -Destination C:\databases}
-    .INPUTS
-       String
-    .OUTPUTS
-       None
-    .NOTES
-       Inspired by:  Mike F Robbins, @mikefrobbins
-       This function first checks to see if the .NET Framework 4.5 is installed and uses it for the unzipping process, otherwise COM is used.
-    #>
+function Update-EnvPathIfNot {
     [CmdletBinding()]
-    param (
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-        [string]$File,
+    [String]$path
 
-        [ValidateNotNullOrEmpty()]
-        [string]$Destination = (Get-Location).Path
-    )
-
-    $filePath = Resolve-Path $File
-    $destinationPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Destination)
-
-    if (($PSVersionTable.PSVersion.Major -ge 3) -and
-       ((Get-ItemProperty -Path "HKLM:\Software\Microsoft\NET Framework Setup\NDP\v4\Full" -ErrorAction SilentlyContinue).Version -like "4.5*" -or
-       (Get-ItemProperty -Path "HKLM:\Software\Microsoft\NET Framework Setup\NDP\v4\Client" -ErrorAction SilentlyContinue).Version -like "4.5*")) {
-
-        try {
-            [System.Reflection.Assembly]::LoadWithPartialName("System.IO.Compression.FileSystem") | Out-Null
-            [System.IO.Compression.ZipFile]::ExtractToDirectory("$filePath", "$destinationPath")
-        }
-        catch {
-            Write-Warning -Message "Unexpected Error. Error details: $_.Exception.Message"
-        }
+    if (-not (Test-Path $path)) {
+        Write-Verbose "$path not found"
+        return
+    }
+  
+    $currentPath = [System.Environment]::GetEnvironmentVariable('PATH', [System.EnvironmentVariableTarget]::User)
+  
+    if ($currentPath -notlike "*$path*") {
+        $env:PATH = $currentPath + ";$path"
+        Write-Verbose "$path added to the PATH"
     }
     else {
-        try {
-            $shell = New-Object -ComObject Shell.Application
-            $shell.Namespace($destinationPath).copyhere(($shell.NameSpace($filePath)).items())
-        }
-        catch {
-            Write-Warning -Message "Unexpected Error. Error details: $_.Exception.Message"
-        }
+        Write-Verbose "$path is already in the PATH"
     }
 }
