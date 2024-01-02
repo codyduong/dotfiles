@@ -8,15 +8,15 @@ function Set-Environment([String] $variable, [String] $value) {
 
 # Add a folder to $env:Path
 function Update-EnvPathIfNot {
-    [CmdletBinding()]
-    [String]$path
+    param(
+        [Parameter(Mandatory = $true, Position = 0)][string]$path
+    )
 
     if (-not (Test-Path $path)) {
-        Write-Verbose "$path not found"
         return
     }
   
-    $currentPath = [System.Environment]::GetEnvironmentVariable('PATH', [System.EnvironmentVariableTarget]::User)
+    $currentPath = $env:PATH
   
     if ($currentPath -notlike "*$path*") {
         $env:PATH = $currentPath + ";$path"

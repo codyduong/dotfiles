@@ -51,7 +51,6 @@ if ($true) {
   # Pull if possible
   $script:gpOut = git -C "$TerminalIconsForkPath" pull
   
-  Write-Host $gpOut
   if ($gpOut -notlike '*Already up to date.*') {
     Write-Host "Pulling Terminal-Icons (fork)..." -ForegroundColor $InstallationIndicatorColorUpdating
   }
@@ -154,10 +153,13 @@ Install-Winget Microsoft.PowerToys
 $script:PowerToysPluginsPath = Join-Path $Env:LOCALAPPDATA "Microsoft\PowerToys\PowerToys Run\Plugins\"
 New-Item $PowerToysPluginsPath -ItemType Directory -Force -ErrorAction SilentlyContinue | Out-Null
 # EverythingPowerToys
-Expand-Archive -LiteralPath $(Install-GitHubRelease lin-ycv/EverythingPowerToys lin-ycv/EverythingPowerToys ".*-x64\.zip$" -NoAction -Version $(
+$script:EverythingPowerToysZip = $(Install-GitHubRelease lin-ycv/EverythingPowerToys lin-ycv/EverythingPowerToys ".*-x64\.zip$" -NoAction -Version $(
   (Get-Content -Path $(Join-Path $PowerToysPluginsPath "Everything\plugin.json") -Raw -ErrorAction SilentlyContinue | ConvertFrom-Json -ErrorAction SilentlyContinue).Version ?? "0.0.0"
-)) -DestinationPath $env:TEMP -Force
-Copy-Item -Path $(Join-Path $env:TEMP "Everything") -Destination $PowerToysPluginsPath -Recurse -Force
+))
+if ($null -ne $EverythingPowerToysZip) {
+  Expand-Archive -LiteralPath $EverythingPowerToysZip -DestinationPath $env:TEMP -Force
+  Copy-Item -Path $(Join-Path $env:TEMP "Everything") -Destination $PowerToysPluginsPath -Recurse -Force
+}
 
 Install-Winget Git.Git
 # TODO add script which properly updates git-credential-manager
@@ -230,7 +232,7 @@ catch { Write-Warning $_ }
 Install-GitHubRelease msys2 msys2/msys2-installer "msys2-x86_64-latest\.exe$" -version $msys2LocalVersion -remoteVersion $msys2RemoteVersion
 
 # install mingw
-Write-Verbose $(& $msys2Path\bash.exe -c "pacman -Syu base-devel mingw-w64-ucrt-x86_64-toolchain --noconfirm")
+Write-Verbose "$(& $msys2Path\bash.exe -c "pacman -Syu base-devel mingw-w64-ucrt-x86_64-toolchain --noconfirm")"
 
 Write-Host "`nC#/DotNet" -ForegroundColor "Cyan"
 Install-Winget Microsoft.DotNet.SDK.8
