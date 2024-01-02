@@ -25,7 +25,16 @@ function script:Convert-Version {
         }
 
         $convertedVersions = $versions | ForEach-Object {
-            if ($null -ne $_) {$_ -as [version]$_ -or [double]$_} else {$null}
+            $v = $null
+            # OK this is dumb but just convert to a double LOL
+            if ($null -ne $_) {
+                if (-not [version]::TryParse($_, [ref]$v)) {
+                    if (-not [semver]::TryParse($_, [ref]$v)) {
+                        $v = [double]($_ -replace "\D*", '')
+                    }
+                }
+            }
+            return $v
         }
 
         return $convertedVersions
@@ -48,11 +57,12 @@ function script:Find-WingetAll {
             $name = $line.substring($id_index, $version_index - $id_index - 1).Trim()
             $line = $line.substring($version_index).Trim()
             $line = $line -replace "\s(?=\s{1,})", ""
+            $version = $line -split " "
 
-            if (($inputString -split '-').Count - 1 -eq 1) {
-                # Valid semver revision strings will only have one dash and remove the text
-                $line = $inputString -replace '-\D*', '.'
-            }
+            # if (($inputString -split '-').Count - 1 -eq 1) {
+            #     # Valid semver revision strings will only have one dash and remove the text
+            #     $line = $inputString -replace '-\D*', '.'
+            # }
 
             $version = $line -split " " | ForEach-Object {$_ -replace "[^\d\.]*", ""}
 
@@ -134,15 +144,15 @@ function script:Find-Winget {
         $version = @($version[0], $(Invoke-Command -ScriptBlock $GetAvailable))
     }
 
-    $version = Convert-Version $version
+    $newver = Convert-Version $version
 
     if (-not $installed) {
         return [PackageIs]::notinstalled, $null
     }
-    elseif ($version[0] -match "unknown") {
+    elseif ($newver[0] -match "Unknown") {
         return [PackageIs]::unknown, $version
     }
-    elseif ($version[1] -gt $version[0]) {
+    elseif ($newver[1] -gt $newver[0]) {
         return [PackageIs]::outdated, $version
     }
     else {
