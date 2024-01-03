@@ -6,6 +6,9 @@ function Set-Environment([String] $variable, [String] $value) {
     Invoke-Expression "`$env:${variable} = `"$value`""
 }
 
+function CreateDirectory([String] $path) { New-Item $path -ItemType Directory -ErrorAction SilentlyContinue }
+function CreateAndSet-Directory([String] $path) { New-Item $path -ItemType Directory -ErrorAction SilentlyContinue; Set-Location $path }
+
 # Add a folder to $env:Path
 function Update-EnvPathIfNot {
     param(
