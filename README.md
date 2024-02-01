@@ -48,6 +48,12 @@ TO-DO
   ```powershell
   cp "$PROFILE\AppData\Roaming\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\PowerShell 7-preview (x64).lnk" "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\PowerShell\" 
   ```
+
+<!-- 
+https://superuser.com/questions/1568072/hide-navigation-bar-in-firefox
+Hide navigation bar firefox
+ -->
+
 <!--- https://superuser.com/a/171129 
 Pinned Menu: %AppData%\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar
 Start Menu (loc 1): %AppData%\Microsoft\Internet Explorer\Quick Launch\User Pinned\StartMenu

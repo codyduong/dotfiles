@@ -6,5 +6,6 @@
 
 | Mapped From                                  | Mapped To                    | Reason                                                      |
 | -------------------------------------------- | ---------------------------- | ----------------------------------------------------------- |
-| <kbd>win</kbd>+<kbd>shift</kbd>+<kbd>w</kbd> | <kbd>alt</kbd>+<kbd>f4</kbd> | The bind used to close windows on my i3 Linux Configuration |
-| <kbd>win</kbd>+<kbd>d</kbd>                  | <kbd>alt</kbd>+<kbd>d</kbd>  | dmenu                                                       |
+| <kbd>Win</kbd>+<kbd>Shift</kbd>+<kbd>W</kbd> | <kbd>Alt</kbd>+<kbd>F4</kbd> | The bind used to close windows on my i3 Linux Configuration |
+| <kbd>Win</kbd>+<kbd>D</kbd>                  | <kbd>Alt</kbd>+<kbd>D</kbd>  | dmenu                                                       |
+| <kbd>CapsLock</kbd>                          | <kbd>F13</kbd>               | Who the fuck uses caps-lock in 2024                         |

@@ -1,0 +1,6 @@
+{
+  "$schema": "https://raw.githubusercontent.com/LGUG2Z/komorebi/master/schema.json",
+  "alt_focus_hack": true,
+  "default_workspace_padding": 10,
+  "default_container_padding": 10
+}
