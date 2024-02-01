@@ -1,5 +1,13 @@
 {
   "remapKeys": {
+    "inProcess": [
+      {
+        "originalKeys": "20",
+        "newRemapKeys": "124"
+      }
+    ]
+  },
+  "remapKeysToText": {
     "inProcess": []
   },
   "remapShortcuts": {

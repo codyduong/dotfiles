@@ -14,8 +14,12 @@ local config = {
     -- debug_key_events = true,
 
     -- appearance
-    window_background_opacity = 0.75,
-    win32_system_backdrop = 'Acrylic',
+    window_background_opacity = 0.5,
+    colors = {
+      background = '#000000',
+    },
+
+    win32_system_backdrop = 'Disable',
     initial_rows = 30,
     initial_cols = 120,
     animation_fps = 15,

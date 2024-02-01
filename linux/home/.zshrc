@@ -2,7 +2,7 @@
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Path to your oh-my-zsh installation.
-export ZSH="/home/codyduong/.oh-my-zsh"
+export ZSH="/home/$USERNAME/.oh-my-zsh"
 source $ZSH/oh-my-zsh.sh
 
 # Set name of the theme to load --- if set to "random", it will
@@ -129,7 +129,7 @@ export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
 
 # bun completions
-[ -s "/home/codyduong/.bun/_bun" ] && source "/home/codyduong/.bun/_bun"
+[ -s "/home/$USERNAME/.bun/_bun" ] && source "/home/$USERNAME/.bun/_bun"
 
 # bun
 export BUN_INSTALL="$HOME/.bun"
