@@ -33,6 +33,7 @@ Install-PowerShell alias-tips -Scope CurrentUser -Force -AllowClobber -AllowPrer
 Install-PowerShell Posh-Git -Scope CurrentUser -Force
 Install-PowerShell PSReadLine -AllowPrerelease -Scope CurrentUser -Force -SkipPublisherCheck
 Install-PowerShell -Name CompletionPredictor -Scope CurrentUser -Force -SkipPublisherCheck
+Install-Winget gerardog.gsudo -Scope CurrentUser -Force
 
 ### Install oh-my-posh and dependencies
 Install-Winget JanDeDobbeleer.OhMyPosh
