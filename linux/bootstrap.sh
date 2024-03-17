@@ -267,6 +267,15 @@ _gcloud() {
     )
 }
 
+_nvim() {
+  which nvim >/dev/null &&
+    echo "\033[1;33minstalling nvim...\033[0m" ||
+    (
+      echo "\033[1;34minstalling nvim...\033[0m"
+      sudo apt install neovim
+    )
+}
+
 _dotfiles() {
   echo "\033[1;34mMoving dotfiles (home) to ~\033[0m"
   sudo cp ~/dotfiles/linux/home/. -r ~/
