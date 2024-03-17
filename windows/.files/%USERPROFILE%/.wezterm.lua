@@ -14,7 +14,7 @@ local config = {
     -- debug_key_events = true,
 
     -- appearance
-    window_background_opacity = 0.5,
+    window_background_opacity = 0.75,
     colors = {
       background = '#000000',
     },
@@ -46,6 +46,12 @@ local config = {
         -- non leader keys
         { key = "n",      mods = "SHIFT|CTRL",        action = "ToggleFullScreen" },
         { key = "p",      mods = "SHIFT|CTRL",        action = act.ActivateCommandPalette},
+        { key = "j",      mods = "CTRL",              action = act.ScrollByLine(-1) },
+        { key = "k",      mods = "CTRL",              action = act.ScrollByLine(1) },
+        { key = "e",      mods = "CTRL",              action = act.EmitEvent "scroll-half-up" },
+        { key = "u",      mods = "CTRL",              action = act.EmitEvent "scroll-half-up" },
+        { key = "d",      mods = "CTRL",              action = act.EmitEvent "scroll-half-down" },
+        { key = "t",      mods = "SHIFT|CTRL",        action = act.ShowTabNavigator },
 
         -- Dynamic Leader, appriopriately choose wezterm or tmux leader based on active pane
         { key = "Space",  mods = "CTRL",              action = act.EmitEvent "check-tmux" },
@@ -101,6 +107,7 @@ local config = {
         { key = "7",      mods = "CTRL",              action = act{ActivateTab=6}},
         { key = "8",      mods = "CTRL",              action = act{ActivateTab=7}},
         { key = "9",      mods = "CTRL",              action = act{ActivateTab=8}},
+        -- CTRL+TAB and CTRL+SHIFT+TAB to cycle
         { key = "raw:9",  mods = "CTRL",              action = act.ActivateTabRelative(1)},
         { key = "raw:9",  mods = "SHIFT|CTRL",        action = act.ActivateTabRelative(-1)},
       },
@@ -125,18 +132,7 @@ local config = {
       },
       tmux_escape = {
         -- used to get back to wezterm
-        { key = "w",                                  action = act.CloseCurrentPane { confirm = true }},
-        { key = "t",                                  action = act{SpawnTab="CurrentPaneDomain"}},
-        { key = "1",                                  action = act{ActivateTab=0}},
-        { key = "2",                                  action = act{ActivateTab=1}},
-        { key = "3",                                  action = act{ActivateTab=2}},
-        { key = "4",                                  action = act{ActivateTab=3}},
-        { key = "5",                                  action = act{ActivateTab=4}},
-        { key = "6",                                  action = act{ActivateTab=5}},
-        { key = "7",                                  action = act{ActivateTab=6}},
-        { key = "8",                                  action = act{ActivateTab=7}},
-        { key = "9",                                  action = act{ActivateTab=8}},
-
+        -- the key/value pairs are a copy of config.key_tables.wezterm except these VVV
         { key = 'Escape',                             action = 'PopKeyTable' },
         { key = 'c',      mods = "CTRL",              action = 'PopKeyTable' },
         { key = 'd',      mods = "CTRL",              action = 'PopKeyTable' },
@@ -148,6 +144,9 @@ local config = {
 for _, value in ipairs(config.key_tables.wezterm) do
   table.insert(config.keys, {
     key = value.key, mods = value.mods, action = act.EmitEvent("check-tmux-nolead-" .. value.mods .. "+" .. value.key)
+  })
+  table.insert(config.key_tables.tmux_escape, {
+    key = value.key, mods = value.mods, action = value.action
   })
 end
 for _, value in ipairs(config.key_tables.tmux) do
@@ -176,7 +175,7 @@ wezterm.on('window-config-reloaded', function(window, pane)
   wezterm.log_info 'Configuration reloaded!'
 end)
 
-function tab_title(tab_info)
+local function tab_title(tab_info)
   local title = tab_info.tab_title
   -- if the tab title is explicitly set, take that
   if title and #title > 0 then
@@ -197,8 +196,8 @@ wezterm.on('format-tab-title', function(tab, tabs, panes, config, hover, max_wid
   local muxTab = wezterm.mux.get_tab(tab.tab_id)
   local actualPanes = muxTab:panes_with_info()
 
-  for _, pane in ipairs(actualPanes) do 
-    if pane.is_zoomed then 
+  for _, pane in ipairs(actualPanes) do
+    if pane.is_zoomed then
       prefix = '[f] '
       foreground = "#FFFFFF"
       background = '#FCA17D'
@@ -210,6 +209,8 @@ wezterm.on('format-tab-title', function(tab, tabs, panes, config, hover, max_wid
     local panePane
     -- pcall this, since it is possible for .pane to fail try to grab it from mux after we've deleted it
     local status, err = pcall(function() panePane = pane.pane if (panePane:has_unseen_output()) then
+      -- TODO @codyduong, if wezterm resizes, there may not be any new logical output but reformatting
+      -- means there is an updated output, is this even possible to resolve?
       background = "#DA627D"
     end end)
     if not status then
@@ -237,7 +238,7 @@ wezterm.on('format-tab-title', function(tab, tabs, panes, config, hover, max_wid
     ::continue::
   end
 
-  prefix = " " .. tab.tab_index .. ": " .. prefix 
+  prefix = " " .. tab.tab_index+1 .. ": " .. prefix
   suffix = suffix .. " "
   local truncated = wezterm.truncate_right(title, max_width - (string.len(prefix) + string.len(suffix)))
   title = prefix .. (truncated ~= title and (string.sub(truncated, 1, -2) .. "…") or title) .. suffix
@@ -269,12 +270,14 @@ end)
 wezterm.on('user-var-changed', function(window, pane, name, value)
   local overrides = window:get_config_overrides() or {}
 
-  if (name == "TMUX") then
+  if (name == "TMUX" and value == "1") then
     tmuxPanes[pane:pane_id()] = pane
+  elseif (name == "TMUX") then
+    tmuxPanes[pane:pane_id()] = nil
   end
 end)
 
-function is_in_tmux_pane(pane_id)
+local function is_in_tmux_pane(pane_id)
   return tmuxPanes[pane_id] ~= nil
 end
 
@@ -337,6 +340,24 @@ wezterm.on('update-right-status', function(window, pane)
   end
 
   window:set_right_status(name or '')
+end)
+
+wezterm.on('scroll-half-up', function(window, pane)
+  local dims = pane:get_dimensions()
+  local rows = dims.viewport_rows
+  for _ = 1, rows//2, 1 do
+    wezterm.sleep_ms(1)
+    window:perform_action(act.ScrollByLine(-1), pane)
+  end
+end)
+
+wezterm.on('scroll-half-down', function(window, pane)
+  local dims = pane:get_dimensions()
+  local rows = dims.viewport_rows
+  for _ = 1, rows//2, 1 do
+    wezterm.sleep_ms(1)
+    window:perform_action(act.ScrollByLine(1), pane)
+  end
 end)
 
 return config

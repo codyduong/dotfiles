@@ -75,6 +75,20 @@ Copy-Item -Path $PSScriptRoot/../components/** -Destination $componentDir -Inclu
 Copy-Item -Path $PSScriptRoot/../setup/remote.ps1 -Destination $setupDir -Include **
 # Copy-Item -Path ./home/** -Destination $home -Include **
 
+## Setup the custom bootstrap.alias
+$script:bootstrapToPrepend = "`$script:pathToBootstrap = `"$PSCommandPath`"`r`n"
+$script:bootstrapToRun = "Invoke-Expression `"`$pathToBootstrap -skip:``$`$(`$skip.IsPresent) -update:``$`$(`$update.IsPresent) -linux:``$`$(`$linux.IsPresent)`"`r`n"
+$script:bootstrapAlias = Join-Path $aliasesDir "bootstrap.ps1"
+$script:bootstrapContent = ($bootstrapToPrepend + (Get-Content -Path $bootstrapAlias -Raw))
+$script:bootstrapLines = $bootstrapContent -split "`r`n"
+for ($i = $bootstrapLines.Length; $i -ge 0; $i--) {
+  if ($bootstrapLines[$i] -match 'BUILD_START') {
+    $bootstrapLines[$i] = $bootstrapLines[$i] + "`r`n" + $bootstrapToRun
+    break
+  }
+}
+($bootstrapLines -join "`r`n") | Set-Content -Path $bootstrapAlias
+
 ##############
 # Config Files
 ##############

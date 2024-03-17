@@ -1,6 +1,6 @@
 Get-ChildItem -Path "./components" | Where-Object { $_.extension -eq ".ps1" } | ForEach-Object -process {
-  Invoke-Expression ". '$_'"
-  # Write-Host "components.$_ : $(Measure-Command { Invoke-Expression ". '$_'" })"
+  # Invoke-Expression ". '$_'"
+  Write-Host "components.$_ : $(Measure-Command { Invoke-Expression ". '$_'" })"
 }
 
 # oh-my-posh
@@ -31,10 +31,11 @@ Set-PSReadLineOption @PSReadLineOptions
 # git
 Import-Module git-aliases-plus -DisableNameChecking
 if (($null -ne (Get-Command git -ErrorAction SilentlyContinue)) -and ($null -ne (Get-Module -ListAvailable Posh-Git -ErrorAction SilentlyContinue))) {
+  # 0.2 seconds? TODO @codyduong
   Import-Module Posh-Git -arg 0, 0, 1
 }
 
 Import-Module PSProfiler
 ### To save on initial profile load time we will not regenerate the AliasHash. Run only after profile updates?
 # Import-Module C:\Users\duong\powershell-essentials\powershell-alias-tips\src\alias-tips.psm1 -ArgumentList 0,0,1 # Development alias-tips load
-Import-Module alias-tips -ArgumentList 0
+Import-Module alias-tips
