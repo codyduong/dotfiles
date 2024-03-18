@@ -41,17 +41,18 @@ local config = {
         -- sensible defaults
         { key = "v",      mods = "SHIFT|CTRL",        action = act.PasteFrom 'Clipboard'},
         { key = "c",      mods = "SHIFT|CTRL",        action = act.CopyTo 'Clipboard'},
-        { key = "-",      mods = "CTRL",              action = act.DecreaseFontSize },
-        { key = "=",      mods = "CTRL",              action = act.IncreaseFontSize },
+        { key = "-",      mods = "CTRL",              action = act.Multiple{ act.EmitEvent "disable-unseen-temp", act.DecreaseFontSize }},
+        { key = "=",      mods = "CTRL",              action = act.Multiple{ act.EmitEvent "disable-unseen-temp", act.IncreaseFontSize }},
 
         -- non leader keys
         { key = "n",      mods = "SHIFT|CTRL",        action = "ToggleFullScreen" },
         { key = "p",      mods = "SHIFT|CTRL",        action = act.ActivateCommandPalette},
         { key = "j",      mods = "CTRL",              action = act.ScrollByLine(-1) },
         { key = "k",      mods = "CTRL",              action = act.ScrollByLine(1) },
-        { key = "e",      mods = "CTRL",              action = act.EmitEvent "scroll-half-up" },
-        { key = "u",      mods = "CTRL",              action = act.EmitEvent "scroll-half-up" },
-        { key = "d",      mods = "CTRL",              action = act.EmitEvent "scroll-half-down" },
+        -- TODO @codyduong: check if we are in nvim/vim/etc, if so, disable these
+        -- { key = "e",      mods = "CTRL",              action = act.EmitEvent "scroll-half-up" },
+        -- { key = "u",      mods = "CTRL",              action = act.EmitEvent "scroll-half-up" },
+        -- { key = "d",      mods = "CTRL",              action = act.EmitEvent "scroll-half-down" },
         { key = "t",      mods = "SHIFT|CTRL",        action = act.ShowTabNavigator },
 
         -- Dynamic Leader, appriopriately choose wezterm or tmux leader based on active pane
@@ -171,6 +172,14 @@ end
 ---------
 
 local tmuxPanes = {}
+-- suppress update notifier by storing the latest line and checking if it has changed
+local panesLogicalText = {}
+-- increments for various tabIds
+local tabIncrements = {} -- key: tab_id(), value: 0->max_width of process - substring max
+
+local function is_in_tmux_pane(pane_id)
+  return tmuxPanes[pane_id] ~= nil
+end
 
 wezterm.on('window-config-reloaded', function(window, pane)
   wezterm.log_info 'Configuration reloaded!'
@@ -209,11 +218,19 @@ wezterm.on('format-tab-title', function(tab, tabs, panes, config, hover, max_wid
     end
     local panePane
     -- pcall this, since it is possible for .pane to fail try to grab it from mux after we've deleted it
-    local status, err = pcall(function() panePane = pane.pane if (panePane:has_unseen_output()) then
-      -- TODO @codyduong, if wezterm resizes, there may not be any new logical output but reformatting
-      -- means there is an updated output, is this even possible to resolve?
+    local status, err = pcall(function() panePane = pane.pane end)
+    -- If we change fontsize or any other action that modifies lines but not logically, don't mark as updated
+    if (
+      panePane ~= nil and
+      -- TODO, some programs that should provide update use this altscreen char and so we need to find alternative way
+      -- (panePane:is_alt_screen_active() ~= true) and -- nvim/less shouldn't have updates to report, this is just logical line change
+      panesLogicalText[panePane:pane_id()] ~= panePane:get_logical_lines_as_text(2)
+      and panePane:has_unseen_output()
+      -- panePane:has_unseen_output()
+    ) then
+      -- this works OK for increase/decrease font size in plain terminals, subterminals like nvim will still fail
       background = "#DA627D"
-    end end)
+    end
     if not status then
       wezterm.log_info(err)
       goto continue
@@ -223,6 +240,7 @@ wezterm.on('format-tab-title', function(tab, tabs, panes, config, hover, max_wid
       local inTmux = false
       local status, err = pcall(function() inTmux = panePane:get_user_vars()['TMUX'] == "1" and true or false end)
       if not status then
+        wezterm.log_warn(err)
         goto continue
       end
       if (inTmux) then
@@ -241,8 +259,25 @@ wezterm.on('format-tab-title', function(tab, tabs, panes, config, hover, max_wid
 
   prefix = " " .. tab.tab_index+1 .. ": " .. prefix
   suffix = suffix .. " "
+
+  local recalculated_max = max_width-(string.len(prefix)+string.len(suffix))
   local truncated = wezterm.truncate_right(title, max_width - (string.len(prefix) + string.len(suffix)))
-  title = prefix .. (truncated ~= title and (string.sub(truncated, 1, -2) .. "…") or title) .. suffix
+  local actually_truncated = truncated ~= title
+  if actually_truncated then
+    local tabIncrement = tabIncrements[tab.tab_id] or 0
+    local incrementAdjusted = math.max(0, (tabIncrement-25))//10
+    if hover then
+      local speed = 1
+      if (recalculated_max + incrementAdjusted >= string.len(title) + 5) then
+        tabIncrements[tab.tab_id] = 0
+      else
+        tabIncrements[tab.tab_id] = tabIncrement+speed
+      end
+    end
+    truncated = string.sub(title, math.min(string.len(title)-recalculated_max+1,1+incrementAdjusted), recalculated_max+incrementAdjusted)
+  end
+
+  title = prefix .. (actually_truncated and (string.sub(truncated, 1, -2) .. "…") or title) .. suffix
   -- title = " " .. (tab.tab_index == tab.tab_id and tab.tab_index or (tab.tab_index .. "#" .. tab.tab_id)) .. ": " .. title .. " "
 
   local format = {}
@@ -277,10 +312,6 @@ wezterm.on('user-var-changed', function(window, pane, name, value)
     tmuxPanes[pane:pane_id()] = nil
   end
 end)
-
-local function is_in_tmux_pane(pane_id)
-  return tmuxPanes[pane_id] ~= nil
-end
 
 wezterm.on('check-tmux', function(window, pane)
   if is_in_tmux_pane(pane:pane_id()) then
@@ -358,6 +389,19 @@ wezterm.on('scroll-half-down', function(window, pane)
   for _ = 1, rows//2, 1 do
     wezterm.sleep_ms(1)
     window:perform_action(act.ScrollByLine(1), pane)
+  end
+end)
+
+wezterm.on('disable-unseen-temp', function(window, pane)
+  local tabs = window:mux_window():tabs_with_info()
+  -- Iterate through all tabs/panes and store their latest text
+  for _, tab in ipairs(tabs) do
+    for _, pane2 in ipairs(tab.tab:panes_with_info()) do
+      panesLogicalText[pane2.pane:pane_id()] = pane2.pane:get_logical_lines_as_text(2)
+    end
+  end
+  for k, p in ipairs(panesLogicalText) do
+    wezterm.log_info(p)
   end
 end)
 
