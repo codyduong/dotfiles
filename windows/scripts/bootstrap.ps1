@@ -89,6 +89,25 @@ for ($i = $bootstrapLines.Length; $i -ge 0; $i--) {
 }
 ($bootstrapLines -join "`r`n") | Set-Content -Path $bootstrapAlias
 
+## Setup thefuck alias
+$script:fuckPath = Join-Path $aliasesDir "fuck.ps1"
+thefuck --alias | Set-Content -Path $fuckPath
+
+## Setup oh-my-posh (precompute here to save time)
+# https://ohmyposh.dev/docs/configuration/debug-prompt <-- this prompt I never use, so manually disable it
+# because we precompute the script file, the call-stack is not empty, thus thinking we are debugging, so just replace
+# Saves around 70-100ms
+$script:ohMyPoshPath = Join-Path $componentDir "ohmyposh.ps1"
+(Invoke-Expression (@"
+  $(oh-my-posh init pwsh --config "$env:POSH_THEMES_PATH\M365Princess.omp.json")
+"@ -replace "\|\s*Invoke-Expression",'')
+) -replace '\$script:PromptType = \"debug\"',@"
+  #`$script:PromptType = `"debug`" # Disabled by bootstrap.ps1
+  `$script:PromptType = `"primary`"
+"@
+| Set-Content -Path $ohMyPoshPath
+
+
 ##############
 # Config Files
 ##############

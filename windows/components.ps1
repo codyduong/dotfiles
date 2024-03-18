@@ -4,7 +4,7 @@ Get-ChildItem -Path "./components" | Where-Object { $_.extension -eq ".ps1" } | 
 }
 
 # oh-my-posh
-oh-my-posh init pwsh --config "$env:POSH_THEMES_PATH\M365Princess.omp.json" | Invoke-Expression
+# oh-my-posh init pwsh --config "$env:POSH_THEMES_PATH\M365Princess.omp.json" | Invoke-Expression
 try {
   Import-Module PSReadLine
 }
@@ -15,9 +15,13 @@ Import-Module CompletionPredictor
 $script:TerminalIconsForkPath = (Join-Path $env:USERPROFILE "Terminal-Icons")
 if (Test-Path -Path $TerminalIconsForkPath -PathType Container) {
   $script:TerminalIconsVersion = (Import-PowerShellDataFile (Join-Path $TerminalIconsForkPath "Terminal-Icons/Terminal-Icons.psd1")).ModuleVersion
-  Import-Module (Join-Path $TerminalIconsForkPath "Output/Terminal-Icons/$TerminalIconsVersion/Terminal-Icons.psd1")
+  $script:TerminalIconsModulePath = (Join-Path $TerminalIconsForkPath "Output/Terminal-Icons/$TerminalIconsVersion/Terminal-Icons.psd1")
+  # ~250ms here
+  # Write-Host $(Measure-Command {Import-Module $TerminalIconsModulePath)
+  Import-Module $TerminalIconsModulePath
 }
 else {
+  # ~500ms here
   Import-Module Terminal-Icons
 }
 
