@@ -17,3 +17,7 @@ komorebic.exe float-rule class "Qt624QWindowIcon"
 # ultimaker cura
 komorebic.exe float-rule title "Abort print"
 komorebic.exe float-rule class "Qt5152QWindowIcon"
+
+# snip
+komorebic.exe float-rule exe "SnippingTool.exe"
+
