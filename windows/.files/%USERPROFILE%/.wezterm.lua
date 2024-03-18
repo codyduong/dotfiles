@@ -29,6 +29,7 @@ local config = {
     tab_bar_at_bottom = true,
     use_fancy_tab_bar = false,
     tab_max_width = 30,
+    adjust_window_size_when_changing_font_size = false,
 
     -- use custom leaders
     leader = { key="_", mods="SHIFT|CTRL|SUPER|ALT" },
