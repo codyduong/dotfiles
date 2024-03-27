@@ -107,6 +107,10 @@ $script:ohMyPoshPath = Join-Path $componentDir "ohmyposh.ps1"
 "@
 | Set-Content -Path $ohMyPoshPath
 
+## Setup zoxide
+$script:zoxidePath = Join-Path $aliasesDir "zoxide.ps1"
+zoxide init powershell | Set-Content -Path $script:zoxidePath
+
 
 ##############
 # Config Files
