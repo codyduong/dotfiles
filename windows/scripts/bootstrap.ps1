@@ -91,7 +91,7 @@ for ($i = $bootstrapLines.Length; $i -ge 0; $i--) {
 
 ## Setup thefuck alias
 $script:fuckPath = Join-Path $aliasesDir "fuck.ps1"
-"`$env:PYTHONIOENCODING=`"utf-8`"`r`n`$(thefuck --alias)" | Set-Content -Path $fuckPath
+"`$env:PYTHONIOENCODING=`"utf-8`"`r`n$(thefuck --alias)" | Set-Content -Path $fuckPath
 
 ## Setup oh-my-posh (precompute here to save time)
 # https://ohmyposh.dev/docs/configuration/debug-prompt <-- this prompt I never use, so manually disable it
