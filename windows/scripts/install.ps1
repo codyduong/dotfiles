@@ -16,6 +16,9 @@ else {
 
 $script:currentPath = [System.Environment]::GetEnvironmentVariable('PATH', [System.EnvironmentVariableTarget]::User)
 
+Write-Host "`r`nBuild PowerShell Availability: $(Measure-Command {Find-PowershellAll})"
+Write-Host     "Build Winget Availability:     $(Measure-Command {Find-WingetAll})"
+
 ### Update Help for Modules
 # Write-Host "Updating Help..." -ForegroundColor "Yellow"
 # Update-Help -Force
@@ -26,15 +29,16 @@ $script:currentPath = [System.Environment]::GetEnvironmentVariable('PATH', [Syst
 Write-Host "`nInstalling PowerShell and Extensions..." -ForegroundColor "Yellow"
 Install-GitHubRelease winget microsoft/winget-cli "Microsoft\.DesktopAppInstaller_.*\.msixbundle$"
 Install-Winget Microsoft.Powershell
-Install-PowerShell PSWindowsUpdate -Scope CurrentUser -Force
-Install-PowerShell PSProfiler -Scope CurrentUser -Force -SkipPublisherCheck -AllowPrerelease
-Install-PowerShell git-aliases-plus -Scope CurrentUser -Force -AllowClobber
+# OK, we have a threadjob which loads these alphabetically, so sort these alphabetically, this is a good enough solution LOL!
 Install-PowerShell alias-tips -Scope CurrentUser -Force -AllowClobber -AllowPrerelease
-Install-PowerShell Posh-Git -Scope CurrentUser -Force
-Install-PowerShell PSReadLine -AllowPrerelease -Scope CurrentUser -Force -SkipPublisherCheck
+Install-PowerShell git-aliases-plus -Scope CurrentUser -Force -AllowClobber
 Install-PowerShell -Name CompletionPredictor -Scope CurrentUser -Force -SkipPublisherCheck
-Install-Winget junegunn.fzf
+Install-PowerShell Posh-Git -Scope CurrentUser -Force
 Install-PowerShell -Name PSFzf -Scope CurrentUser -Force -SkipPublisherCheck -RequiredVersion 2.5.22 
+Install-PowerShell PSProfiler -Scope CurrentUser -Force -SkipPublisherCheck -AllowPrerelease
+Install-PowerShell PSReadLine -AllowPrerelease -Scope CurrentUser -Force -SkipPublisherCheck
+Install-PowerShell PSWindowsUpdate -Scope CurrentUser -Force
+Install-Winget junegunn.fzf
 Install-Winget gerardog.gsudo
 Install-Winget ajeetdsouza.zoxide
 
@@ -54,7 +58,7 @@ if ($true) {
 
   # Pull if possible
   $script:gpOut = git -C "$TerminalIconsForkPath" pull
-  
+
   if ($gpOut -notlike '*Already up to date.*') {
     Write-Host "Pulling Terminal-Icons (fork)..." -ForegroundColor $InstallationIndicatorColorUpdating
   }
@@ -192,7 +196,7 @@ npm install -g yarn
 Write-Host "`nPython" -ForegroundColor "Cyan"
 ### Python
 Install-Winget Python.Python.3.11
-python.exe -m pip install --upgrade pip -q
+python -m pip install --upgrade pip -q
 # TODO these won't be in execution context upon first install
 pip install thefuck -q
 pip install pyenv-win --target $HOME\\.pyenv -q
@@ -236,7 +240,7 @@ catch { Write-Warning $_ }
 Install-GitHubRelease msys2 msys2/msys2-installer "msys2-x86_64-latest\.exe$" -version $msys2LocalVersion -remoteVersion $msys2RemoteVersion
 
 # install mingw
-Write-Verbose "$(& $msys2Path\bash.exe -c "pacman -Syu base-devel mingw-w64-ucrt-x86_64-toolchain --noconfirm")"
+# Write-Verbose "$(& $msys2Path\bash.exe -c "pacman -Syu base-devel mingw-w64-ucrt-x86_64-toolchain --noconfirm")"
 
 Write-Host "`nC#/DotNet" -ForegroundColor "Cyan"
 Install-Winget Microsoft.DotNet.SDK.8
@@ -268,6 +272,9 @@ Install-Winget OBSProject.OBSStudio
 if (([Environment]::OSVersion.Version).Build -ge 22621) {
   Install-Winget valinet.ExplorerPatcher
 }
+
+### CLEANUP
+Clear-PowershellAll
 
 #####
 # WSL
