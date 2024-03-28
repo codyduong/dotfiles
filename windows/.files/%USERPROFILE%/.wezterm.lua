@@ -47,21 +47,20 @@ local config = {
         -- non leader keys
         { key = "n",      mods = "SHIFT|CTRL",        action = "ToggleFullScreen" },
         { key = "p",      mods = "SHIFT|CTRL",        action = act.ActivateCommandPalette},
-        { key = "j",      mods = "CTRL",              action = act.ScrollByLine(-1) },
-        { key = "k",      mods = "CTRL",              action = act.ScrollByLine(1) },
-        -- TODO @codyduong: check if we are in nvim/vim/etc, if so, disable these
-        -- { key = "e",      mods = "CTRL",              action = act.EmitEvent "scroll-half-up" },
-        -- { key = "u",      mods = "CTRL",              action = act.EmitEvent "scroll-half-up" },
-        -- { key = "d",      mods = "CTRL",              action = act.EmitEvent "scroll-half-down" },
         { key = "t",      mods = "SHIFT|CTRL",        action = act.ShowTabNavigator },
 
         -- Dynamic Leader, appriopriately choose wezterm or tmux leader based on active pane
-        { key = "Space",  mods = "CTRL",              action = act.EmitEvent "check-tmux" },
+        { key = "Space",  mods = "CTRL",              action = act.EmitEvent "check-pane" },
         -- Wezterm Leader
         { key = "Space",  mods = "SHIFT|CTRL",        action = act.ActivateKeyTable { name = 'wezterm_leader' } },
     },
     key_tables = {
       resize = {
+        { key = 'Escape',                             action = 'PopKeyTable' },
+        { key = 'c',      mods = "CTRL",              action = 'PopKeyTable' },
+        { key = 'd',      mods = "CTRL",              action = 'PopKeyTable' },
+        { key = 'r',                                  action = 'PopKeyTable' },
+
         { key = "h",                                  action = act{AdjustPaneSize={"Left", 5}}},
         { key = "j",                                  action = act{AdjustPaneSize={"Down", 5}}},
         { key = "k",                                  action = act{AdjustPaneSize={"Up", 5}}},
@@ -70,12 +69,14 @@ local config = {
         { key = "j",      mods = "SHIFT",             action = act{AdjustPaneSize={"Up", 5}}},
         { key = "k",      mods = "SHIFT",             action = act{AdjustPaneSize={"Down", 5}}},
         { key = "l",      mods = "SHIFT",             action = act{AdjustPaneSize={"Left", 5}}},
+      },
+      wezterm_leader = {
         { key = 'Escape',                             action = 'PopKeyTable' },
         { key = 'c',      mods = "CTRL",              action = 'PopKeyTable' },
         { key = 'd',      mods = "CTRL",              action = 'PopKeyTable' },
-        { key = 'r',                                  action = 'PopKeyTable' },
-      },
-      wezterm_leader = {
+        { key = 'Space',  mods = "CTRL",              action = 'PopKeyTable' },
+        { key = "Space",  mods = "SHIFT|CTRL",        action = 'PopKeyTable' },
+
         { key = "c",      mods = "SHIFT",             action = act.ReloadConfiguration},
 
         --------
@@ -112,21 +113,26 @@ local config = {
         -- CTRL+TAB and CTRL+SHIFT+TAB to cycle
         { key = "raw:9",  mods = "CTRL",              action = act.ActivateTabRelative(1)},
         { key = "raw:9",  mods = "SHIFT|CTRL",        action = act.ActivateTabRelative(-1)},
+
+        { key = "j",      mods = "CTRL",              action = act.ScrollByLine(-1) },
+        { key = "k",      mods = "CTRL",              action = act.ScrollByLine(1) },
+        { key = "e",      mods = "CTRL",              action = act.EmitEvent "scroll-half-up" },
+        { key = "d",      mods = "CTRL",              action = act.EmitEvent "scroll-half-down" },
       },
       -- typically empty, values are just passed to tmux terminal
       tmux_leader = {},
       tmux = {
         { key = "w",      mods = "CTRL",              action = act.SendString("\x17")},
         { key = "t",      mods = "CTRL",              action = act.SendString("\x14")},
-        { key = "1",      mods = "CTRL",              action = act.Multiple{ act.SendKey { key = "1", mods = 'CTRL' } }},
-        { key = "2",      mods = "CTRL",              action = act.Multiple{ act.SendKey { key = "2", mods = 'CTRL' } }},
-        { key = "3",      mods = "CTRL",              action = act.Multiple{ act.SendKey { key = "3", mods = 'CTRL' } }},
-        { key = "4",      mods = "CTRL",              action = act.Multiple{ act.SendKey { key = "4", mods = 'CTRL' } }},
-        { key = "5",      mods = "CTRL",              action = act.Multiple{ act.SendKey { key = "5", mods = 'CTRL' } }},
-        { key = "6",      mods = "CTRL",              action = act.Multiple{ act.SendKey { key = "6", mods = 'CTRL' } }},
-        { key = "7",      mods = "CTRL",              action = act.Multiple{ act.SendKey { key = "7", mods = 'CTRL' } }},
-        { key = "8",      mods = "CTRL",              action = act.Multiple{ act.SendKey { key = "8", mods = 'CTRL' } }},
-        { key = "9",      mods = "CTRL",              action = act.Multiple{ act.SendKey { key = "9", mods = 'CTRL' } }},
+        { key = "1",      mods = "CTRL",              action = act.SendKey{ key = "1", mods = 'CTRL' }},
+        { key = "2",      mods = "CTRL",              action = act.SendKey{ key = "2", mods = 'CTRL' }},
+        { key = "3",      mods = "CTRL",              action = act.SendKey{ key = "3", mods = 'CTRL' }},
+        { key = "4",      mods = "CTRL",              action = act.SendKey{ key = "4", mods = 'CTRL' }},
+        { key = "5",      mods = "CTRL",              action = act.SendKey{ key = "5", mods = 'CTRL' }},
+        { key = "6",      mods = "CTRL",              action = act.SendKey{ key = "6", mods = 'CTRL' }},
+        { key = "7",      mods = "CTRL",              action = act.SendKey{ key = "7", mods = 'CTRL' }},
+        { key = "8",      mods = "CTRL",              action = act.SendKey{ key = "8", mods = 'CTRL' }},
+        { key = "9",      mods = "CTRL",              action = act.SendKey{ key = "9", mods = 'CTRL' }},
 
         -- enter the escape mode to use wezterm non leader commands
         -- CTRL+SHIFT+~
@@ -138,14 +144,39 @@ local config = {
         { key = 'Escape',                             action = 'PopKeyTable' },
         { key = 'c',      mods = "CTRL",              action = 'PopKeyTable' },
         { key = 'd',      mods = "CTRL",              action = 'PopKeyTable' },
+      },
+      nvim_leader = {},
+      nvim = {
+        { key = "j",      mods = "CTRL",              action = act.SendKey{ key = "j", mods = 'CTRL' }},
+        { key = "k",      mods = "CTRL",              action = act.SendKey{ key = "k", mods = 'CTRL' }},
+        { key = "e",      mods = "CTRL",              action = act.SendKey{ key = "e", mods = 'CTRL' }},
+        { key = "d",      mods = "CTRL",              action = act.SendKey{ key = "d", mods = 'CTRL' }},
       }
     },
 }
 
+--------------
+-- COMMON VARS
+--------------
+-- check for specific processes running in a pane
+local tmuxPanes = {}
+local nvimPanes = {}
+-- suppress update notifier by storing the latest line and checking if it has changed
+local panesLogicalText = {}
+-- increments for various tabIds
+local tabIncrements = {} -- key: tab_id(), value: 0->max_width of process - substring max
+
+-- last run for ease of tracking
+local lastRun = {"N/A", "", ""}
+
+--------
+-- TABLE
+--------
+
 -- Generate the generic key press to route to wezterm or tmux
 for _, value in ipairs(config.key_tables.wezterm) do
   table.insert(config.keys, {
-    key = value.key, mods = value.mods, action = act.EmitEvent("check-tmux-nolead-" .. value.mods .. "+" .. value.key)
+    key = value.key, mods = value.mods, action = act.EmitEvent("check-nolead-" .. value.mods .. "+" .. value.key)
   })
   table.insert(config.key_tables.tmux_escape, {
     key = value.key, mods = value.mods, action = value.action
@@ -157,28 +188,75 @@ for _, value in ipairs(config.key_tables.tmux) do
   for _, value2 in ipairs(config.keys) do
     if (value.key == value2.key) and (value.mods == value2.mods) then
       isUnique = false
+      break
     end
   end
 
   if (isUnique) then
     table.insert(config.keys, {
-      key = value.key, mods = value.mods, action = act.EmitEvent("check-tmux-nolead-" .. value.mods .. "+" .. value.key)
+      key = value.key, mods = value.mods, action = act.EmitEvent("check-nolead-" .. value.mods .. "+" .. value.key)
     })
   end
+end
+for _, value in ipairs(config.key_tables.nvim) do
+  local isUnique = true
+
+  for _, value2 in ipairs(config.keys) do
+    if (value.key == value2.key) and (value.mods == value2.mods) then
+      isUnique = false
+      break
+    end
+  end
+
+  if (isUnique) then
+    table.insert(config.keys, {
+      key = value.key, mods = value.mods, action = act.EmitEvent("check-nolead-" .. value.mods .. "+" .. value.key)
+    })
+  end
+end
+
+-- Multikey the leader keys so we can send it to lastKey
+for k, value in pairs(config.key_tables) do
+  if (string.match(k, "_leader")) then
+    config.key_tables[k] = {}
+    for _, value2 in ipairs(value) do
+      local key, mods, action = value2.key, value2.mods, value2.action
+      local event = "emit-"..(mods or "").."+"..key
+      table.insert(config.key_tables[k], {
+        key = key,
+        mods = mods,
+        -- action = action
+        action = act.Multiple {
+          wezterm.action_callback(function(window, pane)
+            lastRun = {k, mods or "", key}
+          end),
+          action
+        }
+      })
+    end
+  end
+  -- TODO also add escape
 end
 
 ---------
 -- EVENTS
 ---------
 
-local tmuxPanes = {}
--- suppress update notifier by storing the latest line and checking if it has changed
-local panesLogicalText = {}
--- increments for various tabIds
-local tabIncrements = {} -- key: tab_id(), value: 0->max_width of process - substring max
+local function basename(s)
+  return string.gsub(s, '(.*[/\\])(.*)', '%2')
+end
 
 local function is_in_tmux_pane(pane_id)
   return tmuxPanes[pane_id] ~= nil
+end
+
+local function is_in_nvim_pane(process)
+  local pname = process:get_foreground_process_name()
+  if pname ~= nil then
+    local base = basename(pname)
+    return string.match(base, "vim")
+  end
+  return false
 end
 
 wezterm.on('window-config-reloaded', function(window, pane)
@@ -260,24 +338,30 @@ wezterm.on('format-tab-title', function(tab, tabs, panes, config, hover, max_wid
   prefix = " " .. tab.tab_index+1 .. ": " .. prefix
   suffix = suffix .. " "
 
-  local recalculated_max = max_width-(string.len(prefix)+string.len(suffix))
-  local truncated = wezterm.truncate_right(title, max_width - (string.len(prefix) + string.len(suffix)))
+  local recalculated_max = max_width-(string.len(prefix)+string.len(suffix)+1)
+  local truncated = string.sub(title, 1, 1+recalculated_max)
   local actually_truncated = truncated ~= title
   if actually_truncated then
     local tabIncrement = tabIncrements[tab.tab_id] or 0
-    local incrementAdjusted = math.max(0, (tabIncrement-25))//10
+    local incrementAdjusted = math.max(0, (tabIncrement-5))//10
     if hover then
-      local speed = 1
+      local speed = 2
       if (recalculated_max + incrementAdjusted >= string.len(title) + 5) then
         tabIncrements[tab.tab_id] = 0
       else
         tabIncrements[tab.tab_id] = tabIncrement+speed
       end
     end
-    truncated = string.sub(title, math.min(string.len(title)-recalculated_max+1,1+incrementAdjusted), recalculated_max+incrementAdjusted)
+    truncated = string.sub(title, math.min(string.len(title)-recalculated_max,1+incrementAdjusted), recalculated_max+incrementAdjusted)
+    if (recalculated_max + incrementAdjusted >= string.len(title)) then
+      title = prefix .. truncated .. suffix
+    else 
+      title = prefix .. (string.sub(truncated, 1, -1) .. "…") .. suffix
+    end
+  else
+    title = prefix .. (actually_truncated and (string.sub(truncated, 1, -1) .. "…") or title) .. suffix
   end
 
-  title = prefix .. (actually_truncated and (string.sub(truncated, 1, -2) .. "…") or title) .. suffix
   -- title = " " .. (tab.tab_index == tab.tab_id and tab.tab_index or (tab.tab_index .. "#" .. tab.tab_id)) .. ": " .. title .. " "
 
   local format = {}
@@ -304,17 +388,32 @@ wezterm.on('format-window-title', function(tab, pane, tabs, panes, config)
 end)
 
 wezterm.on('user-var-changed', function(window, pane, name, value)
-  local overrides = window:get_config_overrides() or {}
+  local paneId = pane:pane_id()
 
   if (name == "TMUX" and value == "1") then
-    tmuxPanes[pane:pane_id()] = pane
+    tmuxPanes[paneId] = pane
+    return
   elseif (name == "TMUX") then
-    tmuxPanes[pane:pane_id()] = nil
+    tmuxPanes[paneId] = nil
+    return
   end
+
+  -- TODO: use this for nvim inside of wsl
+  -- if (name == "NVIM" and value == "1") then
+  --   nvimPanes[paneId] = pane
+  --   return
+  -- elseif  (name == "NVIM") then
+  --   nvimPanes[paneId] = nil
+  --   return
+  -- end
 end)
 
-wezterm.on('check-tmux', function(window, pane)
-  if is_in_tmux_pane(pane:pane_id()) then
+wezterm.on('check-pane', function(window, pane)
+  local paneId = pane:pane_id()
+  if is_in_nvim_pane(pane) then
+    window:perform_action(act.ActivateKeyTable { name = 'nvim_leader' }, pane)
+  elseif is_in_tmux_pane(paneId) then
+    -- by default suppress key presses
     window:perform_action(act.SendString("\x00"), pane)
     window:perform_action(act.ActivateKeyTable { name = 'tmux_leader' }, pane)
   else
@@ -324,9 +423,32 @@ end)
 
 -- dynamically generate a bunch of events
 for _, value in ipairs(config.keys) do
-  wezterm.on("check-tmux-nolead-" .. value.mods .. "+" .. value.key, function(window, pane)
+  local actionstr = value.mods .. "+" .. value.key
+  wezterm.on("check-nolead-" .. value.mods .. "+" .. value.key, function(window, pane)
+    lastRun = {"", value.mods, value.key}
+    if is_in_nvim_pane(pane) then
+      wezterm.log_info("attempting nvim action: " .. value.mods .. "+" .. value.key)
+      -- attempt to find the nvim action
+      local nvim_action = (function()
+        for _, value2 in ipairs(config.key_tables.nvim) do
+          if (value2.key == value.key) and (value2.mods == value.mods) then
+            return value2.action
+          end
+        end
+        return nil
+      end)()
+      if nvim_action then
+        wezterm.log_info("using nvim action: " .. actionstr)
+        lastRun[1] = "nvim"
+        window:perform_action(nvim_action, pane)
+        return
+      else
+        wezterm.log_warn("unable to find nvim action")
+      end
+    end
+
     if is_in_tmux_pane(pane:pane_id()) then
-      wezterm.log_info("using tmux action: " .. value.mods .. "+" .. value.key)
+      wezterm.log_info("attempting tmux action: " .. actionstr)
       -- attempt to find the tmux action
       local tmux_action = (function()
         for _, value2 in ipairs(config.key_tables.tmux) do
@@ -335,43 +457,94 @@ for _, value in ipairs(config.keys) do
           end
         end
         return nil
-      end)() or value.action
+      end)()
       if tmux_action then
+        wezterm.log_info("using tmux action: " .. actionstr)
+        lastRun[1] = "tmux"
         window:perform_action(tmux_action, pane)
+        return
       else
         wezterm.log_warn("unable to find tmux action")
       end
-    else
-      wezterm.log_info("using wezterm action: " .. value.mods .. "+" .. value.key)
-      -- attempt to find the wezterm action
-      local wezterm_action = (function()
-        for _, value2 in ipairs(config.key_tables.wezterm) do
-          if (value2.key == value.key) and (value2.mods == value.mods) then
-            return value2.action
-          end
-        end
-        return nil
-      end)() or value.action
-      if wezterm_action then
-        window:perform_action(wezterm_action, pane)
-      else
-        wezterm.log_warn("unable to find wezterm action")
-      end
     end
+
+    -- attempt to find the wezterm action
+    wezterm.log_info("attempting wezterm action: " .. actionstr)
+    local wezterm_action = (function()
+      for _, value2 in ipairs(config.key_tables.wezterm) do
+        if (value2.key == value.key) and (value2.mods == value.mods) then
+          return value2.action
+        end
+      end
+      return nil
+    end)()
+    if wezterm_action then
+      wezterm.log_info("using wezterm action: " .. actionstr)
+      lastRun[1] = "wezterm"
+      window:perform_action(wezterm_action, pane)
+      return
+    else
+      wezterm.log_warn("unable to find wezterm action")
+    end
+    
+    wezterm.log_info("using default action: " .. actionstr)
+    -- this can cause infinite loops if we are not careful... notably we should exhaust all options above
+    window:perform_action(value.action)
   end)
 end
 
 wezterm.on('update-right-status', function(window, pane)
-  local name = window:active_key_table()
-  if name then
-    name = 'mode: ' .. name
+  local cells = {}
+
+  local LEFT_ARROW = utf8.char(0xe0b3)
+  local SOLID_LEFT_ARROW = utf8.char(0xe0b2)
+
+  local colors = {
+    -- https://github.com/JanDeDobbeleer/oh-my-posh/blob/main/themes/M365Princess.omp.json
+    white = "#FFFFFF",
+    tan = "#CC3802",  
+    teal = "#047E84",  
+    plum = "#9A348E",  
+    blush = "#DA627D",  
+    salmon = "#FCA17D",  
+    sky = "#86BBD8",  
+    teal_blue = "#33658A"   
+  }
+  local text_fg = '#FFFFFF'
+
+  -- last key pressed
+  
+  local mods, key  = lastRun[2], lastRun[3]
+  mods = mods:gsub("|", ""):gsub("CTRL", "C"):gsub("SHIFT", "S")
+
+  -- ⍰ Mode
+  -- local PLACEHOLDER = utf8.char(9072)
+
+  wezterm.log_info(mods .. key)
+  local key_table = window:active_key_table()
+  local name = key_table or lastRun[1] or ""
+  name = string.gsub(name, "_leader", "+")
+  table.insert(cells, {Foreground = { Color = text_fg }})
+  local isPlussed = string.match(name, "+")
+  name = (isPlussed and name or (name.." "))
+  if key_table then
+    table.insert(cells, {Background = { Color = colors['sky'] }})
+    table.insert(cells, {
+      Text = " M: " .. wezterm.pad_left(name .. mods .. (mods ~= "" and "-" or "") .. "?", 14) .. " "
+    })
+  elseif isPlussed then
+    table.insert(cells, {Background = { Color = colors['teal_blue'] }})
+    table.insert(cells, {
+      Text = " L: " .. wezterm.pad_left(name .. mods .. (mods ~= "" and "-" or "") .. key, 14) .. " "
+    })
+  else
+    table.insert(cells, {Background = { Color = colors['teal_blue'] }})
+    table.insert(cells, {
+      Text = " N: " .. wezterm.pad_left(name .. mods .. (mods ~= "" and "-" or "") .. key, 14) .. " "
+    })
   end
 
-  if is_in_tmux_pane(pane:pane_id()) then
-    window:set_right_status('mode: tmux')
-  end
-
-  window:set_right_status(name or '')
+  window:set_right_status(wezterm.format(cells))
 end)
 
 wezterm.on('scroll-half-up', function(window, pane)
