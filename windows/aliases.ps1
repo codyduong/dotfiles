@@ -21,10 +21,6 @@ Set-Alias mkdir CreateDirectory
 Set-Alias mkdircd CreateAndSet-Directory
 # Determine size of a file or total size of a directory
 Set-Alias fs Get-DiskUsage
-# Empty the Recycle Bin on all drives
-Set-Alias emptytrash Empty-RecycleBin
-# Cleanup old files all drives
-Set-Alias cleandisks Clean-Disks
 # http://xkcd.com/530/
 Set-Alias mute Set-SoundMute
 Set-Alias unmute Set-SoundUnmute

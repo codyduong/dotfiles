@@ -267,6 +267,15 @@ _gcloud() {
     )
 }
 
+_nvim() {
+  which nvim >/dev/null &&
+    echo "\033[1;33minstalling nvim...\033[0m" ||
+    (
+      echo "\033[1;34minstalling nvim...\033[0m"
+      sudo apt install neovim
+    )
+}
+
 _dotfiles() {
   echo "\033[1;34mMoving dotfiles (home) to ~\033[0m"
   sudo cp ~/dotfiles/linux/home/. -r ~/
@@ -274,7 +283,7 @@ _dotfiles() {
 
 _otherfiles() {
   echo "\033[1;34mCopying other files\033[0m"
-  sudo cp ~/dotfiles/linux/var/lib/gdm3/.config /var/lib/gdm3/.config
+  # sudo cp ~/dotfiles/linux/var/lib/gdm3/.config /var/lib/gdm3/.config
 }
 
 _curl

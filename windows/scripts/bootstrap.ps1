@@ -9,13 +9,17 @@ param (
   [string]
   $sourceFile,
 
-  [Parameter(ParameterSetName = "update")]
+  [Parameter(ParameterSetName = "skip")]
   [switch]
   $update,
 
   [Parameter(ParameterSetName = "skip")]
   [switch]
-  $skip
+  $skip,
+
+  [Parameter(ParameterSetName = "skip")]
+  [switch]
+  $linux
 )
 
 try {
@@ -71,6 +75,43 @@ Copy-Item -Path $PSScriptRoot/../components/** -Destination $componentDir -Inclu
 Copy-Item -Path $PSScriptRoot/../setup/remote.ps1 -Destination $setupDir -Include **
 # Copy-Item -Path ./home/** -Destination $home -Include **
 
+## Setup the custom bootstrap.alias
+$script:bootstrapToPrepend = "`$script:pathToBootstrap = `"$PSCommandPath`"`r`n"
+$script:bootstrapToRun = "Invoke-Expression `"`$pathToBootstrap -skip:``$`$(`$skip.IsPresent) -update:``$`$(`$update.IsPresent) -linux:``$`$(`$linux.IsPresent)`"`r`n"
+$script:bootstrapAlias = Join-Path $aliasesDir "bootstrap.ps1"
+$script:bootstrapContent = ($bootstrapToPrepend + (Get-Content -Path $bootstrapAlias -Raw))
+$script:bootstrapLines = $bootstrapContent -split "`r`n"
+for ($i = $bootstrapLines.Length; $i -ge 0; $i--) {
+  if ($bootstrapLines[$i] -match 'BUILD_START') {
+    $bootstrapLines[$i] = $bootstrapLines[$i] + "`r`n" + $bootstrapToRun
+    break
+  }
+}
+($bootstrapLines -join "`r`n") | Set-Content -Path $bootstrapAlias
+
+## Setup thefuck alias
+$script:fuckPath = Join-Path $aliasesDir "fuck.ps1"
+"`$env:PYTHONIOENCODING=`"utf-8`"`r`n$(thefuck --alias)" | Set-Content -Path $fuckPath
+
+## Setup oh-my-posh (precompute here to save time)
+# https://ohmyposh.dev/docs/configuration/debug-prompt <-- this prompt I never use, so manually disable it
+# because we precompute the script file, the call-stack is not empty, thus thinking we are debugging, so just replace
+# Saves around 70-100ms
+$script:ohMyPoshPath = Join-Path $componentDir "ohmyposh.ps1"
+(Invoke-Expression (@"
+  $(oh-my-posh init pwsh --config "$env:POSH_THEMES_PATH\M365Princess.omp.json")
+"@ -replace "\|\s*Invoke-Expression",'')
+) -replace '\$script:PromptType = \"debug\"',@"
+  #`$script:PromptType = `"debug`" # Disabled by bootstrap.ps1
+  `$script:PromptType = `"primary`"
+"@
+| Set-Content -Path $ohMyPoshPath
+
+## Setup zoxide
+$script:zoxidePath = Join-Path $aliasesDir "zoxide.ps1"
+zoxide init powershell | Set-Content -Path $script:zoxidePath
+
+
 ##############
 # Config Files
 ##############
@@ -82,6 +123,17 @@ Copy-Item $PSScriptRoot/$localFiles/%USERPROFILE%/* -Recurse -Exclude *.md -Dest
 # Other Files
 #############
 Copy-Item $PSScriptRoot/$localFiles/%LOCALAPPDATA%/* -Recurse -Exclude *.md -Destination $Env:LOCALAPPDATA -ErrorAction SilentlyContinue
+
+#####
+# WSL
+#####
+if ((wsl --list) -and $linux) {
+  $script:dest = Join-Path $PSScriptRoot '/../../linux/home/'
+  # Make sure the path is in the correct format for WSL
+  $script:fixDest = wsl -e bash -ic "wslpath -u '$dest'"
+  Write-Host "<wsl password>" $fixDest
+  wsl sudo rsync -av --progress "$fixDest" '~/'
+}
 
 }
 catch {

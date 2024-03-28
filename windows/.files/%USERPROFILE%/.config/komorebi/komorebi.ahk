@@ -1,7 +1,6 @@
 #Requires AutoHotkey v2.0
 #SingleInstance Force
 #Include %A_ScriptDir%/komorebi.lib.ahk
-#Include %A_ScriptDir%/komorebi.generated.ahk
 ; SendMode, Input
 ; SetBatchLines, -1
 
@@ -82,6 +81,7 @@ CompleteConfiguration()
 
 ; Window manager options
 #+r::Retile()
+#+c::ReloadConfiguration()
 #p::TogglePause()
 
 ; Layouts

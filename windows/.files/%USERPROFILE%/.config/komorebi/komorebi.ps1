@@ -12,6 +12,7 @@ if (!(Get-Process ahk -ErrorAction SilentlyContinue)) {
 }
 
 . $PSScriptRoot\komorebi.generated.ps1
+. $PSScriptRoot\komorebi.manual.ps1
 
 # Send the ALT key whenever changing focus to force focus changes
 komorebic alt-focus-hack enable
@@ -28,13 +29,13 @@ komorebic watch-configuration enable
 # komorebic ensure-named-workspaces 1 A B C D E F
 
 # assign layouts to workspaces, possible values: bsp, columns, rows, vertical-stack, horizontal-stack, ultrawide-vertical-stack
-komorebic named-workspace-layout I bsp
+# komorebic named-workspace-layout I bsp
 
 # set the gaps around the edge of the screen for a workspace
-komorebic named-workspace-padding I 20
+# komorebic named-workspace-padding I 20
 
 # set the gaps between the containers for a workspace
-komorebic named-workspace-container-padding I 20
+# komorebic named-workspace-container-padding I 20
 
 # you can assign specific apps to named workspaces
 # komorebic named-workspace-rule exe "Firefox.exe" III

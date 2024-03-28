@@ -5,11 +5,48 @@ enum PackageIs {
     unknown
 }
 
-$script:InstallationIndicatorColorInstalling = "DarkCyan"
-$script:InstallationIndicatorColorUpdating = "DarkGreen"
-$script:InstallationIndicatorColorFound = "DarkGray"
+$InstallationIndicatorColorInstalling = "DarkCyan"
+$InstallationIndicatorColorUpdating = "DarkGreen"
+$InstallationIndicatorColorFound = "DarkGray"
 
-function script:Find-WingetAll {
+function script:Convert-Version {
+    [CmdletBinding(DefaultParameterSetName = 'NameParameterSet')]
+    param (
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
+        [Alias("version")]
+        [object]
+        $versions
+    )
+
+    process {
+        # If a single string is provided, treat it as an array with a single element
+        if ($versions -is [string]) {
+            $versions = @($versions)
+        }
+
+        $convertedVersions = $versions | ForEach-Object {
+            # If it is unknown use version 0.0.0
+            if ($_ -eq "Unknown") {
+                return [version]"0.0.0"
+            }
+
+            $v = $null
+            # OK this is dumb but just convert to a double LOL
+            if ($null -ne $_) {
+                if (-not [version]::TryParse($_, [ref]$v)) {
+                    if (-not [semver]::TryParse($_, [ref]$v)) {
+                        $v = [double]($_ -replace "\D*", '')
+                    }
+                }
+            }
+            return $v
+        }
+
+        return $convertedVersions
+    }
+}
+
+function Find-WingetAll {
     $currentEncoding = [Console]::OutputEncoding
     try {
         [Console]::OutputEncoding = [Text.Encoding]::UTF8
@@ -25,16 +62,74 @@ function script:Find-WingetAll {
             $name = $line.substring($id_index, $version_index - $id_index - 1).Trim()
             $line = $line.substring($version_index).Trim()
             $line = $line -replace "\s(?=\s{1,})", ""
-            # Write-Output $name $line
             $version = $line -split " "
-            if ($version -is [String]) {
+
+            # if (($inputString -split '-').Count - 1 -eq 1) {
+            #     # Valid semver revision strings will only have one dash and remove the text
+            #     $line = $inputString -replace '-\D*', '.'
+            # }
+
+            # Some packages are formatted
+            # MM/DD/YYYY, just remove the date and use the version
+            # Others use '> sem.ver.patch' or '< sem.ver.patch'
+            $version = $line -replace "\d{2}/\d{2}/\d\d{2,4}\w*", "" -replace "< |> ", "" -split " " | ForEach-Object { $_ -replace "[^\d\.]*", "" }
+
+            if ($version -is [string]) {
                 $version = $version, $null
             }
+
+            # Replace first empty string (second indicates unknown update, which is never shown) with "Unknown"
+            if ($version[0] -match '^\s*$') { $version = "Unknown", $version[1] }
+
             $winget_table[$name] = $version
         }
     }
     finally {
         [Console]::OutputEncoding = $currentEncoding
+    }
+}
+
+function script:Start-FindModuleThreadJob {
+    param($name, $version)
+    return Start-ThreadJob -Name "$name aVers" -ThrottleLimit 20 -InitializationScript {
+        Import-Module PowerShellGet
+    } -ScriptBlock {
+        param($name, $version)
+
+        $availableModule = Find-Module -Name $name -ErrorAction SilentlyContinue
+        $availableVersion = $availableModule.Version
+        $toTable = @($version, $availableVersion)
+        if ($availableVersion -gt $version) {
+            $toTable = @($version, $availableVersion)
+        }
+
+        $availableModule = Find-Module -Name $name -AllowPrerelease -ErrorAction SilentlyContinue
+        $availableVersion = $availableModule.Version
+        $toTablePrerelease = @($version, $availableVersion)
+        if ($availableVersion -gt $version) {
+            $toTablePrerelease = @($version, $availableVersion)
+        }
+        
+        return @{ "normal" = $toTable; "prerelease" = $toTablePrerelease }
+    } -ArgumentList $name, $version
+}
+
+$global:jobsToClean = [System.Collections.ArrayList]@()
+
+function Find-PowershellAll {
+    ForEach ($module in Get-InstalledModule) {
+        $name, $version = $module.Name, $module.Version
+        $job = Start-FindModuleThreadJob $name $version
+        $global:jobsToClean.Add($job)
+    }
+}
+
+function Clear-PowershellAll {
+    foreach ($job in $global:jobsToClean) {
+        if ($job.State -eq 'Running') {
+            Stop-Job $job
+        }
+        Remove-Job $job
     }
 }
 
@@ -91,6 +186,7 @@ function script:Find-Winget {
         }
     }
     if ($version -is [String]) {
+        # If we only have one version, it means there was no version to update to
         $version = $version, $null
     }
     if ($GetCurrent) {
@@ -100,13 +196,15 @@ function script:Find-Winget {
         $version = @($version[0], $(Invoke-Command -ScriptBlock $GetAvailable))
     }
 
+    $newver = Convert-Version $version
+
     if (-not $installed) {
         return [PackageIs]::notinstalled, $null
     }
-    elseif ($version[0] -match "unknown") {
+    elseif ($newver[0] -match "Unknown") {
         return [PackageIs]::unknown, $version
     }
-    elseif ($table_header -match "Available" -and ([version]($version[1] ?? "0.0.0") -gt [version]($version[0] ?? "0.0.0"))) {
+    elseif ($newver[1] -gt $newver[0]) {
         return [PackageIs]::outdated, $version
     }
     else {
@@ -151,7 +249,7 @@ function Install-Winget {
     }
     elseif ($i -eq [PackageIs]::outdated -and $updateOutdated -eq $true) {
         Write-Host "Updating $($Name) from $($a[0]) to $($a[1])..." -ForegroundColor $InstallationIndicatorColorUpdating
-        winget install -e --id $Name
+        winget update -e --id $Name
     }
     else {
         Write-Host "$($Name) $($a[0]) found, skipping..." -ForegroundColor $InstallationIndicatorColorFound
@@ -159,30 +257,11 @@ function Install-Winget {
 }
 
 function InstallerPromptUpdateOutdated() {
-    $updateOutdated = PromptBooleanQuestion("Would you like to update existing dependencies") $true
+    $updateOutdated = PromptBooleanQuestion("Would you like to update existing dependencies") $false
     $Env:UPDATE_OUTDATED_DEPS = $updateOutdated
 }
 
 . $PSScriptRoot\..\components\utils.ps1
-
-filter quoteStringWithSpecialChars {
-    if ($_ -and ($_ -match '\s+|#|@|\$|;|,|''|\{|\}|\(|\)')) {
-        $str = $_ -replace "'", "''"
-        "'$str'"
-    }
-    else {
-        $_
-    }
-}
-
-function script:PrepModuleToStr {
-    param (
-        [Parameter(ValueFromPipeline)]
-        [string]$moduleStr
-    )
-
-    return $moduleStr -replace '^@{|}$', '' -replace '\\', '\\' -replace "`n", "\n" -replace '; ', "`n"
-}
 
 function script:Find-PowerShellModule {
     [CmdletBinding(DefaultParameterSetName = 'NameParameterSet')]
@@ -196,32 +275,44 @@ function script:Find-PowerShellModule {
         ${AllowPrerelease}
     )
 
-    $str_data = [string]$(Get-InstalledModule -Name $Name -AllowPrerelease:$AllowPrerelease -ErrorAction SilentlyContinue)
-    if ($null -eq $str_data -or "" -eq ($str_data -replace "\s", "")) {
-        return [PackageIs]::notinstalled
-    }
-    $current_hashtable = ConvertFrom-StringData -StringData ($str_data | PrepModuleToStr)
-    $available_hashtable = ConvertFrom-StringData -StringData ($(Find-Module -Name $Name -AllowPrerelease:$AllowPrerelease) | PrepModuleToStr)
-
-    $version = $current_hashtable['version'], $available_hashtable['version']
-    try {
-        # try converting with semver
-        $version = [semver]$($current_hashtable['version']), [semver]$($available_hashtable['version'])
-    }
-    catch [System.Management.Automation.PSInvalidCastException] {
-        try {
-            # try converting with using regular ver
-            $version = [version]$($current_hashtable['version']), [version]$($available_hashtable['version'])
-        }
-        catch [System.Management.Automation.PSInvalidCastException] {}
+    $current_aVers = Get-Job | Where-Object Name -Match "aVers"
+    if ($current_aVers.count -le 0) {
+        Find-PowershellAll
     }
 
-    if ($version[1] -gt $version[0]) {
-        return [PackageIs]::outdated, $version
+    $job = Get-Job -Name "$Name aVers"
+    $module = $null
+    if ($job.State -eq 'Completed') {
+        $module = Receive-Job -Job $job
     }
     else {
-        return [PackageIs]::installed, $version
+        $module = Receive-Job -Job $job -Wait
     }
+
+    if ($null -eq $module -or $Name -eq "PowershellHumanizer") {
+        $imodule = Get-InstalledModule -Name $Name -AllowPrerelease:$AllowPrerelease
+        $module = $(Start-FindModuleThreadJob $Name $imodule.Version) | Receive-Job -Wait
+    }
+
+    if ($AllowPrerelease) {
+        $prerelease = $module['prerelease']
+        if ($null -eq $prerelease) {
+            return [PackageIs]::notinstalled
+        }
+        if ($prerelease[1] -gt $prerelease[0]) {
+            return [PackageIs]::outdated, @($prerelease)
+        }
+        return [PackageIs]::installed, @($prerelease)
+    }
+
+    $normal = $module['normal']
+    if ($null -eq $normal) {
+        return [PackageIs]::notinstalled
+    }
+    if ($normal[1] -gt $normal[0]) {
+        return [PackageIs]::outdated, @($normal)
+    }
+    return [PackageIs]::installed, @($normal)
 }
 
 function Install-PowerShell {
@@ -298,6 +389,8 @@ function Install-PowerShell {
     $i = $installed[0]
     $a = $installed[1]
 
+    # Write-Host $i $a
+
     if ($i -eq [PackageIs]::notinstalled) {
         Write-Host "Installing $($Name)..." -ForegroundColor $InstallationIndicatorColorInstalling
         Install-Module @($Name) @PSBoundParameters
@@ -339,22 +432,28 @@ function Install-GitHubRelease {
 
         [Parameter(ValueFromPipelineByPropertyName)]
         [switch]
-        ${WhatIf}
+        ${WhatIf},
+
+        [Parameter(ValueFromPipelineByPropertyName)]
+        [switch]
+        ${NoAction}
     )
 
-    if ($Version) {
-        Update-GitHubRelease @PSBoundParameters
+    $Version = if ($null -eq $version) { $(Invoke-Expression "$Name --version").TrimStart("v") | Convert-Version } else { $Version }
+
+    $PSBoundParameters.Remove("Version") | Out-Null
+
+    $Installed = Get-Command $Name -ErrorAction SilentlyContinue | Select-Object -ExpandProperty "Name" -ErrorAction SilentlyContinue
+
+    if ($Installed) {
+        if ($updateOutdated -eq $true) {
+            return Update-GitHubRelease $Version @PSBoundParameters
+        }
+        Write-Host "$Name $Version found, skipping..." -ForegroundColor $InstallationIndicatorColorFound
+        return $null
     }
     else {
-        $Installed = Get-Command $Name -ErrorAction SilentlyContinue | Select-Object -ExpandProperty "Name" -ErrorAction SilentlyContinue
-
-        if ($Installed) {
-            $Version = [semver]$(Invoke-Expression "$Name --version").TrimStart("v")
-            Update-GitHubRelease $Version @PSBoundParameters
-        }
-        else {
-            Update-GitHubRelease $([semver]$("0.0.0")) @PSBoundParameters
-        }
+        return Update-GitHubRelease $Version @PSBoundParameters
     }
 }
 
@@ -386,7 +485,11 @@ function Update-GitHubRelease {
 
         [Parameter(ValueFromPipelineByPropertyName)]
         [switch]
-        ${WhatIf}
+        ${WhatIf},
+
+        [Parameter(ValueFromPipelineByPropertyName)]
+        [switch]
+        ${NoAction}
     )
 
     # get remote version
@@ -406,19 +509,29 @@ function Update-GitHubRelease {
     $Temp = Join-Path $env:TEMP "Github"
     $File = Join-Path $Temp $Asset.name
     New-Item $Temp -ItemType Directory -Force -ErrorAction SilentlyContinue | Out-Null
-    Invoke-WebRequest -Uri $Url -OutFile $File
+    if (-not (Test-Path -Path $File)) {
+        Invoke-WebRequest -Uri $Url -OutFile $File
+    }
 
     if ($Version -eq [semver]"0.0.0") {
         Write-Host "Installing $Name..." -ForegroundColor $InstallationIndicatorColorInstalling
     }
-    elseif ($LatestVersion -gt $Version) {
+    elseif ($LatestVersion -gt $Version -and $updateOutdated -eq $true) {
         Write-Host "Updating $Name from $Version to $LatestVersion..." -ForegroundColor $InstallationIndicatorColorUpdating
+    }
+    else {
+        Write-Host "$Name $Version found, skipping..." -ForegroundColor $InstallationIndicatorColorFound
+    }
+
+    # If we have a NoAction, return the path for the callee to handle
+    if ($NoAction) {
+        return $File
     }
 
     # Handle zipped files
     if ($File -match ".*\.zip") {
         $Destination = ($File -replace "\.zip$", "")
-        Expand-Archive -LiteralPath $File -DestinationPath $Temp
+        Expand-Archive -LiteralPath $File -DestinationPath $Temp -Force
         $File = $Destination
         # Todo iterate over inside files to find msixbundle or exe. If the .exe is an installer specify with installer flag
         # otherwise add binary to path
@@ -430,6 +543,9 @@ function Update-GitHubRelease {
     # Handle .exe
     elseif ($File -match ".*\.exe$") {
         Start-Process -FilePath $File -WhatIf:$WhatIf
+    }
+    elseif ($File -match ".*\.msi$") {
+        Start-Process msiexec.exe -ArgumentList "/i $File" -Wait
     }
     else {
         Write-Warning "Unsupported file extension on file: $File"
