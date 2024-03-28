@@ -1,5 +1,5 @@
 function bootstrap {
-  [CmdletBinding(DefaultParametersetName = 'skip')] 
+  [CmdletBinding(DefaultParametersetName = 'skip')]
   param (
     [Parameter(ParameterSetName = "skip")]
     [switch]
