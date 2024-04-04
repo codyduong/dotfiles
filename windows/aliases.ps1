@@ -1,7 +1,7 @@
-Get-ChildItem -Path "./aliases" |
-Where-Object { $_.extension -eq ".ps1" } |
-Where-Object { $_.Name[0] -ne "." } |
-ForEach-Object -process { Invoke-Expression ". '$_'" }
+Get-ChildItem -Path "./aliases"
+| Where-Object { $_.extension -eq ".ps1" }
+| Where-Object { $_.Name[0] -ne "." }
+| ForEach-Object -process { Invoke-Expression ". '$_'" }
 
 # curl: Use `curl.exe` if available
 if (Get-Command curl.exe -ErrorAction SilentlyContinue | Test-Path) {
@@ -17,8 +17,7 @@ else {
 }
 
 # Create a new directory and enter it
-Set-Alias mkdir CreateDirectory
-Set-Alias mkdircd CreateAndSet-Directory
+Set-Alias mkdir New-Directory
 # Determine size of a file or total size of a directory
 Set-Alias fs Get-DiskUsage
 # http://xkcd.com/530/

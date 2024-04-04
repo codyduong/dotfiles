@@ -61,23 +61,27 @@ $script:aliasesDir = Join-Path $profileDir "aliases"
 $script:componentDir = Join-Path $profileDir "components"
 $script:setupDir = Join-Path $profileDir "setup"
 $script:scriptsDir = Join-Path $profileDir "scripts"
+$script:functionsDir = Join-Path $profileDir "functions"
 
 Remove-Item $aliasesDir -Recurse -ErrorAction SilentlyContinue
 Remove-Item $componentDir -Recurse -ErrorAction SilentlyContinue
 Remove-Item $setupDir -Recurse -ErrorAction SilentlyContinue
 Remove-Item $scriptsDir -Recurse -ErrorAction SilentlyContinue
+Remove-Item $functionsDir -Recurse -ErrorAction SilentlyContinue
 
 createDir $profileDir
 createDir $aliasesDir
 createDir $componentDir
 createDir $setupDir
 createDir $scriptsDir
+createDir $functionsDir
 
 Copy-Item -Path $PSScriptRoot/../*.ps1 -Destination $profileDir -Exclude "bootstrap.ps1"
 Copy-Item -Path $PSScriptRoot/../aliases/** -Destination $aliasesDir -Include **
 Copy-Item -Path $PSScriptRoot/../components/** -Destination $componentDir -Include **
 Copy-Item -Path $PSScriptRoot/../setup/remote.ps1 -Destination $setupDir -Include **
 Copy-Item -Path $PSScriptRoot/../scripts/utils.ps1 -Destination $scriptsDir -Include **
+Copy-Item -Path $PSScriptRoot/../functions/** -Destination $functionsDir -Include **
 # Copy-Item -Path ./home/** -Destination $home -Include **
 
 ## Setup the custom bootstrap.alias
@@ -115,6 +119,11 @@ $script:ohMyPoshPath = Join-Path $componentDir "ohmyposh.ps1"
 ## Setup zoxide
 $script:zoxidePath = Join-Path $aliasesDir "zoxide.ps1"
 zoxide init powershell | Set-Content -Path $script:zoxidePath
+
+##########
+# CLOSURES
+##########
+
 
 
 ##############

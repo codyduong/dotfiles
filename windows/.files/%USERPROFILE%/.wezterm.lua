@@ -528,10 +528,32 @@ wezterm.on('update-right-status', function(window, pane)
   table.insert(cells, {Foreground = { Color = text_fg }})
   local isPlussed = string.match(name, "+")
   name = (isPlussed and name or (name.." "))
-  if key_table then
-    table.insert(cells, {Background = { Color = colors['sky'] }})
+
+  if not key_table then
+    -- vim like
+    table.insert(cells, {Background = { Color = colors['teal'] }})
     table.insert(cells, {
-      Text = " M: " .. wezterm.pad_left(name .. mods .. (mods ~= "" and "-" or "") .. "?", 14) .. " "
+      Text = " M: " .. wezterm.pad_left('NORMAL', 14) .. " "
+    })
+  end
+    
+  if key_table then
+    -- vim like
+    if (key_table == 'resize') then
+      table.insert(cells, {Background = { Color = colors['teal'] }})
+      table.insert(cells, {
+        Text = " M: " .. wezterm.pad_left('RESIZE', 14) .. " "
+      })
+    end
+
+    table.insert(cells, {Background = { Color = colors['teal'] }})
+    table.insert(cells, {
+      Text = " M: " .. wezterm.pad_left(name, 14) .. " "
+    })
+    
+    table.insert(cells, {Background = { Color = colors['teal_blue'] }})
+    table.insert(cells, {
+      Text = " L: " .. wezterm.pad_left(name .. mods .. (mods ~= "" and "-" or "") .. key, 14) .. " "
     })
   elseif isPlussed then
     table.insert(cells, {Background = { Color = colors['teal_blue'] }})
