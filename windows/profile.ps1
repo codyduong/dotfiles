@@ -7,6 +7,6 @@ Push-Location (Split-Path -parent "$profile")
 "aliases"
 # "scripts"
 | Where-Object { Test-Path "$_.ps1" } | ForEach-Object -process {
-  Write-Output "$_ : $(Measure-Command { Invoke-Expression ". .\$_.ps1" })"
-}
+    Write-Output "$_ : $(Measure-Command { Invoke-Expression ". .\$_.ps1" })"
+  }
 Pop-Location

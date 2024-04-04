@@ -45,7 +45,7 @@ function Update-AvailableProfile {
     Remove-Job -Job $existingJob -Force
   }
   else {
-    if ($null -ne $existingJob) { 
+    if ($null -ne $existingJob) {
       $lastRunTime = $existingJob.PSBeginTime
       $currentTime = Get-Date
       $timeDifference = $currentTime - $lastRunTime

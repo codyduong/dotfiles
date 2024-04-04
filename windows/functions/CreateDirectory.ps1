@@ -1,0 +1,1 @@
+function New-Directory([String] $path) { New-Item $path -ItemType Directory -ErrorAction SilentlyContinue }
