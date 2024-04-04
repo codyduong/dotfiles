@@ -60,19 +60,24 @@ $script:profileDir = Split-Path -parent $profile
 $script:aliasesDir = Join-Path $profileDir "aliases"
 $script:componentDir = Join-Path $profileDir "components"
 $script:setupDir = Join-Path $profileDir "setup"
+$script:scriptsDir = Join-Path $profileDir "scripts"
 
 Remove-Item $aliasesDir -Recurse -ErrorAction SilentlyContinue
 Remove-Item $componentDir -Recurse -ErrorAction SilentlyContinue
+Remove-Item $setupDir -Recurse -ErrorAction SilentlyContinue
+Remove-Item $scriptsDir -Recurse -ErrorAction SilentlyContinue
 
 createDir $profileDir
 createDir $aliasesDir
 createDir $componentDir
 createDir $setupDir
+createDir $scriptsDir
 
 Copy-Item -Path $PSScriptRoot/../*.ps1 -Destination $profileDir -Exclude "bootstrap.ps1"
 Copy-Item -Path $PSScriptRoot/../aliases/** -Destination $aliasesDir -Include **
 Copy-Item -Path $PSScriptRoot/../components/** -Destination $componentDir -Include **
 Copy-Item -Path $PSScriptRoot/../setup/remote.ps1 -Destination $setupDir -Include **
+Copy-Item -Path $PSScriptRoot/../scripts/utils.ps1 -Destination $scriptsDir -Include **
 # Copy-Item -Path ./home/** -Destination $home -Include **
 
 ## Setup the custom bootstrap.alias

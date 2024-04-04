@@ -109,7 +109,7 @@ function script:Start-FindModuleThreadJob {
         if ($availableVersion -gt $version) {
             $toTablePrerelease = @($version, $availableVersion)
         }
-        
+
         return @{ "normal" = $toTable; "prerelease" = $toTablePrerelease }
     } -ArgumentList $name, $version
 }
@@ -275,9 +275,10 @@ function script:Find-PowerShellModule {
         ${AllowPrerelease}
     )
 
-    $current_aVers = Get-Job | Where-Object Name -Match "aVers"
+    $current_aVers = Get-Job | Where-Object Name -Match "$Name aVers"
     if ($current_aVers.count -le 0) {
-        Find-PowershellAll
+        $job = Start-FindModuleThreadJob $name $version
+        $global:jobsToClean.Add($job)
     }
 
     $job = Get-Job -Name "$Name aVers"
@@ -391,7 +392,7 @@ function Install-PowerShell {
 
     # Write-Host $i $a
 
-    if ($i -eq [PackageIs]::notinstalled) {
+    if ($i -eq [PackageIs]::notinstalled -or $true) {
         Write-Host "Installing $($Name)..." -ForegroundColor $InstallationIndicatorColorInstalling
         Install-Module @($Name) @PSBoundParameters
     }

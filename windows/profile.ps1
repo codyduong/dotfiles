@@ -5,6 +5,7 @@ Push-Location (Split-Path -parent "$profile")
 "exports",
 "components",
 "aliases"
+# "scripts"
 | Where-Object { Test-Path "$_.ps1" } | ForEach-Object -process {
   Write-Output "$_ : $(Measure-Command { Invoke-Expression ". .\$_.ps1" })"
 }
