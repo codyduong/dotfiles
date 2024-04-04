@@ -43,6 +43,7 @@ local config = {
         { key = "c",      mods = "SHIFT|CTRL",        action = act.CopyTo 'Clipboard'},
         { key = "-",      mods = "CTRL",              action = act.Multiple{ act.EmitEvent "disable-unseen-temp", act.DecreaseFontSize }},
         { key = "=",      mods = "CTRL",              action = act.Multiple{ act.EmitEvent "disable-unseen-temp", act.IncreaseFontSize }},
+        { key = "0",      mods = "CTRL",              action = act.Multiple{ act.EmitEvent "disable-unseen-temp", act.ResetFontSize }},
 
         -- non leader keys
         { key = "n",      mods = "SHIFT|CTRL",        action = "ToggleFullScreen" },
@@ -489,7 +490,7 @@ for _, value in ipairs(config.keys) do
     
     wezterm.log_info("using default action: " .. actionstr)
     -- this can cause infinite loops if we are not careful... notably we should exhaust all options above
-    window:perform_action(value.action)
+    -- window:perform_action(value.action)
   end)
 end
 
@@ -573,9 +574,9 @@ wezterm.on('disable-unseen-temp', function(window, pane)
       panesLogicalText[pane2.pane:pane_id()] = pane2.pane:get_logical_lines_as_text(2)
     end
   end
-  for k, p in ipairs(panesLogicalText) do
-    wezterm.log_info(p)
-  end
+  -- for k, p in ipairs(panesLogicalText) do
+  --   wezterm.log_info(p)
+  -- end
 end)
 
 return config

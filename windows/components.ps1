@@ -1,6 +1,6 @@
 Get-ChildItem -Path "./components" | Where-Object { $_.extension -eq ".ps1" } | ForEach-Object -process {
-  # Invoke-Expression ". '$_'"
-  Write-Host "components.$_ : $(Measure-Command { Invoke-Expression ". '$_'" })"
+  Invoke-Expression ". '$_'"
+  # Write-Host "components.$_ : $(Measure-Command { Invoke-Expression ". '$_'" })"
 }
 
 # oh-my-posh
