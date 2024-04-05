@@ -16,6 +16,9 @@ Set-Environment "PYENV_HOME" (Join-Path -Path $Env:USERPROFILE -ChildPath '.pyen
 # alias-tips
 Set-Environment "ALIASTIPS_FUNCTION_INTROSPECTION" $true
 
+# PSFzf
+Set-Environment 'FZF_COMPLETION_TRIGGER' '*'
+
 # Disable the Progress Bar
 # $ProgressPreference='SilentlyContinue'
 
