@@ -78,7 +78,7 @@ createDir $functionsDir
 
 Copy-Item -Path $PSScriptRoot/../*.ps1 -Destination $profileDir -Exclude "bootstrap.ps1"
 Copy-Item -Path $PSScriptRoot/../aliases/** -Destination $aliasesDir -Include **
-Copy-Item -Path $PSScriptRoot/../components/** -Destination $componentDir -Include **
+Copy-Item -Path $PSScriptRoot/../components/** -Recurse -Destination $componentDir -Include **
 Copy-Item -Path $PSScriptRoot/../setup/remote.ps1 -Destination $setupDir -Include **
 Copy-Item -Path $PSScriptRoot/../scripts/utils.ps1 -Destination $scriptsDir -Include **
 Copy-Item -Path $PSScriptRoot/../functions/** -Destination $functionsDir -Include **
@@ -119,12 +119,6 @@ $script:ohMyPoshPath = Join-Path $componentDir "ohmyposh.ps1"
 ## Setup zoxide
 $script:zoxidePath = Join-Path $aliasesDir "zoxide.ps1"
 zoxide init powershell | Set-Content -Path $script:zoxidePath
-
-##########
-# CLOSURES
-##########
-
-
 
 ##############
 # Config Files

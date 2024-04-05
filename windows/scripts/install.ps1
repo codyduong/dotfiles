@@ -41,6 +41,7 @@ Install-PowerShell PSWindowsUpdate -Scope CurrentUser -Force
 Install-Winget junegunn.fzf
 Install-Winget gerardog.gsudo
 Install-Winget ajeetdsouza.zoxide
+Install-Winget sharkdp.bat
 
 ### Install oh-my-posh and dependencies
 Install-Winget JanDeDobbeleer.OhMyPosh
