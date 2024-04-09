@@ -8,4 +8,4 @@ Get-ChildItem -Path (Join-Path $PSScriptRoot "completions")
 
 # this contains custom completions
 Register-CompletionsKomorebic
-# Register-CompletionsNpm
+Register-CompletionsNpm
