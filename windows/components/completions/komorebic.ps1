@@ -1,8 +1,8 @@
 # Registers tab completions for komorebic
 . $PSScriptRoot/.TrimFzfTrigger.ps1
 
-$export_version = [semver]'0.1.0'
-$komorebic_version = $($(komorebic --version | Out-String) -replace 'komorebic','').Trim()
+$script:export_version = [semver]'0.1.0'
+$script:komorebic_version = $($(komorebic --version | Out-String) -replace 'komorebic','').Trim()
 
 function Export-CompletionsKomorebicClixml {
   Param(
@@ -261,7 +261,7 @@ function Register-CompletionsKomorebic {
         $wordToComplete = $wordToComplete.Substring(0, $wordToComplete.Length - $completionTrigger.Length)
         if ($allSuggestions.Count -gt 0) {
           # if we have suggestions
-          $used = $allSuggestions | Invoke-Fzf -Query $wordToComplete
+          $used = $allSuggestions | Invoke-Fzf -Multi -Query $wordToComplete
           if ($null -ne $used) {
             return $used
           }
