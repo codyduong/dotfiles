@@ -105,7 +105,7 @@ function Export-CompletionsNpmClixml {
   $state = $null
 
   # Gets package.json and reads scripts key
-  foreach ($line in $npmHelp -split "`r`n") {
+  foreach ($line in $npmHelp -split "`r?`n") {
     $line = $line.Trim()
 
     if ([string]::IsNullOrEmpty($line)) {
@@ -280,6 +280,69 @@ function Export-CompletionsNpmClixml {
   }
 }
 
+$script:completions_npm_run_var = '__completions_npm_run'
+
+function Get-NpmRun {
+  # cache the results based on cwd
+  $cwd = Get-Location
+  $cache = Get-Variable $script:completions_npm_run_var -Scope global -ErrorAction SilentlyContinue
+  if ($null -ne $cache) {
+    # Write-Host "maybe fast"
+    if ($cache.Value.ContainsKey("$cwd")) {
+      # Write-Host "fast"
+      return $cache.Value["$cwd"]
+    }
+  }
+
+  $results = npm run-script --foreground-scripts
+  $lines = $results -split "`r?`n"
+
+  # ready -> lifecycle -> cmd -> skip
+  #          default -> cmd -> skip
+  # 
+  # re-enters ready upon empty line
+  $evaluated = @()
+  $state = 'ready'
+  foreach ($line in $lines) {
+    $line = $line.Trim()
+    if ('' -eq $line.Trim()) {
+      $state = 'ready'
+      continue
+    }
+
+    if ($line -match '^\s*[Ll]ifecycle scripts') {
+      $state = 'lifecycle'
+      continue
+    }
+
+    if ($line -match '^\s*[Aa]vailable via') {
+      $state = 'default'
+      continue
+    }
+
+    if ($state -eq 'lifecycle' -or $state -eq 'default') {
+      # we are parsing the first part, ie the actual cmd
+      $evaluated += $line
+
+      # set next state to skip, skip every other line
+      $state = 'skip'
+      continue
+    }
+    
+    if ($state -eq 'skip') {
+      $state = 'default'
+      continue
+    }
+    Write-Error 'invariant state'
+  }
+  $cache = @{}
+  $cache["$cwd"] = $evaluated
+
+  Set-Variable $script:completions_npm_run_var -Scope global -Value $cache
+
+  return $evaluated
+}
+
 function Get-CompletionsNpm {
   param(
     [Parameter()]
@@ -353,6 +416,8 @@ function Get-CompletionsNpm {
     }
   }
 
+  $GetNpmRunRef = ${function:Get-NpmRun}
+
   $currently_at = $npm
   # values evaluated at runtime rather than beforehand
   $evaluated = @()
@@ -362,18 +427,18 @@ function Get-CompletionsNpm {
     $next = try { $currently_at[$part] } catch [System.Management.Automation.RuntimeException] { $null }
     
     if ($null -eq $next) {
-      # Read through all <.*> values, and parse them according to our helpers
-      foreach ($possible in $currently_at.Keys) {
-        if ($possible -match "<command>") {
-          # npm run <command>
-          $evaluated += "foobar yippee"
-        }
-      }
       # todo traversal of free-form like <>
       break
     }
 
     $currently_at = $next
+  }
+
+  # Read through all <.*> values, and parse them according to our helpers
+  foreach ($possible in $currently_at.Keys) {
+    if ($possible -match "<command>") {
+      $evaluated += & $GetNpmRunRef
+    }
   }
 
   # attempt to use -like
@@ -382,15 +447,19 @@ function Get-CompletionsNpm {
     | Where-Object {-not ($_.StartsWith('$') -or $_.StartsWith('<'))}
     | Sort-Object -Property { $_.Length }
 
+  $options += $evaluated
+    | Where-Object {$_ -like "$last*"}
+
   # if we failed fallback to the tree
   if ($null -eq $options -or $options.Count -eq 0) {
     $options = $currently_at.Keys
     | Where-Object {-not ($_.StartsWith('$') -or $_.StartsWith('<'))}
     | Sort-Object -Property { $_.Length }
+
+    $options += $evaluated
   }
 
-  $options += $evaluated
-
+  $allOptions += $evaluated
   $allOptions += $currently_at.Keys
     | Where-Object {-not ($_.StartsWith('$') -or $_.StartsWith('<'))}
   

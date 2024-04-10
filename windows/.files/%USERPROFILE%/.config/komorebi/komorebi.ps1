@@ -55,7 +55,7 @@ komorebic manage-rule exe conhost.exe
 komorebic manage-rule exe pwsh.exe
 
 # Focus follows mouse
-komorebic toggle-focus-follows-mouse --implementation komorebi  
+# komorebic toggle-focus-follows-mouse --implementation komorebi  
 
 # Retile
 komorebic retile
