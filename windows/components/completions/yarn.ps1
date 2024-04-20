@@ -1,6 +1,6 @@
 . $PSScriptRoot/.completions.ps1
 # Ironically we use npm Get-NpmRun for our Yarn Run completions... it's just easier...
-. $PSScriptRoot/npm.ps1
+# . $PSScriptRoot/npm.ps1
 
 $script:completions_yarn_export_version = [semver]'0.1.0'
 $script:completions_yarn_version = $(yarn --version).Trim()
@@ -353,6 +353,7 @@ function Get-CompletionsYarn {
   $currently_at = $yarn
   # values evaluated at runtime rather than beforehand
   $evaluated = @()
+  $runCompletions = @()
 
   # get as far as possible in autocomplete tree
   foreach ($part in $parts) {
@@ -366,12 +367,18 @@ function Get-CompletionsYarn {
     $currently_at = $next
   }
 
-  # Read through all <.*> values, and parse them according to our helpers
-  foreach ($possible in $currently_at.Keys) {
-    if ($possible -match "<command>") {
-      $evaluated += & $GetNpmRunRef
-    }
+  # if we are at the base level or at run then we can use run completions
+  if ($parts.Length -eq 1 -or $last -eq 'run' -or $2ndlast -eq 'run') {
+    $runCompletions = & $GetNpmRunRef
+    # note that we prepend it to our options array, because I like to prioritize it this way
   }
+
+  # Read through all <.*> values, and parse them according to our helpers
+  # foreach ($possible in $currently_at.Keys) {
+  #   if ($possible -match "<command>") {
+  #     $evaluated += & $GetNpmRunRef
+  #   }
+  # }
 
   # attempt to use -like
   $options = $currently_at.Keys 
@@ -382,6 +389,11 @@ function Get-CompletionsYarn {
   $options += $evaluated
     | Where-Object {$_ -like "$last*"}
 
+  $runCompletionsMaybe = $runCompletions | Where-Object {$_ -like "$last*"}
+  if ($runCompletionsMaybe.Count -gt 0) {
+    $options = @($runCompletionsMaybe + $options)
+  }
+
   # if we failed fallback to the tree
   if ($null -eq $options -or $options.Count -eq 0) {
     $options = $currently_at.Keys
@@ -389,11 +401,13 @@ function Get-CompletionsYarn {
     | Sort-Object -Property { $_.Length }
 
     $options += $evaluated
+    $options = @($runCompletions + $options)
   }
 
   $allOptions += $evaluated
   $allOptions += $currently_at.Keys
     | Where-Object {-not ($_.StartsWith('$') -or $_.StartsWith('<'))}
+  $allOptions = @($runCompletions + $allOptions)
   
   # remove nullish values
   $allOptions = $allOptions | Where-Object { $null -ne $_ }

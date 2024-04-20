@@ -2,7 +2,7 @@
 . $PSScriptRoot/.TrimFzfTrigger.ps1
 
 $script:completions_komorebic_export_version = [semver]'0.1.0'
-$script:completions_komorebic_version = $($(komorebic --version | Out-String) -replace 'komorebic','').Trim()
+$script:completions_komorebic_version = $($(komorebic --version) -replace 'komorebic','').Trim()
 
 function Export-CompletionsKomorebicClixml {
   Param(
@@ -146,9 +146,9 @@ function Register-CompletionsKomorebic {
   [semver]$clixml_export_version = if ($null -ne $clixml.export_version) { [semver]($clixml.export_version) } else { [semver]'0.0.0' }
   [semver]$clixml_komorebic_version = if ($null -ne $clixml.komorebic_version) { [semver]($clixml.komorebic_version) } else { [semver]'0.0.0' }
   if (
-    $clixml_export_version -lt $script:export_version -or 
-    $clixml_komorebic_version -ne $script:komorebic_version) {
-    Write-Host "$clixml_export_version, $script:export_version, $clixml_komorebic_version, $script:komorebic_version"
+    $clixml_export_version -lt $script:completions_komorebic_export_version -or 
+    $clixml_komorebic_version -ne $script:completions_komorebic_version) {
+    # Write-Host "$clixml_export_version, $script:export_version, $clixml_komorebic_version, $script:komorebic_version"
     $clixml = Export-CompletionsKomorebicClixml -PassThru
   }
 
