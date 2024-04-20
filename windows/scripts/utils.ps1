@@ -392,7 +392,7 @@ function Install-PowerShell {
 
     # Write-Host $i $a
 
-    if ($i -eq [PackageIs]::notinstalled -or $true) {
+    if ($i -eq [PackageIs]::notinstalled) {
         Write-Host "Installing $($Name)..." -ForegroundColor $InstallationIndicatorColorInstalling
         Install-Module @($Name) @PSBoundParameters
     }
