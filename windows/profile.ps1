@@ -10,3 +10,5 @@ Push-Location (Split-Path -parent "$profile")
     Write-Output "$_ : $(Measure-Command { Invoke-Expression ". .\$_.ps1" -ErrorAction Continue })"
   }
 Pop-Location
+
+Import-Module alias-tips
