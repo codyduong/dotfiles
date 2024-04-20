@@ -1,54 +1,8 @@
 . $PSScriptRoot/.TrimFzfTrigger.ps1
 
-$script:export_version = [semver]'0.1.0'
-$script:npm_version = $($(komorebic --version | Out-String) -replace 'komorebic','').Trim()
-$script:path = (Join-Path $HOME ".completions.npm")
-
-function Write-Pretty {
-  [CmdletBinding()]
-  Param(
-    [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-    [object]$InputObject
-  )
-
-  Process {
-    # This function prints the structure
-    function Write-PrettyR {
-      param (
-        [object]$Obj,
-        [int]$Level = 0
-      )
-
-      $indentation = " " * ($Level * 4) # 4 spaces per indentation level
-      if ($Obj -is [System.Collections.IDictionary]) {
-        foreach ($key in $Obj.Keys) {
-          $value = $Obj[$key]
-          if ($null -eq $value) {
-            Write-Host "${indentation}$key = $null"
-          }
-          elseif ($value -is [System.Collections.IEnumerable] -and -not ($value -is [string])) {
-            Write-Host "${indentation}$key = ,@"
-            Write-PrettyR -Obj $value -Level ($Level + 1)
-          }
-          else {
-            Write-Host "${indentation}$key = $value"
-          }
-        }
-      }
-      elseif ($Obj -is [System.Collections.IEnumerable] -and -not ($Obj -is [string])) {
-        foreach ($item in $Obj) {
-          Write-PrettyR -Obj $item -Level $Level
-        }
-      }
-      else {
-        Write-Host "${indentation}$Obj"
-      }
-    }
-
-    # Call the recursive function with the current pipeline object
-    Write-PrettyR -Obj $InputObject
-  }
-}
+$script:completions_npm_export_version = [semver]'0.1.1'
+$script:completions_npm_version = $(npm --version).Trim()
+$script:completions_npm_path = (Join-Path $HOME ".completions.npm")
 
 function Export-CompletionsNpmClixml {
   Param(
@@ -96,7 +50,15 @@ function Export-CompletionsNpmClixml {
   $segmentsNow = @('npm', 'access', 'set', 'mfa=none|publish|automation') # 5 5 2 1
   #>
 
-  $npm = [ordered]@{}
+  $npm = [ordered]@{
+    '$sflags' = [ordered]@{
+      '-l' = $null
+    }
+    '$flags' = [ordered]@{
+      '--version' = $null
+      '--help' = $null
+    }
+  }
 
   # 'all'
   # 'usageNew'
@@ -252,10 +214,10 @@ function Export-CompletionsNpmClixml {
       }
     }
 
-    if ($line -match '^aliases:') {
-      $aliases = $line -replace '^aliases:\s+', '' -split "," | ForEach-Object {$_.Trim()}
+    if ($line -match '^alias(es)?:') {
+      $aliases = $line -replace '^alias(es)?:\s+', '' -split "," | ForEach-Object {$_.Trim()}
       foreach ($alias in $aliases) {
-        $whitelist = @('run')
+        $whitelist = @('run', 'add', 'list', 'upgrade', 'author')
         if ($whitelist -notcontains $alias) {
           # dont recommend unless whitelisted
           continue
@@ -268,12 +230,12 @@ function Export-CompletionsNpmClixml {
   }
 
   $toReturn = @{
-    export_version         = $script:export_version.ToString();
-    npm_version            = $script:npm_version;
+    export_version         = $script:completions_npm_export_version.ToString();
+    npm_version            = $script:completions_npm_version;
     tree                   = $npm;
   }
 
-  $toReturn | Export-Clixml -Path $script:path
+  $toReturn | Export-Clixml -Path $script:completions_npm_path
 
   if ($PassThru) {
     $toReturn
@@ -286,7 +248,7 @@ function Get-NpmRun {
   # cache the results based on cwd
   $cwd = Get-Location
   $cache = Get-Variable $script:completions_npm_run_var -Scope global -ErrorAction SilentlyContinue
-  if ($null -ne $cache) {
+  if ($null -ne $cache -and $null -ne $cache.Value) {
     # Write-Host "maybe fast"
     if ($cache.Value.ContainsKey("$cwd")) {
       # Write-Host "fast"
@@ -295,6 +257,12 @@ function Get-NpmRun {
   }
 
   $results = npm run-script --foreground-scripts
+
+  if ($LASTEXITCODE -ne 0) {
+    Set-Variable $script:completions_npm_run_var -Scope global -Value @{}
+    return @()
+  }
+
   $lines = $results -split "`r?`n"
 
   # ready -> lifecycle -> cmd -> skip
@@ -367,12 +335,12 @@ function Get-CompletionsNpm {
 
   $clixml = $null
 
-  if (-not (Test-Path $script:path -ErrorAction SilentlyContinue)) {
-    $clixml = Export-CompletionsNpm -PassThru
+  if (-not (Test-Path $script:completions_npm_path -ErrorAction SilentlyContinue)) {
+    $clixml = Export-CompletionsNpmClixml -PassThru
   }
 
   if ($null -eq $clixml) {
-    $clixml = Import-Clixml -Path $script:path
+    $clixml = Import-Clixml -Path $script:completions_npm_path
   }
 
   $npm = $clixml.tree
@@ -382,7 +350,12 @@ function Get-CompletionsNpm {
   $last = $parts | Select-Object -Last 1
 
   $options = @()
-  $allOptions = @(
+  $allOptions = 
+  @(
+    try {$npm['$sflags'].Keys} catch [System.Management.Automation.RuntimeException] {$null}
+  ) + @(
+    try {$npm['$flags'].Keys} catch [System.Management.Automation.RuntimeException] {$null}
+  ) + @(
     try {$npm[$base]['$sflags'].Keys} catch [System.Management.Automation.RuntimeException] {$null}
   ) + @(
     try {$npm[$base]['$flags'].Keys} catch [System.Management.Automation.RuntimeException] {$null}
@@ -401,17 +374,27 @@ function Get-CompletionsNpm {
   }
 
   if ($last.StartsWith('-')) {
+    $thisFlags = try {$npm[$base]['$flags'].Keys} catch [System.Management.Automation.RuntimeException] {$()}
+    $thisSFlags = try {$npm[$base]['$sflags'].Keys} catch [System.Management.Automation.RuntimeException] {$()}
+
     if ($last.StartsWith('--')) {
-      $options = $npm[$base]['$flags'].Keys
+      $options = $thisFlags
+      $options += $npm['$flags'].Keys
     } else {
-      $options = $npm[$base]['$sflags'].Keys
+      $options = $thisSFlags
+      $options += $npm['$sflags'].Keys
     }
-    # if we are complete, then don't use it
-    if ($npm[$base]['$flags'].Keys -contains $last -or $npm[$base]['$sflags'].Keys -contains $last) {
+
+    if (
+      $npm['$flags'].Keys -contains $last -or
+      $npm['$sflags'].Keys -contains $last -or
+      $thisFlags -contains $last -or
+      $thisSFlags -contains $last
+    ) {
       $options = @()
     } else {
       if (-not $allPossible) {
-        return $options
+        return $options | Where-Object {$_ -like "$last*"}
       }
     }
   }

@@ -1,8 +1,8 @@
 # Registers tab completions for komorebic
 . $PSScriptRoot/.TrimFzfTrigger.ps1
 
-$script:export_version = [semver]'0.1.0'
-$script:komorebic_version = $($(komorebic --version | Out-String) -replace 'komorebic','').Trim()
+$script:completions_komorebic_export_version = [semver]'0.1.0'
+$script:completions_komorebic_version = $($(komorebic --version | Out-String) -replace 'komorebic','').Trim()
 
 function Export-CompletionsKomorebicClixml {
   Param(
@@ -117,8 +117,8 @@ function Export-CompletionsKomorebicClixml {
   }`
 
   $toReturn = @{
-    export_version         = $script:export_version.ToString();
-    komorebic_version      = $script:komorebic_version;
+    export_version         = $script:completions_komorebic_export_version.ToString();
+    komorebic_version      = $script:completions_komorebic_version;
     primary_cmds           = $primary_cmds;
     primary_single         = $primary_single;
     primary_double         = $primary_double;
