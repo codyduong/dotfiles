@@ -4,5 +4,32 @@
   "default_workspace_padding": 10,
   "default_container_padding": 10,
   "focus_follows_mouse": "Komorebi",
-  "mouse_follows_focus": true
+  "mouse_follows_focus": true,
+  "resize_delta": 50,
+  "window_container_behaviour": "Create",
+  "cross_monitor_move_behaviour": "Insert",
+  "unmanaged_window_operation_behaviour": "Op",
+  "border_width": 2,
+  "border_offset": -1,
+  "active_window_border": true,
+  "active_window_border_colours": {
+    "single": {
+      "r": 66,
+      "g": 165,
+      "b": 245
+    },
+    "stack": {
+      "r": 0,
+      "g": 165,
+      "b": 66
+    },
+    "monocle": {
+      "r": 255,
+      "g": 51,
+      "b": 153
+    }
+  },
+  "window_hiding_behaviour": "Cloak",
+  "monitor_index_preferences": {},
+  "display_index_preferences": {}
 }

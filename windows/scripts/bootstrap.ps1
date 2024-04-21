@@ -127,6 +127,26 @@ $script:localFiles = '../.files'
 
 Copy-Item $PSScriptRoot/$localFiles/%USERPROFILE%/* -Recurse -Exclude *.md -Destination $HOME -ErrorAction SilentlyContinue
 
+## komorebi generates this using komorebic
+try {
+  komorebic fetch-app-specific-configuration | Out-Null
+
+  $__komorebic_config_path = Join-Path $HOME ".config/komorebi/komorebi.json"
+  $__komorebic_app_config_path = Join-Path $HOME ".config/komorebi/applications.yaml"
+
+  $jsonContent = Get-Content -Path $__komorebic_config_path | Out-String
+
+  $jsonObject = ConvertFrom-Json $jsonContent
+
+  $jsonObject | Add-Member -NotePropertyName "app_specific_configuration_path" -NotePropertyValue $__komorebic_app_config_path
+
+  $newJsonContent = ConvertTo-Json $jsonObject -Depth 10
+
+  Set-Content -Path $__komorebic_config_path -Value $newJsonContent
+} catch {
+  Write-Error $_
+}
+
 #############
 # Other Files
 #############

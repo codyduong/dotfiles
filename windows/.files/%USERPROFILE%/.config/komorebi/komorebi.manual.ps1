@@ -1,3 +1,8 @@
+# Tile console/pwsh
+komorebic manage-rule exe PowerShell.exe
+komorebic manage-rule exe conhost.exe
+komorebic manage-rule exe pwsh.exe
+
 # PowerToys Run
 komorebic.exe float-rule exe "PowerToys.PowerLauncher.exe"
 
