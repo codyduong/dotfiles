@@ -446,7 +446,7 @@ function Install-GitHubRelease {
 
     $Installed = Get-Command $Name -ErrorAction SilentlyContinue | Select-Object -ExpandProperty "Name" -ErrorAction SilentlyContinue
 
-    if ($Installed) {
+    if ($Installed -or ($Version -and $Version -ne "0.0.0")) {
         if ($updateOutdated -eq $true) {
             return Update-GitHubRelease $Version @PSBoundParameters
         }
@@ -522,6 +522,7 @@ function Update-GitHubRelease {
     }
     else {
         Write-Host "$Name $Version found, skipping..." -ForegroundColor $InstallationIndicatorColorFound
+        return $null
     }
 
     # If we have a NoAction, return the path for the callee to handle

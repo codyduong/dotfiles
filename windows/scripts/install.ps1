@@ -143,12 +143,13 @@ Install-Winget LGUG2Z.komorebi
 Install-GitHubRelease ahk AutoHotkey/AutoHotkey ".*\.exe"
 
 # yasb
-$script:__yasb_repo = [System.IO.Path]::Combine("$HOME",'yasb')
+$script:__yasb_repo = [System.IO.Path]::Combine("$HOME", 'yasb')
 
 if (Test-Path $__yasb_repo) {
   Push-Location $__yasb_repo;
-  git fetch & git pull;
-} else {
+  git fetch && git pull;
+}
+else {
   git clone https://github.com/da-rth/yasb.git $__yasb_repo
   Push-Location $__yasb_repo
 }
@@ -176,7 +177,7 @@ New-Item $PowerToysPluginsPath -ItemType Directory -Force -ErrorAction SilentlyC
 # EverythingPowerToys
 $script:EverythingPowerToysZip = $(Install-GitHubRelease lin-ycv/EverythingPowerToys lin-ycv/EverythingPowerToys ".*-x64\.zip$" -NoAction -Version $(
   (Get-Content -Path $(Join-Path $PowerToysPluginsPath "Everything\plugin.json") -Raw -ErrorAction SilentlyContinue | ConvertFrom-Json -ErrorAction SilentlyContinue).Version ?? "0.0.0"
-))
+  ))
 if ($null -ne $EverythingPowerToysZip) {
   Expand-Archive -LiteralPath $EverythingPowerToysZip -DestinationPath $env:TEMP -Force
   Copy-Item -Path $(Join-Path $env:TEMP "Everything") -Destination $PowerToysPluginsPath -Recurse -Force
@@ -254,6 +255,10 @@ Install-GitHubRelease msys2 msys2/msys2-installer "msys2-x86_64-latest\.exe$" -v
 
 # install mingw
 # Write-Verbose "$(& $msys2Path\bash.exe -c "pacman -Syu base-devel mingw-w64-ucrt-x86_64-toolchain --noconfirm")"
+$script:__mingw_installer = "$PSScriptRoot/mingw.sh"
+$script:__mingw_normalized = & "$script:msys2Path\bash.exe" -c "cygpath -u `"$script:__mingw_installer`"" 2>&1
+& "$msys2Path\bash.exe" -c "chmod +x $script:__mingw_normalized"
+& "$msys2Path\bash.exe" -c $script:__mingw_normalized
 
 Write-Host "`nC#/DotNet" -ForegroundColor "Cyan"
 Install-Winget Microsoft.DotNet.SDK.8
