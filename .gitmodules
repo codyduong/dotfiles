@@ -1,0 +1,3 @@
+[submodule "windows/.files/%LOCALAPPDATA%/nvim"]
+	path = windows/.files/%LOCALAPPDATA%/nvim
+	url = https://github.com/codyduong/nvim

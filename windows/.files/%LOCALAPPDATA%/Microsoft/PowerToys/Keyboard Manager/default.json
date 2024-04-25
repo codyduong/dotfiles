@@ -13,12 +13,24 @@
   "remapShortcuts": {
     "global": [
       {
-        "originalKeys": "91;68",
-        "newRemapKeys": "164;68"
+        "originalKeys": "260;68",
+        "operationType": 0,
+        "secondKeyOfChord": 0,
+        "newRemapKeys": "18;68"
       },
       {
-        "originalKeys": "260;160;87",
-        "newRemapKeys": "164;115"
+        "originalKeys": "260;70",
+        "newRemapKeys": "256"
+      },
+      {
+        "originalKeys": "260;77",
+        "newRemapKeys": "256"
+      },
+      {
+        "originalKeys": "260;16;87",
+        "operationType": 0,
+        "secondKeyOfChord": 0,
+        "newRemapKeys": "18;115"
       }
     ],
     "appSpecific": []

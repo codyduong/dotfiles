@@ -451,3 +451,8 @@ NotificationSchema() {
 SocketSchema() {
     RunWait("komorebic.exe socket-schema", , "Hide")
 }
+
+ToggleZen() {
+    ToggleMonocle()
+    ToggleMaximize()
+}
