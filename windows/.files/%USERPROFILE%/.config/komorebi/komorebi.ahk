@@ -77,7 +77,9 @@ CompleteConfiguration()
 
 ; Manipulate windows
 #Space::ToggleFloat()
+#+x::ToggleMaximize()
 #+f::ToggleMonocle()
+#+z::ToggleZen()
 
 ; Window manager options
 #+r::Retile()
