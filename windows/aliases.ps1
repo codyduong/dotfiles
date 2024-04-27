@@ -4,16 +4,17 @@ Get-ChildItem -Path "./aliases"
 | ForEach-Object -process { Invoke-Expression ". '$_'" }
 
 # curl: Use `curl.exe` if available
-if (Get-Command curl.exe -ErrorAction SilentlyContinue | Test-Path) {
-    Remove-Item alias:curl -ErrorAction SilentlyContinue
-    # Set `ls` to call `ls.exe` and always use --color
-    ${function:curl} = { curl.exe @args }
-    # Gzip-enabled `curl`
-    ${function:gurl} = { curl --compressed @args }
-}
-else {
-    # Gzip-enabled `curl`
-    ${function:gurl} = { curl -TransferEncoding GZip }
+if (Get-Command curl.exe -ErrorAction SilentlyContinue | Test-Path)
+{
+  Remove-Item alias:curl -ErrorAction SilentlyContinue
+  # Set `ls` to call `ls.exe` and always use --color
+  ${function:curl} = { curl.exe @args }
+  # Gzip-enabled `curl`
+  ${function:gurl} = { curl --compressed @args }
+} else
+{
+  # Gzip-enabled `curl`
+  ${function:gurl} = { curl -TransferEncoding GZip }
 }
 
 # Create a new directory and enter it
