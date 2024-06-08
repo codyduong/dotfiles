@@ -1,0 +1,39 @@
+[include]
+  path = ~/.gitconfig_private
+
+[filter "lfs"]
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+  clean = git-lfs clean -- %f
+
+[core]
+	autocrlf = false
+  eol = lf
+  pager = delta
+
+[interactive]
+  diffFilter = delta --color-only
+
+[delta]
+  navigate = true
+  dark = true
+
+[merge]
+  conflictstyle = diff3
+
+[diff]
+  colorMoved = default
+
+[user]
+	name = Cody Duong
+  email = duongcody507@gmail.com
+
+[credential]
+  helper = C:/Users/duong/AppData/Local/Programs/Git\\ Credential\\ Manager/git-credential-manager.exe
+
+[credential "https://dev.azure.com"]
+  useHttpPath = true
+
+[credential "github.com"]
+	useHttpPath = true
