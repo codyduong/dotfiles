@@ -7,10 +7,11 @@ param (
 . $PSScriptRoot\utils.ps1
 . $PSScriptRoot\..\functions.ps1
 
-if ($update.IsPresent) {
+if ($update.IsPresent)
+{
   $Env:UPDATE_OUTDATED_DEPS = $update
-}
-else {
+} else
+{
   InstallerPromptUpdateOutdated
 }
 
@@ -42,16 +43,21 @@ Install-Winget junegunn.fzf
 Install-Winget gerardog.gsudo
 Install-Winget ajeetdsouza.zoxide
 Install-Winget sharkdp.bat
+Install-Winget dandavison.delta
+# scoop install yazi
+# scoop install unar jq poppler
 
 ### Install oh-my-posh and dependencies
 Install-Winget JanDeDobbeleer.OhMyPosh
 Install-PowerShell -Name Terminal-Icons -Repository PSGallery -Force
-if ($true) {
+if ($true)
+{
   $script:TerminalIconsForkPath = (Join-Path $env:USERPROFILE "Terminal-Icons")
   $script:TerminalIconsCloned = $false
 
   # Clone a fork of Terminal-Icons
-  if (-not (Test-Path -Path $TerminalIconsForkPath -PathType Container)) {
+  if (-not (Test-Path -Path $TerminalIconsForkPath -PathType Container))
+  {
     Write-Host "Cloning Terminal-Icons (fork) v$TerminalIconsVersion..." -ForegroundColor $InstallationIndicatorColorInstalling
     git clone https://github.com/codyduong/Terminal-Icons.git "$TerminalIconsForkPath"
     $script:TerminalIconsCloned = $true
@@ -60,17 +66,19 @@ if ($true) {
   # Pull if possible
   $script:gpOut = git -C "$TerminalIconsForkPath" pull
 
-  if ($gpOut -notlike '*Already up to date.*') {
+  if ($gpOut -notlike '*Already up to date.*')
+  {
     Write-Host "Pulling Terminal-Icons (fork)..." -ForegroundColor $InstallationIndicatorColorUpdating
-  }
-  else {
+  } else
+  {
     Write-Host "Terminal-Icons (fork) up to date." -ForegroundColor $InstallationIndicatorColorFound
   }
 
   # Install actual deps
   $script:manifestData = Import-PowerShellDataFile -Path (Join-Path $TerminalIconsForkPath "Terminal-Icons/Terminal-Icons.psd1")
 
-  foreach ($script:moduleName in $manifestData.RequiredModules) {
+  foreach ($script:moduleName in $manifestData.RequiredModules)
+  {
     Install-PowerShell -Name $moduleName -Force -RequiredVersion $moduleVersion
   }
 
@@ -78,32 +86,38 @@ if ($true) {
   $script:manifestData2 = Import-PowerShellDataFile -Path (Join-Path $TerminalIconsForkPath "requirements.psd1")
 
   # Remove similiar deps
-  foreach ($script:actDep in $manifestData.Keys) {
-    if ($manifestData2.ContainsKey($actDep)) {
+  foreach ($script:actDep in $manifestData.Keys)
+  {
+    if ($manifestData2.ContainsKey($actDep))
+    {
       $manifestData2.Remove($actDep)
     }
   }
 
   $script:psDependOptions = $manifestData2.PSDependOptions
 
-  $script:scope = if ($psDependOptions -and $psDependOptions.Target) {
+  $script:scope = if ($psDependOptions -and $psDependOptions.Target)
+  {
     $psDependOptions.Target
-  }
-  else {
+  } else
+  {
     'CurrentUser'
   }
 
-  foreach ($script:moduleName in $manifestData2.Keys) {
-    if ($moduleName -eq 'PSDependOptions') {
+  foreach ($script:moduleName in $manifestData2.Keys)
+  {
+    if ($moduleName -eq 'PSDependOptions')
+    {
       continue
     }
 
     $script:moduleVersion = $manifestData2[$moduleName]
 
-    if ($moduleVersion -eq 'latest') {
+    if ($moduleVersion -eq 'latest')
+    {
       Install-PowerShell -Name $moduleName -Force -Scope $scope
-    }
-    else {
+    } else
+    {
       Install-PowerShell -Name $moduleName -Force -RequiredVersion $moduleVersion -Scope $scope
     }
   }
@@ -111,26 +125,29 @@ if ($true) {
   $script:TerminalIconsVersion = (Import-PowerShellDataFile (Join-Path $TerminalIconsForkPath "Terminal-Icons/Terminal-Icons.psd1")).ModuleVersion
 
   # Build only if we haven't built the current version
-  if (-not (Test-Path -Path (Join-Path $TerminalIconsForkPath "Output/Terminal-Icons/$TerminalIconsVersion") -PathType Container)) {
-    if ($TerminalIconsCloned) {
+  if (-not (Test-Path -Path (Join-Path $TerminalIconsForkPath "Output/Terminal-Icons/$TerminalIconsVersion") -PathType Container))
+  {
+    if ($TerminalIconsCloned)
+    {
       Write-Host "Building Terminal-Icons (fork) $TerminalIconsVersion..." -ForegroundColor $InstallationIndicatorColorInstalling
-    }
-    else {
+    } else
+    {
       Write-Host "Building Terminal-Icons (fork) $TerminalIconsVersion..." -ForegroundColor $InstallationIndicatorColorUpdating
     }
     Push-Location
     Set-Location $TerminalIconsForkPath
     & (Join-Path $TerminalIconsForkPath "build.ps1")
     Pop-Location
-  }
-  else {
+  } else
+  {
     Write-Host "Terminal-Icons (fork) $TerminalIconsVersion found, skipping build..." -ForegroundColor $InstallationIndicatorColorFound
   }
 }
 
 # Install Meslo if not already installed
 $script:fonts = Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts'
-if (-not ($fonts.PSObject.Properties.name -contains 'Meslo LG S Bold Italic Nerd Font Complete Mono Windows Compatible (TrueType)')) {
+if (-not ($fonts.PSObject.Properties.name -contains 'Meslo LG S Bold Italic Nerd Font Complete Mono Windows Compatible (TrueType)'))
+{
   Invoke-ElevatedScript { oh-my-posh font install Meslo }
 }
 
@@ -145,11 +162,12 @@ Install-GitHubRelease ahk AutoHotkey/AutoHotkey ".*\.exe"
 # yasb
 $script:__yasb_repo = [System.IO.Path]::Combine("$HOME", 'yasb')
 
-if (Test-Path $__yasb_repo) {
+if (Test-Path $__yasb_repo)
+{
   Push-Location $__yasb_repo;
   git fetch && git pull;
-}
-else {
+} else
+{
   git clone https://github.com/da-rth/yasb.git $__yasb_repo
   Push-Location $__yasb_repo
 }
@@ -178,7 +196,8 @@ New-Item $PowerToysPluginsPath -ItemType Directory -Force -ErrorAction SilentlyC
 $script:EverythingPowerToysZip = $(Install-GitHubRelease lin-ycv/EverythingPowerToys lin-ycv/EverythingPowerToys ".*-x64\.zip$" -NoAction -Version $(
   (Get-Content -Path $(Join-Path $PowerToysPluginsPath "Everything\plugin.json") -Raw -ErrorAction SilentlyContinue | ConvertFrom-Json -ErrorAction SilentlyContinue).Version ?? "0.0.0"
   ))
-if ($null -ne $EverythingPowerToysZip) {
+if ($null -ne $EverythingPowerToysZip)
+{
   Expand-Archive -LiteralPath $EverythingPowerToysZip -DestinationPath $env:TEMP -Force
   Copy-Item -Path $(Join-Path $env:TEMP "Everything") -Destination $PowerToysPluginsPath -Recurse -Force
 }
@@ -220,15 +239,17 @@ Write-Host "`nRust" -ForegroundColor "Cyan"
 ### Rust
 # See https://github.com/rust-lang/rustup/pull/3047, on occasion it will read Unknown, add a custom GetCurrent ScriptBlock
 Install-Winget Rustlang.Rustup -GetCurrent {
-  try {
-    if ((Get-Command rustup -ErrorAction SilentlyContinue) -and ($(rustup --version) -match "(?<=rustup)\s*[\d\.]+")) {
+  try
+  {
+    if ((Get-Command rustup -ErrorAction SilentlyContinue) -and ($(rustup --version) -match "(?<=rustup)\s*[\d\.]+"))
+    {
       [version]($matches[0])
-    }
-    else {
+    } else
+    {
       [version]"0.0.0"
     }
-  }
-  catch {
+  } catch
+  {
     Write-Warning $_
     [version]"0.0.0"
   }
@@ -237,20 +258,34 @@ Install-Winget Rustlang.Rustup -GetCurrent {
 Write-Host "`nC/C++" -ForegroundColor "Cyan"
 $script:msys2Path = "C:\msys64\usr\bin"
 $script:mingwPath = "C:\msys64\ucrt64\bin"
+
+# https://github.com/rust-lang/pkg-config-rs/issues/51#issuecomment-346300858
+# WTF bruh -@codyduong
+
 # This has an superfluous call but idgaf. We really only care when the gcc version is updated, so use that as our baseline lib for when to upgrade
 $script:msys2Remote = Invoke-RestMethod https://api.github.com/repos/msys2/msys2-installer/releases/latest
 $script:msys2PackagesAsset = $msys2Remote.assets | Where-Object { $_.name -match "msys2-base-x86_64-latest.packages.txt" }
 $script:msys2PackagesTxt = Join-Path $env:TEMP "Github" $msys2PackagesAsset.name
 Invoke-WebRequest -Uri $msys2PackagesAsset.browser_download_url -OutFile $msys2PackagesTxt
-$script:msys2RemoteVersion = if (Get-Content -Path $msys2PackagesTxt | Where-Object { $_ -match "(?<=gcc-libs )(\d+\.\d+\.\d+)" }) { $matches[0] } else { "0.0.0" }
+$script:msys2RemoteVersion = if (Get-Content -Path $msys2PackagesTxt | Where-Object { $_ -match "(?<=gcc-libs )(\d+\.\d+\.\d+)" })
+{ $matches[0] 
+} else
+{ "0.0.0" 
+}
 $script:msys2LocalVersion = "0.0.0"
-try {
+try
+{
   $script:msys2LocalVersion = if (
     # We use head instead of cat because there is some fuckery going on with Neovim/bin/cat.exe being on PATH that sometimes blows up msys2 bash cat
     $(& $msys2Path\bash.exe -c "head /proc/version") -match "(?<=gcc version )\d+\.\d+\.\d+"
-  ) { $matches[0] } else { "0.0.0" }
+  )
+  { $matches[0] 
+  } else
+  { "0.0.0" 
+  }
+} catch
+{ Write-Warning $_ 
 }
-catch { Write-Warning $_ }
 Install-GitHubRelease msys2 msys2/msys2-installer "msys2-x86_64-latest\.exe$" -version $msys2LocalVersion -remoteVersion $msys2RemoteVersion
 
 # install mingw
@@ -287,7 +322,8 @@ Install-Winget OBSProject.OBSStudio
 
 ### PATCH W11
 # https://learn.microsoft.com/en-us/windows/release-health/windows11-release-information
-if (([Environment]::OSVersion.Version).Build -ge 22621) {
+if (([Environment]::OSVersion.Version).Build -ge 22621)
+{
   Install-Winget valinet.ExplorerPatcher
 }
 
@@ -298,10 +334,11 @@ Clear-PowershellAll
 # WSL
 #####
 Write-Host "`nInstalling WSL" -ForegroundColor "Yellow"
-try {
+try
+{
   wsl -v
-}
-catch {
+} catch
+{
   wsl --install
 }
 
@@ -314,6 +351,7 @@ reboot Windows for WSL to work properly
 "@ -ForegroundColor White
 Write-Host "  * Reloading shell automatically..." -ForegroundColor Cyan
 Write-Host "=======================================`n" -ForegroundColor White
-if (-not $update) {
+if (-not $update)
+{
   Invoke-Command { & "pwsh.exe" -NoLogo } -NoNewScope
 }

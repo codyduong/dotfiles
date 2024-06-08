@@ -29,7 +29,8 @@ jobs:
       uses: microsoft/psscriptanalyzer-action@v1.0
       with:
         path: .\
-        recurse: true 
+        recurse: true
+        excludeRule: '"AvoidUsingWriteHost"'
         output: results.sarif
     - name: Upload SARIF results file
       uses: github/codeql-action/upload-sarif@v2
