@@ -2,7 +2,7 @@
 . $PSScriptRoot/.TrimFzfTrigger.ps1
 
 $script:completions_komorebic_export_version = [semver]'0.1.0'
-$script:completions_komorebic_version = $($(komorebic --version) -replace 'komorebic','').Trim()
+$script:completions_komorebic_version = (($(komorebic --version) -split "`n")[0] -replace 'komorebic', '').Trim()
 
 function Export-CompletionsKomorebicClixml {
   Param(

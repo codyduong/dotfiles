@@ -1,18 +1,18 @@
 {
   "$schema": "https://raw.githubusercontent.com/LGUG2Z/komorebi/master/schema.json",
   "alt_focus_hack": true,
-  "default_workspace_padding": 10,
-  "default_container_padding": 10,
+  "default_workspace_padding": 0,
+  "default_container_padding": 8,
   "focus_follows_mouse": "Komorebi",
   "mouse_follows_focus": true,
   "resize_delta": 50,
   "window_container_behaviour": "Create",
   "cross_monitor_move_behaviour": "Insert",
   "unmanaged_window_operation_behaviour": "Op",
-  "border_width": 2,
-  "border_offset": -1,
-  "active_window_border": true,
-  "active_window_border_colours": {
+  "border_width": 1,
+  "border_offset": 0,
+  "border": true,
+  "border_colours": {
     "single": {
       "r": 66,
       "g": 165,
@@ -31,5 +31,55 @@
   },
   "window_hiding_behaviour": "Cloak",
   "monitor_index_preferences": {},
-  "display_index_preferences": {}
+  "display_index_preferences": {},
+  // "transparency": true,
+  "transparency_alpha": 200,
+  "float_rules": [
+    {
+      // Steam toast notifications
+      "id": "notificationtoasts_\\d+_desktop",
+      "kind": "Title",
+      "matching_strategy": "Regex"
+    },
+    {
+      // Steam friends list
+      "id": "Friends List",
+      "kind": "Title",
+      "matching_strategy": "Equals"
+    }
+  ],
+  "manage_rules": [
+    {
+      "id": "(?i)(powershell|pwsh)(\\.exe)?",
+      "kind": "Exe",
+      "matching_strategy": "Regex"
+    },
+    {
+      "id": "(?i)conhost(\\.exe)?",
+      "kind": "Exe",
+      "matching_strategy": "Regex"
+    },
+    {
+      "id": "(?i)steam",
+      "kind": "Title",
+      "matching_strategy": "Regex"
+    }
+  ],
+  "animation": {
+    "enabled": true,
+    "duration": 250,
+    "fps": 240,
+    "style": "Linear"
+  }
+  // "stackbar": {
+  //   "height": 16,
+  //   "mode": "OnStack",
+  //   "label": "Title",
+  //   "tabs": {
+  //     "width": 240,
+  //     "focused_text": "#ffffff",
+  //     "unfocused_text": "#c4c4c4",
+  //     "background": "#221f1f"
+  //   }
+  // }
 }

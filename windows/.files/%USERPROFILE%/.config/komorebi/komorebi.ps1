@@ -11,9 +11,6 @@ if (!(Get-Process ahk -ErrorAction SilentlyContinue)) {
     ahk $(Join-Path $PSScriptRoot 'komorebi.ahk')
 }
 
-# . $PSScriptRoot\komorebi.generated.ps1
-. $PSScriptRoot\komorebi.manual.ps1
-
 # Retile
 komorebic retile
 

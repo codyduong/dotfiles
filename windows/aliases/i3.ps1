@@ -8,7 +8,7 @@ function i3 {
   )
 
   if ("start" -in $Remaining) {
-    komorebic start -a
+    komorebic start -a --ffm
     # load config
     & $(Join-Path $HOME '.config/komorebi/komorebi.ps1')
   }

@@ -129,7 +129,9 @@ Copy-Item $PSScriptRoot/$localFiles/%USERPROFILE%/* -Recurse -Exclude *.md -Dest
 
 ## komorebi generates this using komorebic
 try {
-  komorebic fetch-app-specific-configuration | Out-Null
+  # this breaks some of our config, so setup a application.yaml in dotfiles
+  # TODO maybe diff and update as needed? ignoring our lines?
+  # komorebic fetch-app-specific-configuration | Out-Null
 
   $__komorebic_config_path = Join-Path $HOME ".config/komorebi/komorebi.json"
   $__komorebic_app_config_path = Join-Path $HOME ".config/komorebi/applications.yaml"
