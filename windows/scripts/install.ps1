@@ -159,20 +159,6 @@ Install-Winget LGUG2Z.komorebi
 # AutoHotkey
 Install-GitHubRelease ahk AutoHotkey/AutoHotkey ".*\.exe"
 
-# yasb
-$script:__yasb_repo = [System.IO.Path]::Combine("$HOME", 'yasb')
-
-if (Test-Path $__yasb_repo)
-{
-  Push-Location $__yasb_repo;
-  git fetch && git pull;
-} else
-{
-  git clone https://github.com/da-rth/yasb.git $__yasb_repo
-  Push-Location $__yasb_repo
-}
-Pop-Location
-
 ###################
 # WezTerm
 # tmux for windows!
