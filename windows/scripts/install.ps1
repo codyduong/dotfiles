@@ -37,7 +37,7 @@ Install-PowerShell -Name CompletionPredictor -Scope CurrentUser -Force -SkipPubl
 Install-PowerShell Posh-Git -Scope CurrentUser -Force
 Install-PowerShell -Name PSFzf -Scope CurrentUser -Force -SkipPublisherCheck -RequiredVersion 2.5.22 
 Install-PowerShell PSProfiler -Scope CurrentUser -Force -SkipPublisherCheck -AllowPrerelease
-Install-PowerShell PSReadLine -AllowPrerelease -Scope CurrentUser -Force -SkipPublisherCheck
+Install-PowerShell PSReadLine -AllowPrerelease -Scope CurrentUser -Force -SkipPublisherCheck -AllowClobber
 Install-PowerShell PSWindowsUpdate -Scope CurrentUser -Force
 Install-Winget junegunn.fzf
 Install-Winget gerardog.gsudo
