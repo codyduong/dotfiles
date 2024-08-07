@@ -1,26 +1,24 @@
-hitokage.debug(hitokage);
-
 local monitors = hitokage.monitor.get_all()
-local primary = hitokage.monitor.get_primary()
 
-hitokage.debug(monitors)
-
+--- @type BarArray
 local bars = {}
-for index, monitor in ipairs(monitors) do
+
+for _, monitor in ipairs(monitors) do
   if (monitor.model == "LG SDQHD") then
     goto continue
   end
 
-  table.insert(bars, hitokage.bar.create({
-    monitor = index - 1,
-    geometry = monitor.geometry,
+  table.insert(bars, hitokage.bar.create(monitor, {
     widgets = {
-      {Workspace = {}},
-      {Clock = {format = "%Y-%m-%d %H:%M:%S"}},
-      {Box = {}},
+      { Box = {} },
+      { Workspace = { halign = "Center", item_height = 22, item_width = 22 } },
+      { Clock = { format = "%a %b %u %r", halign = 'End' } },
     },
-    scale_factor = monitor.scale_factor,
-    id = monitor.id
+    width = monitor.geometry.width - 16,
+    offset = {
+      x = 8,
+      y = 8,
+    }
   }))
   ::continue::
 end
