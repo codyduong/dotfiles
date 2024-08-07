@@ -5,7 +5,7 @@ local config = {
 	-- use pwsh
 	default_prog = { "C:/Program Files/PowerShell/7/pwsh.exe", "-NoExit", "-NoLogo", "-command", "cls" },
 	font = wezterm.font_with_fallback({
-		{ family = "MesloLGS NF", weight = "Regular" },
+		{ family = "MesloLGS Nerd Font Mono", weight = "Regular" },
 		"JetBrains Mono",
 		"Noto Color Emoji",
 	}),

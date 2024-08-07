@@ -278,7 +278,7 @@ function script:Find-PowerShellModule {
     $current_aVers = Get-Job | Where-Object Name -Match "$Name aVers"
     if ($current_aVers.count -le 0) {
         $job = Start-FindModuleThreadJob $name $version
-        $global:jobsToClean.Add($job)
+        $null = $global:jobsToClean.Add($job)
     }
 
     $job = Get-Job -Name "$Name aVers"
@@ -297,8 +297,8 @@ function script:Find-PowerShellModule {
 
     if ($AllowPrerelease) {
         $prerelease = $module['prerelease']
-        if ($null -eq $prerelease) {
-            return [PackageIs]::notinstalled
+        if ($null -eq $prerelease -or ($null -eq $prerelease[0])) {
+            return [PackageIs]::notinstalled, @($prerelease)
         }
         if ($prerelease[1] -gt $prerelease[0]) {
             return [PackageIs]::outdated, @($prerelease)
@@ -307,8 +307,9 @@ function script:Find-PowerShellModule {
     }
 
     $normal = $module['normal']
-    if ($null -eq $normal) {
-        return [PackageIs]::notinstalled
+
+    if ($null -eq $normal -or ($null -eq $normal[0])) {
+        return [PackageIs]::notinstalled, @($normal)
     }
     if ($normal[1] -gt $normal[0]) {
         return [PackageIs]::outdated, @($normal)
@@ -390,10 +391,8 @@ function Install-PowerShell {
     $i = $installed[0]
     $a = $installed[1]
 
-    # Write-Host $i $a
-
     if ($i -eq [PackageIs]::notinstalled) {
-        Write-Host "Installing $($Name)..." -ForegroundColor $InstallationIndicatorColorInstalling
+        Write-Host "Installing $($Name) $($a[1])..." -ForegroundColor $InstallationIndicatorColorInstalling
         Install-Module @($Name) @PSBoundParameters
     }
     elseif ($i -eq [PackageIs]::outdated -and $updateOutdated -eq $true) {
@@ -440,13 +439,20 @@ function Install-GitHubRelease {
         ${NoAction}
     )
 
-    $Version = if ($null -eq $version) { $(Invoke-Expression "$Name --version").TrimStart("v") | Convert-Version } else { $Version }
+    if ($null -eq $Version)
+    {
+        try {
+            $Version = $(Invoke-Expression "$Name --version").TrimStart("v") | Convert-Version
+        } catch [System.Management.Automation.RuntimeException] {
+            $Version = [semver]"0.0.0"
+        }
+    }
 
     $PSBoundParameters.Remove("Version") | Out-Null
 
     $Installed = Get-Command $Name -ErrorAction SilentlyContinue | Select-Object -ExpandProperty "Name" -ErrorAction SilentlyContinue
 
-    if ($Installed -or ($Version -and $Version -ne "0.0.0")) {
+    if ($null -ne $Installed -or ($null -ne $Version -and $Version -ne "0.0.0")) {
         if ($updateOutdated -eq $true) {
             return Update-GitHubRelease $Version @PSBoundParameters
         }
