@@ -29,9 +29,6 @@
 	name = Cody Duong
   email = duongcody507@gmail.com
 
-[credential]
-  helper = C:/Users/duong/AppData/Local/Programs/Git\\ Credential\\ Manager/git-credential-manager.exe
-
 [credential "https://dev.azure.com"]
   useHttpPath = true
 

@@ -1,32 +1,35 @@
 window {
   /* Be careful about setting values here, this also modifies the debugger appearance */
-  font-family: 'MesloLGS NF', 'Courier New', 'Bars', 'Font Awesome 5 Free';
-  font-size: 14px;
+  font-family: 'MesloLGS Nerd Font Mono', 'Courier New', 'Bars', 'Font Awesome 5 Free';
+  font-size: 12px;
+  color: #000000;
 }
 
 .bar {
-  background-color: rgba(29, 32, 33, 0.0);
-  color: #f2e5bc;
+  background-color: rgba(60, 56, 54, 1.0);
+  color: #ffffe0;
   
-  font-family: 'MesloLGS NF', 'Courier New', 'Bars', 'Font Awesome 5 Free';
-  font-size: 14px;
+  font-family: 'MesloLGS Nerd Font Mono', 'Courier New', 'Bars', 'Font Awesome 5 Free';
+  font-size: 12px;
+  line-height: 24px;
+  min-height: 24px;
 }
 
 .workspace {
-  padding: 0px 24px 0px 24px;
+  background-color: rgba(60, 56, 54, 1);
+  padding: 0px 0px 0px 8px;
   /* border: 1px solid rgba(255, 0, 0, 0.4); */
 }
 
 .workspacechild {
   /* distance between workspace children */
-  margin-left: 8px;
+  /* margin-left: 8px; */
   border: 1px solid rgba(168, 153, 132, 0.4);
 
-  color: #f2e5bc;
-  background-color: rgba(60, 56, 54, 0.4);
+  color: #ffffe0;
 
-  font-size: 11px;
-  border-radius: 11px;
+  font-size: 12px;
+  line-height: 12px;
 
   transition: all 500ms;
   transition-property: min-width, background-color;
@@ -37,16 +40,72 @@ window {
 }
 
 .workspacechild:selected {
-  min-width: 32px;
-  border: 1px solid #f2e5bc;
-  background-color: #f2e5bc;
-  color: #333333;
+  /* min-width: 32px; */
+  border: 1px solid #ffffe0;
+  background-color: #ffffe0;
+  color: rgba(60, 56, 54, 1.0);
   font-weight: bold;
 }
 
-.clock {
-  background-color: rgba(60, 56, 54, 1);
-  border-radius: 0px 0px 0px 24px;
-  padding-left: 32px;
-  padding-right: 16px;
+.data {
+  padding-right: 8px;
 }
+
+.bar-group {
+  background-color: rgba(60, 56, 54, 1);
+}
+
+.bar-group.left {
+  min-width: 160px;
+  border-radius: 0px 12px 12px 0px;
+}
+
+.bar-group.center {
+  margin-left: 8px;
+  padding-left: 8px;
+  padding-right: 8px;
+  border-radius: 12px;
+}
+
+.bar-group.right {
+  padding-left: 8px;
+  padding-right: 8px;
+  border-radius: 12px 0px 0px 12px;
+}
+
+.bar-group-extra {
+  font-size: 20px;
+  line-height: 24px;
+  color: rgba(60, 56, 54, 1);
+}
+
+.fix-spacing {
+  /* just centers the two elements in the center which aren't homogeneous */
+  margin-left: 8px;
+}
+
+.icon {
+  font-size: 20px;
+  line-height: 20px;
+  padding-top: 2px;
+  padding-right: 8px;
+  padding-bottom: 2px;
+  padding-left: 8px;
+  font-weight: bold;
+}
+
+/* .memory {
+  color: #fff;
+}
+
+.cpu {
+  color: #fff;
+} */
+
+/* .cpu.usage-10 {
+  color: #00ff00;
+}
+
+.cpu.usage-20 {
+  color: #ff0000;
+} */
