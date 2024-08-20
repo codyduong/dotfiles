@@ -147,6 +147,6 @@ function tmux_entry() {
 
   printf "\033]1337;SetUserVar=%s=%s\007" "TMUX" $(echo -n "1" | base64)
   command tmux -f "$tmux_config" "$@"
-  printf "\033]1337;SetUserVar=%s=%s\007" "TMUX" $(echo -n "0" | base64)
+  printf "\033]1337;SetUserVar=%s=\007" "TMUX"
 }
 alias tmux='tmux_entry'

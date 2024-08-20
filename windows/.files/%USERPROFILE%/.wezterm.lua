@@ -30,6 +30,7 @@ local config = {
 	use_fancy_tab_bar = false,
 	tab_max_width = 30,
 	adjust_window_size_when_changing_font_size = false,
+	window_decorations = "RESIZE",
 
 	-- use custom leaders
 	leader = { key = "_", mods = "SHIFT|CTRL|SUPER|ALT" },
@@ -281,8 +282,8 @@ local function is_in_nvim_pane(pane)
 		local base = basename(pname)
 		by_process = string.match(base, "vim") or string.match(base, "nvim")
 	end
-	-- this has to be set in init.lua in nvim or by smart-splits.nvim
-	return by_process or pane:get_user_vars().IS_NVIM == "true"
+	-- either attempt to use process name or deduce by iterm2
+	return by_process or nvimPanes[pane:pane_id()] == "1"
 end
 
 wezterm.on("window-config-reloaded", function(window, pane)
@@ -307,6 +308,7 @@ wezterm.on("format-tab-title", function(tab, tabs, panes, config, hover, max_wid
 	local foreground = nil
 	local background = nil
 
+	local process = basename(title)
 	local muxTab = wezterm.mux.get_tab(tab.tab_id)
 	local actualPanes = muxTab:panes_with_info()
 
@@ -367,18 +369,30 @@ wezterm.on("format-tab-title", function(tab, tabs, panes, config, hover, max_wid
 	prefix = " " .. tab.tab_index + 1 .. ": " .. prefix
 	suffix = suffix .. " "
 
+	if not hover then
+		title = process
+	end
+
 	local recalculated_max = max_width - (string.len(prefix) + string.len(suffix) + 1)
 	local truncated = string.sub(title, 1, 1 + recalculated_max)
 	local actually_truncated = truncated ~= title
+
 	if actually_truncated then
-		local tabIncrement = tabIncrements[tab.tab_id] or 0
-		local incrementAdjusted = math.max(0, (tabIncrement - 5)) // 10
+		if not tabIncrements[tab.tab_id] then
+			tabIncrements[tab.tab_id] = {0, os.clock() * 1000}
+		end
+		local tabIncrement = tabIncrements[tab.tab_id]
+		local incrementAdjusted = math.max(0, (tabIncrement[1] + 10))
 		if hover then
-			local speed = 2
-			if recalculated_max + incrementAdjusted >= string.len(title) + 5 then
-				tabIncrements[tab.tab_id] = 0
-			else
-				tabIncrements[tab.tab_id] = tabIncrement + speed
+			local current_time = os.clock() * 1000
+			local time_diff = current_time - tabIncrement[2];
+			-- 10 fps
+			if time_diff > 100 then
+				if recalculated_max + incrementAdjusted >= string.len(title) + 10 then
+					tabIncrements[tab.tab_id] = {0, os.clock()}
+				else
+					tabIncrements[tab.tab_id] = {tabIncrement[1] + 1, os.clock()}
+				end
 			end
 		end
 		truncated = string.sub(
@@ -435,14 +449,13 @@ wezterm.on("user-var-changed", function(window, pane, name, value)
 		return
 	end
 
-	-- TODO: use this for nvim inside of wsl
-	-- if (name == "NVIM" and value == "1") then
-	--   nvimPanes[paneId] = pane
-	--   return
-	-- elseif  (name == "NVIM") then
-	--   nvimPanes[paneId] = nil
-	--   return
-	-- end
+	if (name == "NVIM" and value == "1") then
+	  nvimPanes[paneId] = pane
+	  return
+	elseif  (name == "NVIM") then
+	  nvimPanes[paneId] = nil
+	  return
+	end
 end)
 
 wezterm.on("check-pane", function(window, pane)
@@ -567,32 +580,18 @@ wezterm.on("update-right-status", function(window, pane)
 	name = (isPlussed and name or (name .. " "))
 
 	if not key_table then
-		-- vim like
 		table.insert(cells, { Background = { Color = colors["teal"] } })
 		table.insert(cells, {
-			Text = " M: " .. wezterm.pad_left("NORMAL", 14) .. " ",
+			Text = " M: " .. wezterm.pad_left("normal", 8) .. " ",
+		})
+	else
+		table.insert(cells, { Background = { Color = colors["teal"] } })
+		table.insert(cells, {
+			Text = " M: " .. wezterm.pad_left(name, 8) .. " ",
 		})
 	end
 
-	if key_table then
-		-- vim like
-		if key_table == "resize" then
-			table.insert(cells, { Background = { Color = colors["teal"] } })
-			table.insert(cells, {
-				Text = " M: " .. wezterm.pad_left("RESIZE", 14) .. " ",
-			})
-		end
-
-		table.insert(cells, { Background = { Color = colors["teal"] } })
-		table.insert(cells, {
-			Text = " M: " .. wezterm.pad_left(name, 14) .. " ",
-		})
-
-		table.insert(cells, { Background = { Color = colors["teal_blue"] } })
-		table.insert(cells, {
-			Text = " L: " .. wezterm.pad_left(name .. mods .. (mods ~= "" and "-" or "") .. key, 14) .. " ",
-		})
-	elseif isPlussed then
+	if isPlussed then
 		table.insert(cells, { Background = { Color = colors["teal_blue"] } })
 		table.insert(cells, {
 			Text = " L: " .. wezterm.pad_left(name .. mods .. (mods ~= "" and "-" or "") .. key, 14) .. " ",

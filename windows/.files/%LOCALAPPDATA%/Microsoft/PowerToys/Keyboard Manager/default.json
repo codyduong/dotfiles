@@ -31,8 +31,16 @@
         "operationType": 0,
         "secondKeyOfChord": 0,
         "newRemapKeys": "18;115"
+      },
+      {
+        "originalKeys": "260;17;68",
+        "newRemapKeys": "256"
       }
     ],
+    "appSpecific": []
+  },
+  "remapShortcutsToText": {
+    "global": [],
     "appSpecific": []
   }
 }
