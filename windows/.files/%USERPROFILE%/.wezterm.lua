@@ -164,6 +164,8 @@ local config = {
 		},
 		nvim_leader = {},
 		nvim = {
+			{ key = "w", mods = "SHIFT|CTRL", action = act.CloseCurrentPane({ confirm = false }) },
+			{ key = "w", mods = "CTRL", action = act.SendKey({ key = "w", mods = "CTRL" }) },
 			{ key = "j", mods = "CTRL", action = act.SendKey({ key = "j", mods = "CTRL" }) },
 			{ key = "k", mods = "CTRL", action = act.SendKey({ key = "k", mods = "CTRL" }) },
 			{ key = "e", mods = "CTRL", action = act.SendKey({ key = "e", mods = "CTRL" }) },
@@ -283,7 +285,8 @@ local function is_in_nvim_pane(pane)
 		by_process = string.match(base, "vim") or string.match(base, "nvim")
 	end
 	-- either attempt to use process name or deduce by iterm2
-	return by_process or nvimPanes[pane:pane_id()] == "1"
+	wezterm.log_info(nvimPanes, pane:pane_id())
+	return by_process or nvimPanes[pane:pane_id()] ~= nil
 end
 
 wezterm.on("window-config-reloaded", function(window, pane)
@@ -449,6 +452,8 @@ wezterm.on("user-var-changed", function(window, pane, name, value)
 		return
 	end
 
+	wezterm.log_info(pane, name, value)
+	
 	if (name == "NVIM" and value == "1") then
 	  nvimPanes[paneId] = pane
 	  return

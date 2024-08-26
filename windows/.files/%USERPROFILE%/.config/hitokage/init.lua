@@ -93,7 +93,16 @@ for _, monitor in ipairs(monitors) do
                   homogeneous = false,
                   class = "center bar-group",
                   widgets = {
-                    { Label = { class = "icon clock", label = "\u{F00ED}", } },
+                    {
+											Weather = {
+												class = "icon",
+												latitude = 38.95773795883854,
+												longitude = -95.25382422045898,
+												format = "{{icon}}",
+											},
+										},
+										{ Weather = { class = "data", format = "{{temp_fahrenheit}} °F" } },
+                    { Label = { class = "icon clock date", label = "\u{F00ED}", } },
                     { Clock = { class = "data", format = "%a %b %e", halign = "End" } },
                     { Label = { class = "icon clock", label = reactive_clock_icon, } },
                     { Clock = { class = "data", format = "%r", halign = "End" } },

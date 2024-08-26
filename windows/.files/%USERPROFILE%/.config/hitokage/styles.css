@@ -87,11 +87,25 @@ window {
 .icon {
   font-size: 20px;
   line-height: 20px;
-  padding-top: 2px;
   padding-right: 8px;
-  padding-bottom: 2px;
   padding-left: 8px;
   font-weight: bold;
+}
+
+.weather.temp {
+  padding-right: 16px;
+}
+
+.weather.icon {
+  font-size: 24px;
+  line-height: 12px;
+  padding-left: 0px;
+  font-weight: bolder;
+}
+
+.date {
+  font-size: 18px;
+  line-height: 18px;
 }
 
 /* .memory {
