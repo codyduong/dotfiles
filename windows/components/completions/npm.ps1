@@ -1,7 +1,8 @@
 . $PSScriptRoot/.TrimFzfTrigger.ps1
 
 $script:completions_npm_export_version = [semver]'0.1.1'
-$script:completions_npm_version = $(npm --version).Trim()
+# holy fuck this is slow?
+# $script:completions_npm_version = $(npm --version).Trim()
 $script:completions_npm_path = (Join-Path $HOME ".completions.npm")
 
 function Export-CompletionsNpmClixml {
@@ -456,18 +457,11 @@ function Get-CompletionsNpm {
   return $allOptions
 }
 
-# function Get-CompletionsNpm {
-#   param(
-#     [Parameter()]
-#     [string]$string,
-  
-#     [Parameter()]
-#     [switch]$allPossible
-#   )
-#   # stub
-# }
-
 function Register-CompletionsNpm {
+  if (-not (Test-Path $script:completions_npm_path -ErrorAction SilentlyContinue)) {
+    Export-CompletionsNpmClixml
+  }
+
   $GetCompletionsNpmRef = ${function:Get-CompletionsNpm}
 
   Register-ArgumentCompleter -CommandName 'npm' -ScriptBlock {
