@@ -3,7 +3,8 @@
 # . $PSScriptRoot/npm.ps1
 
 $script:completions_yarn_export_version = [semver]'0.1.0'
-$script:completions_yarn_version = $(yarn --version).Trim()
+# holy fuck this is slow?
+# $script:completions_yarn_version = $(yarn --version).Trim()
 $script:completions_yarn_path = (Join-Path $HOME ".completions.yarn")
 
 function Export-CompletionsYarnClixml {
@@ -420,6 +421,10 @@ function Get-CompletionsYarn {
 }
 
 function Register-CompletionsYarn {
+  if (-not (Test-Path $script:completions_yarn_path -ErrorAction SilentlyContinue)) {
+    Export-CompletionsYarnClixml
+  }
+
   $GetCompletionsYarnRef = ${function:Get-CompletionsYarn}
 
   Register-ArgumentCompleter -CommandName 'yarn' -ScriptBlock {
