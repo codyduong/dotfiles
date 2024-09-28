@@ -58,7 +58,12 @@
       "matching_strategy": "Equals"
     },
     {
-      "id": "(?i)RobloxPlayerBeta(\\.exe)?",
+      "id": "(?i)RobloxPlayer(Beta)?(\\.exe)?",
+      "kind": "Exe",
+      "matching_strategy": "Regex"
+    },
+    {
+      "id": "(?i)CLIPStudio(\\.exe)?",
       "kind": "Exe",
       "matching_strategy": "Regex"
     }
