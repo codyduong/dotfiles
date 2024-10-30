@@ -62,18 +62,18 @@ for _, monitor in ipairs(monitors) do
 
   table.insert(
     bars,
-    hitokage.bar.create(monitor, {
-      widgets = {
+    monitor:attach({
+      children = {
         {
           Box = {
             halign = 'Start',
             hexpand = true,
-            widgets = {
+            children = {
               {
                 Box = {
                   class = "left bar-group",
                   halign = "Start",
-                  widgets = {
+                  children = {
                     { Workspace = { halign = "Start", item_height = 24, item_width = 24, format = "{{add index 1}}" } },
                   }
                 }
@@ -86,13 +86,13 @@ for _, monitor in ipairs(monitors) do
           Box = {
             halign = 'Center',
             hexpand = true,
-            widgets = {
+            children = {
               -- { Label = { label = "\u{E0B6}", class = "bar-group-extra fix-spacing" } },
               {
                 Box = {
                   homogeneous = false,
                   class = "center bar-group",
-                  widgets = {
+                  children = {
                     {
 											Weather = {
 												class = "icon",
@@ -117,19 +117,18 @@ for _, monitor in ipairs(monitors) do
           Box = {
             halign = 'End',
             hexpand = true,
-            widgets = {
+            children = {
               {
                 Box = {
                   halign = 'End',
                   hexpand = true,
-                  widgets = {
+                  children = {
                     -- { Label = { halign = "End", label = "\u{E0B6}", class = "bar-group-extra" } },
                     {
                       Box = {
                         halign = "End",
                         class = "right bar-group",
-                        widgets = {
-
+                        children = {
                           { Label = { class = "icon memory", label = "\u{EFC5}", } },
                           { Memory = { class = "data", format = mem_str, halign = "End" } },
                           { Label = { class = "icon", label = "\u{F4BC}" } },
@@ -155,29 +154,15 @@ end
 --- @type WorkspaceTable
 local workspaces = {}
 
---- @alias ClockTable table<number, Clock>
---- @type ClockTable
-local clocks = {}
-
---- @alias BoxesTable table<number, Box>
---- @type BoxesTable
-local boxes = {}
-
 for i, bar in ipairs(bars) do
   while not bar:is_ready() do
     hitokage.debug("waiting for bar to instantiate", i)
     coroutine.yield() -- yield to other processes to occur
   end
-  for _, widget in ipairs(bar:get_widgets()) do
-    hitokage.debug(widget)
-    if widget.type == "Clock" then
-      table.insert(clocks, widget)
-    end
-    if widget.type == "Workspace" then
-      table.insert(workspaces, widget)
-    end
-    if widget.type == "Box" then
-      table.insert(boxes, widget)
+  for _, child in ipairs(bar:get_children()) do
+    hitokage.debug(child)
+    if child.type == "Clock" then
+      table.insert(clocks, child)
     end
   end
 end

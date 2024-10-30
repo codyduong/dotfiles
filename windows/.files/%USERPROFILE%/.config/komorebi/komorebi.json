@@ -31,9 +31,39 @@
   },
   "window_hiding_behaviour": "Cloak",
   "monitor_index_preferences": {},
-  "display_index_preferences": {},
   // "transparency": true,
   "transparency_alpha": 200,
+  "display_index_preferences": {
+    "0": "ACI24A4-5&e3797cd&0&UID4353",
+    // dualup
+    "1": "GSM5BF4-5&e3797cd&0&UID4358",
+    // other
+    "2": "DELA0C3-5&e3797cd&0&UID4352",
+    // tablet
+    "3": "HAT2380-5&e3797cd&0&UID4355"
+  },
+  "monitors": [
+    {
+      "workspaces": [
+        {"name": "primary", "layout": "BSP"}
+      ]
+    },
+    {
+      "workspaces": [
+        {"name": "dualup","layout": "HorizontalStack"}
+      ]
+    },
+    {
+      "workspaces": [
+        {"name": "other", "layout": "HorizontalStack"}
+      ]
+    },
+    {
+      "workspaces": [
+        {"name": "tablet", "layout": "BSP"}
+      ]
+    }
+  ],
   "float_rules": [
     {
       // Steam toast notifications
@@ -58,13 +88,24 @@
       "matching_strategy": "Equals"
     },
     {
-      "id": "(?i)RobloxPlayer(Beta)?(\\.exe)?",
+      "id": "(?i)Roblox(Player|Studio)(Beta)?(\\.exe)?",
       "kind": "Exe",
       "matching_strategy": "Regex"
     },
     {
       "id": "(?i)CLIPStudio(\\.exe)?",
       "kind": "Exe",
+      "matching_strategy": "Regex"
+    },
+    {
+      "id": "(?i)bongo(\\.exe)?",
+      "kind": "Exe",
+      "matching_strategy": "Regex"
+    },
+    {
+      // OBS popup windows (and maybe other apps that use Qt)?
+      "id": "Qt(\\d)+QWindowIcon",
+      "kind": "Class",
       "matching_strategy": "Regex"
     }
   ],
