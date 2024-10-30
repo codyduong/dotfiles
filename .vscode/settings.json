@@ -1,5 +1,5 @@
 {
   "Lua.workspace.library": [
-    "c:\\Users\\duong\\hitokage\\hitokage-lua-lib\\",
+    "https://raw.githubusercontent.com/codyduong/hitokage/refs/heads/master/hitokage-lua-lib/src/hitokage.lua",
   ],
 }

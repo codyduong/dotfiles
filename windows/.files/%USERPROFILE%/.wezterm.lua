@@ -339,7 +339,8 @@ wezterm.on("format-tab-title", function(tab, tabs, panes, config, hover, max_wid
 			and panePane:has_unseen_output()
 		then
 			-- this works OK for increase/decrease font size in plain terminals, subterminals like nvim will still fail
-			background = "#DA627D"
+			-- background = "#DA627D"
+			-- @codyduong disabled because this was annoying -2024/10/21
 		end
 		if not status then
 			wezterm.log_info(err)
