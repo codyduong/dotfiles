@@ -8,6 +8,12 @@ function i3 {
   )
 
   if ("start" -in $Remaining) {
+    $ver = [semver](komorebic --version | Select-String -Pattern '\d+\.\d+\.\d+').Matches[0].Value
+    # if ($ver -ge [semver]"0.1.30") {
+    #   komorebic start --masir
+    # } else {
+    #   komorebic start --ffm
+    # }
     komorebic start --ffm
     # load config
     & $(Join-Path $HOME '.config/komorebi/komorebi.ps1')

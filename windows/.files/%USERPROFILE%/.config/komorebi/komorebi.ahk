@@ -40,7 +40,7 @@
 #+-::ResizeAxis("vertical", "decrease")
 
 ; Manipulate windows
-#Space::ToggleFloat()
+#+Space::ToggleFloat()
 #+x::ToggleMaximize()
 #+f::ToggleMonocle()
 #+z::ToggleZen()
