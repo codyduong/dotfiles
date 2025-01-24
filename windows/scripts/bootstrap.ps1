@@ -136,6 +136,11 @@ try {
   $__komorebic_config_path = Join-Path $HOME ".config/komorebi/komorebi.json"
   $__komorebic_app_config_path = Join-Path $HOME ".config/komorebi/applications.yaml"
 
+  $komorebicVer = [semver](komorebic --version | Select-String -Pattern '\d+\.\d+\.\d+').Matches[0].Value
+  if ($komorebicVer -ge [semver]"0.1.30") {
+    $__komorebic_app_config_path = Join-Path $HOME ".config/komorebi/applications.json"
+  }
+
   $jsonContent = Get-Content -Path $__komorebic_config_path | Out-String
 
   $jsonObject = ConvertFrom-Json $jsonContent

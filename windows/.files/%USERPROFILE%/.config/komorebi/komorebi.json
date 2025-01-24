@@ -1,16 +1,16 @@
 {
   "$schema": "https://raw.githubusercontent.com/LGUG2Z/komorebi/master/schema.json",
-  "alt_focus_hack": true,
   "default_workspace_padding": 0,
-  "default_container_padding": 8,
-  "focus_follows_mouse": "Komorebi",
-  // "mouse_follows_focus": true,
+  "default_container_padding": 0,
+  "focus_follows_mouse": "Komorebi", // masir has trouble on floating win
+  // "mouse_follows_focus": false, // causes some issues on floating win
   "resize_delta": 50,
   "window_container_behaviour": "Create",
   "cross_monitor_move_behaviour": "Insert",
   "unmanaged_window_operation_behaviour": "Op",
-  "border_width": 1,
+  "border_width": 2,
   "border_offset": 0,
+  "border_style": "Square",
   "border": true,
   "border_colours": {
     "single": {
@@ -45,45 +45,112 @@
   "monitors": [
     {
       "workspaces": [
-        {"name": "primary", "layout": "BSP"}
+        {
+          "name": "1",
+          "layout": "BSP",
+          "initial_workspace_rules": [
+            {
+              "id": "wezterm-gui.exe",
+              "kind": "Exe",
+              "matching_strategy": "Equals"
+            }
+          ]
+        },
+        {
+          "name": "2",
+          "layout": "BSP",
+          "initial_workspace_rules": [
+            {
+              "id": "Code.exe",
+              "kind": "Exe",
+              "matching_strategy": "Equals"
+            }
+          ]
+        },
+        {
+          "name": "3",
+          "layout": "BSP",
+          "initial_workspace_rules": [
+            {
+              "id": "steamwebhelper.exe",
+              "kind": "Exe",
+              "matching_strategy": "Equals"
+            }
+          ]
+        }
       ]
     },
     {
       "workspaces": [
-        {"name": "dualup","layout": "HorizontalStack"}
+        {
+          "name": "1",
+          "layout": "HorizontalStack",
+          "initial_workspace_rules": [
+            {
+              "id": "firefox.exe",
+              "kind": "Exe",
+              "matching_strategy": "Equals"
+            },
+            {
+              "id": "chrome.exe",
+              "kind": "Exe",
+              "matching_strategy": "Equals"
+            }
+          ]
+        }
       ]
     },
     {
       "workspaces": [
-        {"name": "other", "layout": "HorizontalStack"}
+        {
+          "name": "1",
+          "layout": "HorizontalStack",
+          "initial_workspace_rules": [
+            {
+              "id": "Discord.exe",
+              "kind": "Exe",
+              "matching_strategy": "Equals"
+            }
+          ]
+        }
       ]
     },
     {
       "workspaces": [
-        {"name": "tablet", "layout": "BSP"}
+        {
+          "name": "1",
+          "layout": "BSP",
+          "initial_workspace_rules": [
+            {
+              "id": "CLIPStudioPaint.exe",
+              "kind": "Exe",
+              "matching_strategy": "Equals"
+            },
+            {
+              "id": "CLIPStudio.exe",
+              "kind": "Exe",
+              "matching_strategy": "Equals"
+            }
+          ]
+        }
       ]
     }
   ],
-  "float_rules": [
+  "ignore_rules": [
+    [
+      {
+        "id": "steamwebhelper.exe",
+        "kind": "Exe",
+        "matching_strategy": "Regex"
+      },
+      {
+        "id": "notificationtoasts_\\d+_desktop",
+        "kind": "Title",
+        "matching_strategy": "Regex"
+      }
+    ],
     {
-      // Steam toast notifications
-      "id": "notificationtoasts_\\d+_desktop",
-      "kind": "Title",
-      "matching_strategy": "Regex"
-    },
-    {
-      // Steam friends list
-      "id": "Friends List",
-      "kind": "Title",
-      "matching_strategy": "Equals"
-    },
-    {
-      "id": "Steam Settings",
-      "kind": "Title",
-      "matching_strategy": "Equals"
-    },
-    {
-      "id": "(?i)cs(\\.exe)?",
+      "id": "(?i)cs(2)?(\\.exe)?",
       "kind": "Exe",
       "matching_strategy": "Equals"
     },
@@ -92,24 +159,87 @@
       "kind": "Exe",
       "matching_strategy": "Regex"
     },
-    {
-      "id": "(?i)CLIPStudio(\\.exe)?",
-      "kind": "Exe",
-      "matching_strategy": "Regex"
-    },
+    [
+      {
+        "id": "darktable",
+        "kind": "Title",
+        "matching_strategy": "DoesNotEqual"
+      },
+      {
+        "id": "darktable\\.exe",
+        "kind": "Exe",
+        "matching_strategy": "Regex"
+      }
+    ],
     {
       "id": "(?i)bongo(\\.exe)?",
       "kind": "Exe",
       "matching_strategy": "Regex"
-    },
-    {
-      // OBS popup windows (and maybe other apps that use Qt)?
-      "id": "Qt(\\d)+QWindowIcon",
-      "kind": "Class",
-      "matching_strategy": "Regex"
     }
   ],
+  "floating_applications": [
+    [
+      {
+        "id": "steamwebhelper\\.exe",
+        "kind": "Exe",
+        "matching_strategy": "Regex"
+      },
+      {
+        "id": "Steam",
+        "kind": "Title",
+        "matching_strategy": "DoesNotEqual"
+      }
+    ],
+    [
+      {
+        "id": "(?i)CLIPStudioPaint(\\.exe)?",
+        "kind": "Exe",
+        "matching_strategy": "Regex"
+      },
+      {
+        "id": "CLIP STUDIO PAINT",
+        "kind": "Title",
+        "matching_strategy": "DoesNotEqual"
+      }
+    ],
+    [
+      {
+        "id": "(?i)firefox\\.exe",
+        "kind": "Exe",
+        "matching_strategy": "Regex"
+      },
+      {
+        "id": "Library",
+        "kind": "Title",
+        "matching_strategy": "Equals"
+      }
+    ],
+    {
+      // OBS popup windows (and maybe other apps that use Qt)?
+      "id": "Qt\\d+QWindow(Icon|PopupDropShadowSaveBits)",
+      "kind": "Class",
+      "matching_strategy": "Regex"
+    },
+    // file explorer popup windows
+    [
+      {
+        "id": "explorer.exe",
+        "kind": "Exe",
+        "matching_strategy": "Equals"
+      },
+      {
+        "id": "NativeHWNDHost",
+        "kind": "Class",
+        "matching_strategy": "Equals"
+      }
+    ]
+  ],
   "manage_rules": [
+    {
+      "kind": "Exe",
+      "id": "steamwebhelper.exe",
+      "matching_strategy": "Equals"
+    },
     {
       "id": "(?i)(powershell|pwsh)(\\.exe)?",
       "kind": "Exe",
@@ -121,7 +251,7 @@
       "matching_strategy": "Regex"
     },
     {
-      "id": "(?i)steam",
+      "id": "(?i)OBS\\s+(\\d+\\.\\d+\\.\\d+).*",
       "kind": "Title",
       "matching_strategy": "Regex"
     }
@@ -129,8 +259,8 @@
   "animation": {
     "enabled": true,
     "duration": 250,
-    "fps": 240,
-    "style": "Linear"
+    "fps": 120,
+    "style": "EaseInBounce"
   }
   // "stackbar": {
   //   "height": 16,
