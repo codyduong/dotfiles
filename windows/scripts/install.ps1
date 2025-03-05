@@ -40,12 +40,17 @@ Install-PowerShell PSProfiler -Scope CurrentUser -Force -SkipPublisherCheck -All
 Install-PowerShell PSReadLine -AllowPrerelease -Scope CurrentUser -Force -SkipPublisherCheck -AllowClobber
 Install-PowerShell PSWindowsUpdate -Scope CurrentUser -Force
 Install-Winget junegunn.fzf
-Install-Winget gerardog.gsudo
+Install-Winget gerardog.gsudo # waiting for this release to remove gsudo https://devblogs.microsoft.com/commandline/introducing-sudo-for-windows/
 Install-Winget ajeetdsouza.zoxide
 Install-Winget sharkdp.bat
 Install-Winget dandavison.delta
-# scoop install yazi
-# scoop install unar jq poppler
+Install-Winget sxyazi.yazi
+Install-Winget BurntSushi.ripgrep.MSVC
+Install-Winget sharkdp.fd 
+Install-Winget jqlang.jq
+Install-Winget 7zip.7zip
+Install-Winget Gyan.FFmpeg
+Install-Winget ImageMagick.ImageMagick  
 
 ### Install oh-my-posh and dependencies
 Install-Winget JanDeDobbeleer.OhMyPosh
@@ -202,7 +207,7 @@ Install-Winget jftuga.less
 # Install-Powershell GoogleCloud -Scope CurrentUser
 # Todo enable once we configure a gcloud init prompt (see https://cloud.google.com/tools/powershell/docs/quickstart)
 Install-Winget Microsoft.Sysinternals.ProcessExplorer
-Install-Winget BurntSushi.ripgrep.MSVC
+Install-Winget pulumi
 
 Write-Host "`nInstalling Languages..." -ForegroundColor "Yellow"
 Write-Host "NodeJS" -ForegroundColor "Cyan"
@@ -214,10 +219,10 @@ npm install -g yarn
 
 Write-Host "`nPython" -ForegroundColor "Cyan"
 ### Python
-Install-Winget Python.Python.3.11
+Install-Winget Python.Python.3.13
 python -m pip install --upgrade pip -q
 # TODO these won't be in execution context upon first install
-pip install thefuck -q
+pip install https://github.com/nvbn/thefuck/archive/refs/tags/3.32.zip -q
 pip install pyenv-win --target $HOME\\.pyenv -q
 (Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | py -
 

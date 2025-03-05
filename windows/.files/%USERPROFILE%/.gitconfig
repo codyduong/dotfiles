@@ -28,9 +28,13 @@
 [user]
 	name = Cody Duong
   email = duongcody507@gmail.com
+  signingkey = ~/.ssh/id_ed25519.pub
 
 [credential "https://dev.azure.com"]
   useHttpPath = true
 
 [credential "github.com"]
 	useHttpPath = true
+
+[gpg]
+	format = ssh
