@@ -39,3 +39,9 @@ Update-EnvPathIfNot (Join-Path $env:ProgramFiles "\Neovim\bin")
 # https://stackoverflow.com/a/57403956/17954209
 # Update-EnvPathIfNot "C:\Qt\6.6.1\msvc2019_64\include"
 Update-EnvPathIfNot "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Scoop Apps"
+
+# pay-respects
+$env:_PR_LIB = @(
+  (Join-Path $env:APPDATA "pay-respects" "modules"),
+  (Join-Path $env:USERPROFILE ".cargo" "bin")
+) -join ';'

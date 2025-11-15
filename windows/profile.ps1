@@ -7,8 +7,14 @@ Push-Location (Split-Path -parent "$profile")
 "aliases",
 "scripts"
 | Where-Object { Test-Path "$_.ps1" } | ForEach-Object -process {
-    Write-Output "$_ : $(Measure-Command { Invoke-Expression ". .\$_.ps1" -ErrorAction Continue })"
+  $debug = if ($_ -eq "components" ) {
+    "-debug"
+  } else {
+    ""
   }
+  Write-Output "$_ : $(Measure-Command { Invoke-Expression ". .\$_.ps1 $debug" -ErrorAction Continue })"
+  # Invoke-Expression ". .\$_.ps1" -ErrorAction Continue
+}
 Pop-Location
 
 Import-Module alias-tips
