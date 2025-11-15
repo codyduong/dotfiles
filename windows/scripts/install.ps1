@@ -222,8 +222,6 @@ Write-Host "`nPython" -ForegroundColor "Cyan"
 Install-Winget Python.Python.3.13
 python -m pip install --upgrade pip -q
 # TODO these won't be in execution context upon first install
-pip install https://github.com/nvbn/thefuck/archive/refs/tags/3.32.zip -q
-pip install pyenv-win --target $HOME\\.pyenv -q
 (Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | py -
 
 Write-Host "`nRust" -ForegroundColor "Cyan"

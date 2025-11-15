@@ -34,13 +34,11 @@
   // "transparency": true,
   "transparency_alpha": 200,
   "display_index_preferences": {
-    "0": "ACI24A4-5&e3797cd&0&UID4353",
+    "0": "SAM78BB-5&e3797cd&0&UID4352",
     // dualup
     "1": "GSM5BF4-5&e3797cd&0&UID4358",
-    // other
-    "2": "DELA0C3-5&e3797cd&0&UID4352",
     // tablet
-    "3": "HAT2380-5&e3797cd&0&UID4355"
+    "2": "HAT2380-5&e3797cd&0&UID4353"
   },
   "monitors": [
     {
@@ -85,6 +83,7 @@
         {
           "name": "1",
           "layout": "HorizontalStack",
+          "layout_rules": {},
           "initial_workspace_rules": [
             {
               "id": "firefox.exe",
@@ -104,23 +103,13 @@
       "workspaces": [
         {
           "name": "1",
-          "layout": "HorizontalStack",
+          "layout": "BSP",
           "initial_workspace_rules": [
             {
               "id": "Discord.exe",
               "kind": "Exe",
               "matching_strategy": "Equals"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "workspaces": [
-        {
-          "name": "1",
-          "layout": "BSP",
-          "initial_workspace_rules": [
+            },
             {
               "id": "CLIPStudioPaint.exe",
               "kind": "Exe",
@@ -152,7 +141,7 @@
     {
       "id": "(?i)cs(2)?(\\.exe)?",
       "kind": "Exe",
-      "matching_strategy": "Equals"
+      "matching_strategy": "Regex"
     },
     {
       "id": "(?i)Roblox(Player|Studio)(Beta)?(\\.exe)?",
@@ -173,6 +162,21 @@
     ],
     {
       "id": "(?i)bongo(\\.exe)?",
+      "kind": "Exe",
+      "matching_strategy": "Regex"
+    },
+    {
+      "id": "(?i)kdenlive(\\.exe)?",
+      "kind": "Exe",
+      "matching_strategy": "Regex"
+    },
+    {
+      "id": "LeagueClient(Ux)?(\\.exe)?",
+      "kind": "Exe",
+      "matching_strategy": "Regex"
+    },
+    {
+      "id": "League of Legends(\\.exe)?",
       "kind": "Exe",
       "matching_strategy": "Regex"
     }
@@ -232,7 +236,12 @@
         "kind": "Class",
         "matching_strategy": "Equals"
       }
-    ]
+    ],
+    {
+      "id": "Sign in - Google Accounts( — Mozilla Firefox)?",
+      "kind": "Title",
+      "matching_strategy": "Regex"
+    }
   ],
   "manage_rules": [
     {

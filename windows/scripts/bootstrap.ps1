@@ -89,18 +89,14 @@ $script:bootstrapToPrepend = "`$script:pathToBootstrap = `"$PSCommandPath`"`r`n"
 $script:bootstrapToRun = "Invoke-Expression `"`$pathToBootstrap -skip:``$`$(`$skip.IsPresent) -update:``$`$(`$update.IsPresent) -linux:``$`$(`$linux.IsPresent)`"`r`n"
 $script:bootstrapAlias = Join-Path $aliasesDir "bootstrap.ps1"
 $script:bootstrapContent = ($bootstrapToPrepend + (Get-Content -Path $bootstrapAlias -Raw))
-$script:bootstrapLines = $bootstrapContent -split "`r`n"
+$script:bootstrapLines = [regex]::split($bootstrapContent, "`r?`n")
 for ($i = $bootstrapLines.Length; $i -ge 0; $i--) {
-  if ($bootstrapLines[$i] -match 'BUILD_START') {
+  if ($bootstrapLines[$i] -replace '\s','' -match '#BUILD_START') {
     $bootstrapLines[$i] = $bootstrapLines[$i] + "`r`n" + $bootstrapToRun
     break
   }
 }
 ($bootstrapLines -join "`r`n") | Set-Content -Path $bootstrapAlias
-
-## Setup thefuck alias
-$script:fuckPath = Join-Path $aliasesDir "fuck.ps1"
-"`$env:PYTHONIOENCODING=`"utf-8`"`r`n$(thefuck --alias)" | Set-Content -Path $fuckPath
 
 ## Setup oh-my-posh (precompute here to save time)
 # https://ohmyposh.dev/docs/configuration/debug-prompt <-- this prompt I never use, so manually disable it
@@ -158,6 +154,7 @@ try {
 # Other Files
 #############
 Copy-Item $PSScriptRoot/$localFiles/%LOCALAPPDATA%/* -Recurse -Exclude *.md -Destination $Env:LOCALAPPDATA -ErrorAction SilentlyContinue
+Copy-Item $PSScriptRoot/$localFiles/%APPDATA%/* -Recurse -Exclude *.md -Destination $Env:APPDATA -ErrorAction SilentlyContinue
 
 #####
 # WSL
