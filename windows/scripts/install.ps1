@@ -244,6 +244,10 @@ Install-Winget Rustlang.Rustup -GetCurrent {
   }
 }
 
+Write-Host "`nGo" -ForegroundColor "Cyan"
+### Go
+Install-Winget GoLang.Go
+
 Write-Host "`nC/C++" -ForegroundColor "Cyan"
 $script:msys2Path = "C:\msys64\usr\bin"
 $script:mingwPath = "C:\msys64\ucrt64\bin"

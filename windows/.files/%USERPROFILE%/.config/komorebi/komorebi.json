@@ -241,6 +241,11 @@
       "id": "Sign in - Google Accounts( — Mozilla Firefox)?",
       "kind": "Title",
       "matching_strategy": "Regex"
+    },
+    {
+      "id": "(?i)ProjectZomboid(64)?\\.exe",
+      "kind": "Exe",
+      "matching_strategy": "Regex"
     }
   ],
   "manage_rules": [
