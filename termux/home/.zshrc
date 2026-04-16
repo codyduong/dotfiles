@@ -75,11 +75,6 @@ alias la="ls -A"
 # ripgrep
 alias rg="rg --smart-case"
 
-# git shortcuts (supplement oh-my-zsh git plugin)
-alias gs="git status"
-alias gd="git diff"
-alias gl="git log --oneline -20"
-
 # ---------------------------------------------------------------------------
 # tmux helper (sets TMUX user var for wezterm integration when over SSH)
 # ---------------------------------------------------------------------------
