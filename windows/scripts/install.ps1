@@ -293,6 +293,16 @@ Install-Winget Microsoft.DotNet.SDK.8
 # Maybe install ilspycmd instead? https://github.com/icsharpcode/ILSpy/tree/master/ICSharpCode.ILSpyCmd
 # Install-GitHubRelease ilspy icsharpcode/ILSpy "ILSpy_Installer_.*-x64.msi$"
 
+################
+# Claude Code CLI
+################
+Write-Host "`nInstalling Claude Code..." -ForegroundColor "Yellow"
+if (Get-Command claude -ErrorAction SilentlyContinue) {
+  Write-Host "Claude Code already installed." -ForegroundColor $InstallationIndicatorColorFound
+} else {
+  irm https://claude.ai/install.ps1 | iex
+}
+
 ##############
 # Desktop Apps
 ##############

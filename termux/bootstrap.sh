@@ -125,11 +125,24 @@ else
 fi
 
 # ---------------------------------------------------------------------------
+# 4b. Claude Code
+# ---------------------------------------------------------------------------
+
+if has claude; then
+  warn "claude-code already installed"
+else
+  info "Installing Claude Code ..."
+  npm install -g @anthropic-ai/claude-code
+  ok "Claude Code installed"
+fi
+
+# ---------------------------------------------------------------------------
 # 5. Python extras
 # ---------------------------------------------------------------------------
 
 info "Installing Python extras ..."
-install_pkg python-pip python-pygments
+install_pkg python-pip
+pip install pygments
 
 # ---------------------------------------------------------------------------
 # 6. Zsh + Oh My Zsh
