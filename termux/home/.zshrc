@@ -4,7 +4,7 @@
 
 # Oh My Zsh
 export ZSH="$HOME/.oh-my-zsh"
-ZSH_THEME="agnoster"
+ZSH_THEME="fino-time"
 
 # Antigen (plugin manager)
 if [ -f "$HOME/antigen.zsh" ]; then
@@ -17,7 +17,6 @@ if [ -f "$HOME/antigen.zsh" ]; then
   antigen bundle common-aliases
   antigen bundle djui/alias-tips
   antigen bundle pip
-  antigen theme agnoster
   antigen apply
 else
   # Fallback: just load oh-my-zsh with basic plugins
@@ -44,11 +43,6 @@ SAVEHIST=50000
 
 # Cargo / Rust
 [ -d "$HOME/.cargo/bin" ] && export PATH="$HOME/.cargo/bin:$PATH"
-
-# nvm
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-[ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"
 
 # fzf
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh

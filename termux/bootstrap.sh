@@ -42,6 +42,21 @@ if [ ! -d "$HOME/storage" ]; then
 fi
 
 # ---------------------------------------------------------------------------
+# 0b. Nerd Font (needed for oh-my-zsh themes with powerline/icon glyphs)
+# ---------------------------------------------------------------------------
+
+if [ -f "$HOME/.termux/font.ttf" ]; then
+  warn "Nerd Font already installed"
+else
+  info "Installing MesloLGS Nerd Font ..."
+  mkdir -p "$HOME/.termux"
+  curl -fsSL -o "$HOME/.termux/font.ttf" \
+    https://github.com/ryanoasis/nerd-fonts/raw/HEAD/patched-fonts/Meslo/S/Regular/MesloLGSNerdFont-Regular.ttf
+  termux-reload-settings 2>/dev/null || true
+  ok "Nerd Font installed"
+fi
+
+# ---------------------------------------------------------------------------
 # 1. Core packages
 # ---------------------------------------------------------------------------
 
