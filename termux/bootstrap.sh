@@ -63,6 +63,7 @@ fi
 info "Installing core packages ..."
 install_pkg \
   git \
+  gh \
   curl \
   wget \
   openssh \
