@@ -1,128 +1,111 @@
-# If you come from bash you might have to change your $PATH.
-# export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
+# ---------------------------------------------------------------------------
+# Termux .zshrc
+# ---------------------------------------------------------------------------
 
-# Path to your Oh My Zsh installation.
+# Oh My Zsh
 export ZSH="$HOME/.oh-my-zsh"
-
-# Set name of the theme to load --- if set to "random", it will
-# load a random theme each time Oh My Zsh is loaded, in which case,
-# to know which specific one was loaded, run: echo $RANDOM_THEME
-# See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 ZSH_THEME="agnoster"
 
-# Set list of themes to pick from when loading at random
-# Setting this variable when ZSH_THEME=random will cause zsh to load
-# a theme from this variable instead of looking in $ZSH/themes/
-# If set to an empty array, this variable will have no effect.
-# ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )
+# Antigen (plugin manager)
+if [ -f "$HOME/antigen.zsh" ]; then
+  source "$HOME/antigen.zsh"
+  antigen use oh-my-zsh
+  antigen bundle git
+  antigen bundle command-not-found
+  antigen bundle zsh-users/zsh-autosuggestions
+  antigen bundle zsh-users/zsh-syntax-highlighting
+  antigen bundle common-aliases
+  antigen bundle djui/alias-tips
+  antigen bundle pip
+  antigen theme agnoster
+  antigen apply
+else
+  # Fallback: just load oh-my-zsh with basic plugins
+  plugins=(git)
+  source "$ZSH/oh-my-zsh.sh"
+fi
 
-source ~/antigen.zsh
-antigen use oh-my-zsh
-antigen bundle git
-antigen bundle command-not-found
-antigen bundle zsh-users/zsh-autosuggestions
-antigen bundle zsh-users/zsh-syntax-highlighting
-antigen bundle common-aliases
-antigen bundle djui/alias-tips
-antigen bundle pip
-# antigen bundle yarn
-# antigen bundle deno
-antigen theme agnoster
-antigen apply
+# ---------------------------------------------------------------------------
+# Environment
+# ---------------------------------------------------------------------------
 
+export LANG=en_US.UTF-8
+export EDITOR=nvim
+export VISUAL=nvim
 
-# Uncomment the following line to use case-sensitive completion.
-# CASE_SENSITIVE="true"
+# History
+HIST_STAMPS="yyyy-mm-dd"
+HISTSIZE=50000
+SAVEHIST=50000
 
-# Uncomment the following line to use hyphen-insensitive completion.
-# Case-sensitive completion must be off. _ and - will be interchangeable.
-# HYPHEN_INSENSITIVE="true"
+# ---------------------------------------------------------------------------
+# Tool initialization
+# ---------------------------------------------------------------------------
 
-# Uncomment one of the following lines to change the auto-update behavior
-# zstyle ':omz:update' mode disabled  # disable automatic updates
-# zstyle ':omz:update' mode auto      # update automatically without asking
-# zstyle ':omz:update' mode reminder  # just remind me to update when it's time
+# Cargo / Rust
+[ -d "$HOME/.cargo/bin" ] && export PATH="$HOME/.cargo/bin:$PATH"
 
-# Uncomment the following line to change how often to auto-update (in days).
-# zstyle ':omz:update' frequency 13
+# nvm
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"
 
-# Uncomment the following line if pasting URLs and other text is messed up.
-# DISABLE_MAGIC_FUNCTIONS="true"
+# fzf
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-# Uncomment the following line to disable colors in ls.
-# DISABLE_LS_COLORS="true"
+# zoxide (smart cd)
+if command -v zoxide >/dev/null 2>&1; then
+  eval "$(zoxide init zsh)"
+fi
 
-# Uncomment the following line to disable auto-setting terminal title.
-# DISABLE_AUTO_TITLE="true"
+# ---------------------------------------------------------------------------
+# Aliases
+# ---------------------------------------------------------------------------
 
-# Uncomment the following line to enable command auto-correction.
-# ENABLE_CORRECTION="true"
-
-# Uncomment the following line to display red dots whilst waiting for completion.
-# You can also set it to another string to have that shown instead of the default red dots.
-# e.g. COMPLETION_WAITING_DOTS="%F{yellow}waiting...%f"
-# Caution: this setting can cause issues with multiline prompts in zsh < 5.7.1 (see #5765)
-# COMPLETION_WAITING_DOTS="true"
-
-# Uncomment the following line if you want to disable marking untracked files
-# under VCS as dirty. This makes repository status check for large repositories
-# much, much faster.
-# DISABLE_UNTRACKED_FILES_DIRTY="true"
-
-# Uncomment the following line if you want to change the command execution time
-# stamp shown in the history command output.
-# You can set one of the optional three formats:
-# "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
-# or set a custom format using the strftime function format specifications,
-# see 'man strftime' for details.
-# HIST_STAMPS="mm/dd/yyyy"
-
-# Would you like to use another custom folder than $ZSH/custom?
-# ZSH_CUSTOM=/path/to/new-custom-folder
-
-# Which plugins would you like to load?
-# Standard plugins can be found in $ZSH/plugins/
-# Custom plugins may be added to $ZSH_CUSTOM/plugins/
-# Example format: plugins=(rails git textmate ruby lighthouse)
-# Add wisely, as too many plugins slow down shell startup.
-plugins=(git)
-
-source $ZSH/oh-my-zsh.sh
-
-# User configuration
-
-# export MANPATH="/usr/local/man:$MANPATH"
-
-# You may need to manually set your language environment
-# export LANG=en_US.UTF-8
-
-# Preferred editor for local and remote sessions
-# if [[ -n $SSH_CONNECTION ]]; then
-#   export EDITOR='vim'
-# else
-#   export EDITOR='nvim'
-# fi
-
-# Compilation flags
-# export ARCHFLAGS="-arch $(uname -m)"
-
-# Set personal aliases, overriding those provided by Oh My Zsh libs,
-# plugins, and themes. Aliases can be placed here, though Oh My Zsh
-# users are encouraged to define aliases within a top-level file in
-# the $ZSH_CUSTOM folder, with .zsh extension. Examples:
-# - $ZSH_CUSTOM/aliases.zsh
-# - $ZSH_CUSTOM/macos.zsh
-# For a full list of active aliases, run `alias`.
-#
-# Example aliases
-# alias zshconfig="mate ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
 alias cls="clear"
 alias reload="exec zsh"
+alias vim="nvim"
+alias vi="nvim"
 
-# cargo
-export PATH="/data/data/com.termux/files/home/.cargo/bin:$PATH"
+# bat as cat replacement (Termux package is 'bat')
+if command -v bat >/dev/null 2>&1; then
+  alias cat="bat --paging=never"
+  alias catp="bat"
+fi
 
-# bun
-export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
+# ls with color
+alias ls="ls --color=auto"
+alias ll="ls -lah"
+alias la="ls -A"
+
+# ripgrep
+alias rg="rg --smart-case"
+
+# git shortcuts (supplement oh-my-zsh git plugin)
+alias gs="git status"
+alias gd="git diff"
+alias gl="git log --oneline -20"
+
+# ---------------------------------------------------------------------------
+# tmux helper (sets TMUX user var for wezterm integration when over SSH)
+# ---------------------------------------------------------------------------
+
+function tmux_entry() {
+  local tmux_config="$HOME/.tmux.conf"
+
+  if [[ "$#" -gt 0 && "$1" == "-f" ]]; then
+    tmux_config="$2"
+    shift 2
+  fi
+
+  # Set iterm2/wezterm user var for tmux detection
+  printf "\033]1337;SetUserVar=%s=%s\007" "TMUX" "$(echo -n '1' | base64)"
+  command tmux -f "$tmux_config" "$@"
+  printf "\033]1337;SetUserVar=%s=\007" "TMUX"
+}
+alias tmux='tmux_entry'
+
+# Auto-attach to tmux session on Termux launch (if not already in tmux)
+if [ -z "$TMUX" ] && [ -n "$TERMUX_VERSION" ]; then
+  tmux_entry new-session -A -s main
+fi
