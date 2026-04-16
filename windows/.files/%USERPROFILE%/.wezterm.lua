@@ -313,6 +313,9 @@ wezterm.on("format-tab-title", function(tab, tabs, panes, config, hover, max_wid
 
 	local process = basename(title)
 	local muxTab = wezterm.mux.get_tab(tab.tab_id)
+	if muxTab == nil then
+		return " " .. (tab.tab_index + 1) .. ": " .. tab_title(tab) .. " "
+	end
 	local actualPanes = muxTab:panes_with_info()
 
 	for _, pane in ipairs(actualPanes) do
@@ -329,19 +332,19 @@ wezterm.on("format-tab-title", function(tab, tabs, panes, config, hover, max_wid
 		-- pcall this, since it is possible for .pane to fail try to grab it from mux after we've deleted it
 		local status, err = pcall(function()
 			panePane = pane.pane
+			-- If we change fontsize or any other action that modifies lines but not logically, don't mark as updated
+			if
+				panePane ~= nil
+				-- TODO, some programs that should provide update use this altscreen char and so we need to find alternative way
+				-- (panePane:is_alt_screen_active() ~= true) and -- nvim/less shouldn't have updates to report, this is just logical line change
+				and panesLogicalText[panePane:pane_id()] ~= panePane:get_logical_lines_as_text(2)
+				and panePane:has_unseen_output()
+			then
+				-- this works OK for increase/decrease font size in plain terminals, subterminals like nvim will still fail
+				-- background = "#DA627D"
+				-- @codyduong disabled because this was annoying -2024/10/21
+			end
 		end)
-		-- If we change fontsize or any other action that modifies lines but not logically, don't mark as updated
-		if
-			panePane ~= nil
-			-- TODO, some programs that should provide update use this altscreen char and so we need to find alternative way
-			-- (panePane:is_alt_screen_active() ~= true) and -- nvim/less shouldn't have updates to report, this is just logical line change
-			and panesLogicalText[panePane:pane_id()] ~= panePane:get_logical_lines_as_text(2)
-			and panePane:has_unseen_output()
-		then
-			-- this works OK for increase/decrease font size in plain terminals, subterminals like nvim will still fail
-			-- background = "#DA627D"
-			-- @codyduong disabled because this was annoying -2024/10/21
-		end
 		if not status then
 			wezterm.log_info(err)
 			goto continue
@@ -628,6 +631,13 @@ wezterm.on("scroll-half-down", function(window, pane)
 		wezterm.sleep_ms(1)
 		window:perform_action(act.ScrollByLine(1), pane)
 	end
+end)
+
+wezterm.on("pane-closed", function(pane)
+	local paneId = pane:pane_id()
+	tmuxPanes[paneId] = nil
+	nvimPanes[paneId] = nil
+	panesLogicalText[paneId] = nil
 end)
 
 wezterm.on("disable-unseen-temp", function(window, pane)
