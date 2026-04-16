@@ -113,26 +113,14 @@ else
 fi
 
 # ---------------------------------------------------------------------------
-# 4. nvm + Node.js
+# 4. Node.js
 # ---------------------------------------------------------------------------
-
-export NVM_DIR="$HOME/.nvm"
-
-if [ -d "$NVM_DIR" ]; then
-  warn "nvm already installed"
-else
-  info "Installing nvm ..."
-  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
-fi
-
-# Source nvm so we can use it now
-[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
 
 if has node; then
   warn "node $(node --version) already installed"
 else
-  info "Installing Node.js LTS via nvm ..."
-  nvm install --lts
+  info "Installing Node.js LTS ..."
+  install_pkg nodejs-lts
   ok "Node $(node --version) installed"
 fi
 
@@ -140,13 +128,8 @@ fi
 # 5. Python extras
 # ---------------------------------------------------------------------------
 
-if has pip; then
-  info "Installing Python extras ..."
-  pip install --upgrade pip
-  pip install pygments
-else
-  warn "pip not available, skipping Python extras"
-fi
+info "Installing Python extras ..."
+install_pkg python-pip python-pygments
 
 # ---------------------------------------------------------------------------
 # 6. Zsh + Oh My Zsh
@@ -164,7 +147,7 @@ if [ -f "$HOME/antigen.zsh" ]; then
   warn "antigen.zsh already present"
 else
   info "Downloading antigen ..."
-  curl -fsSL git.io/antigen > "$HOME/antigen.zsh"
+  curl -fsSL https://raw.githubusercontent.com/zsh-users/antigen/master/bin/antigen.zsh > "$HOME/antigen.zsh"
 fi
 
 # ---------------------------------------------------------------------------
@@ -222,7 +205,7 @@ echo ""
 ok "Bootstrap complete! Restart Termux or run: exec zsh"
 echo ""
 info "Installed: git, tmux, zsh, neovim, fzf, ripgrep, fd, bat, delta,"
-info "           jq, zoxide, rust, nvm/node, python, openssh"
+info "           jq, zoxide, rust, go, node, python, openssh"
 echo ""
 info "tmux config: ~/.tmux.conf  (Ctrl+Space prefix)"
 info "Termux keys: ~/.termux/termux.properties"
