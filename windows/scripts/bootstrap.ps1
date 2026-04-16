@@ -116,6 +116,14 @@ $script:ohMyPoshPath = Join-Path $componentDir "ohmyposh.ps1"
 $script:zoxidePath = Join-Path $aliasesDir "zoxide.ps1"
 zoxide init powershell | Set-Content -Path $script:zoxidePath
 
+################
+# Shared Files
+################
+$script:sharedHome = Join-Path $PSScriptRoot '..\..\shared\home'
+if (Test-Path $sharedHome) {
+  Copy-Item "$sharedHome\*" -Recurse -Destination $HOME -Force -ErrorAction SilentlyContinue
+}
+
 ##############
 # Config Files
 ##############

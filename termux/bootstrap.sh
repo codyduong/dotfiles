@@ -182,9 +182,14 @@ fi
 # 7. Deploy dotfiles
 # ---------------------------------------------------------------------------
 
+SHARED_HOME="$DOTFILES_DIR/shared/home"
+
+info "Deploying shared dotfiles from $SHARED_HOME ..."
+cp -rv "$SHARED_HOME/." "$HOME/"
+
 info "Deploying dotfiles from $TERMUX_HOME ..."
 
-# Copy home dotfiles
+# Copy home dotfiles (platform-specific overrides shared)
 cp -rv "$TERMUX_HOME/." "$HOME/"
 
 # Ensure .termux dir exists and copy termux-specific config

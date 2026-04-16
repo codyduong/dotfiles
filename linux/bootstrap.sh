@@ -277,6 +277,8 @@ _nvim() {
 }
 
 _dotfiles() {
+  echo "\033[1;34mMoving shared dotfiles to ~\033[0m"
+  sudo cp ~/dotfiles/shared/home/. -r ~/
   echo "\033[1;34mMoving dotfiles (home) to ~\033[0m"
   sudo cp ~/dotfiles/linux/home/. -r ~/
 }

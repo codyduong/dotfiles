@@ -4,25 +4,18 @@
 
 # Oh My Zsh
 export ZSH="$HOME/.oh-my-zsh"
-ZSH_THEME="fino-time"
-
 # Antigen (plugin manager)
-if [ -f "$HOME/antigen.zsh" ]; then
-  source "$HOME/antigen.zsh"
-  antigen use oh-my-zsh
-  antigen bundle git
-  antigen bundle command-not-found
-  antigen bundle zsh-users/zsh-autosuggestions
-  antigen bundle zsh-users/zsh-syntax-highlighting
-  antigen bundle common-aliases
-  antigen bundle djui/alias-tips
-  antigen bundle pip
-  antigen apply
-else
-  # Fallback: just load oh-my-zsh with basic plugins
-  plugins=(git)
-  source "$ZSH/oh-my-zsh.sh"
-fi
+source "$HOME/antigen.zsh"
+antigen use oh-my-zsh
+antigen bundle git
+antigen bundle command-not-found
+antigen bundle zsh-users/zsh-autosuggestions
+antigen bundle zsh-users/zsh-syntax-highlighting
+antigen bundle common-aliases
+antigen bundle djui/alias-tips
+antigen bundle pip
+antigen theme fino-time
+antigen apply
 
 # ---------------------------------------------------------------------------
 # Environment
